@@ -37,6 +37,10 @@ turtle-en: common-en
 	$(SOY_COMPILER) --outputPathFormat appengine/turtle/generated/en/soy.js --srcs appengine/turtle/template.soy
 	python build-app.py turtle en
 
+teacher-en: common-en
+	$(SOY_COMPILER) --outputPathFormat appengine/teacher/generated/en/soy.js --srcs appengine/teacher/template.soy
+	python build-app.py teacher en
+
 movie-en: common-en
 	$(SOY_COMPILER) --outputPathFormat appengine/movie/generated/en/soy.js --srcs appengine/movie/template.soy
 	python build-app.py movie en

@@ -70,6 +70,7 @@
   } catch (e) {
     // Don't even think of throwing an error.
   }
+
   script.src = appName + '/generated/' + lang +
       (debug ? '/uncompressed.js' : '/compressed.js');
   script.type = 'text/javascript';
