@@ -34,6 +34,126 @@ goog.require('Turtle.Blocks');
 goog.require('Turtle.soy');
 
 
+//myao this is the code to enable wilddog.
+var initWildDog = function(workspace){
+
+    var ref = new Wilddog("https://blocklypipe.wilddogio.com/blcklygamemsg");
+    
+    function guid() {
+      return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+        s4() + '-' + s4() + s4() + s4();
+    }
+
+    function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+    }
+    
+    var user_id = guid();
+    ref.remove();
+
+    // Listen to events on master workspace.
+    var remoteEvts = {};
+    
+    workspace.addChangeListener(function(masterEvent) {
+
+      if (masterEvent.type == Blockly.Events.UI) {
+        return;  // Don't mirror UI events.
+      }
+      
+      console.log("we are in mirrorEvent");
+
+      // Convert event to JSON.  This could then be transmitted across the net.
+      var json = masterEvent.toJson();
+      var wdmsg = {"sender":user_id, "blkmsg":json};
+      //console.log("event to be sent");
+      console.log(wdmsg);
+      
+      //we only use blockid and block type to hash the event.
+      //we can add more to fine tuen this in the future.
+      var blockid = masterEvent.blockId;
+      var blktype = masterEvent.type;
+      var groupid = masterEvent.group;
+      var evtKey = blockid+blktype;
+      console.log(remoteEvts);
+      console.log(groupid);
+      if(remoteEvts[groupid]){
+        //if we see this event for this block in the pool, we assume this was triggered
+        //by remote event.
+        console.log("triggered by remote");
+        
+        //should we use count ++  and count -- so we don't remove all the same type event?
+        //delete remoteEvts[evtKey];
+        //console.log(remoteEvts);
+        return;
+      }
+      //console.log(remoteEvts);
+      console.log("sending msg");
+      console.log(wdmsg);
+      
+      ref.push(wdmsg);
+    });
+    
+    ref.on("child_added", function(snapshot) {
+        console.log("We have event from wilddog");
+        var wdmsg = snapshot.val();
+        //console.log(msg);
+        if(!wdmsg){
+            console.log("Nothing in database, returen");
+            return;
+        }
+
+        if(wdmsg.sender == user_id){
+            console.log("ignore message from myself");
+            return;
+        }
+        var blkmsg =wdmsg.blkmsg;
+        
+        //blkmsg = msg;
+        console.log("receiving message");
+        console.log(blkmsg);
+      
+        var slaveEvent = Blockly.Events.fromJson(blkmsg, workspace);
+      
+        //console.log("recover event from json");
+        //console.log(slaveEvent);
+
+        try {
+
+            var sBlockid = slaveEvent.blockId;
+            var sBlktype = slaveEvent.type;
+            var sEvtKey = sBlockid+sBlktype;
+            //remoteEvts[sEvtKey] = true;
+            //console.log(remoteEvts);
+            //console.log(sEvtKey);
+            //console.log(slaveEvent);
+
+            //this run could cause trigger multiple events???
+            
+            var existingGroup = Blockly.Events.getGroup();
+            var groupid = existingGroup;
+            if (!existingGroup) {
+                Blockly.Events.setGroup(true);
+                groupid = Blockly.Events.getGroup();
+            }
+            console.log("groupid is " + groupid);
+            remoteEvts[groupid] = true;
+            slaveEvent.run(true);
+            if (!existingGroup) {
+                Blockly.Events.setGroup(false);
+            }    
+        } 
+        catch(err) {
+            document.getElementById("errmsg").innerHTML = err.message;
+        }
+    });
+
+}
+
+//myao end of the code to enable wilddog.
+
+
 BlocklyGames.NAME = 'turtle';
 
 /**
@@ -127,6 +247,8 @@ Turtle.init = function() {
        'trashcan': true,
        'zoom': BlocklyGames.LEVEL == BlocklyGames.MAX_LEVEL ?
            {'controls': true, 'wheel': true} : null});
+           
+  initWildDog( BlocklyGames.workspace );     
   // Prevent collisions with user-defined functions or variables.
   Blockly.JavaScript.addReservedWords('moveForward,moveBackward,' +
       'turnRight,turnLeft,penUp,penDown,penWidth,penColour,' +
