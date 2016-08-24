@@ -63,7 +63,7 @@
   var script = document.createElement('script');
   var debug = false;
   try {
-    debug = !!sessionStorage.getItem('debug');
+    debug = true;
     if (debug) {
       console.info('Loading uncompressed JavaScript.');
     }

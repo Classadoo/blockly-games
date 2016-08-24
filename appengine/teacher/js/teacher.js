@@ -34,119 +34,33 @@ goog.require('Turtle.Blocks');
 goog.require('Teacher.soy');
 
 
-//myao this is the code to enable wilddog.
-var initWildDog = function(workspace){
+/// Initialize listener for new students and publisher for teacher updates.
+var initWildDog = function(workspace, students_div){
 
-    var ref = new Wilddog("https://blocklypipe.wilddogio.com/blcklygamemsg");
-
-    function guid() {
-      return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-        s4() + '-' + s4() + s4() + s4();
-    }
-
-    function s4() {
-      return Math.floor((1 + Math.random()) * 0x10000)
-        .toString(16)
-        .substring(1);
-    }
-
-    var user_id = guid();
-    ref.remove();
-
-    // Listen to events on master workspace.
-    var remoteEvts = {};
+    var ref = new Wilddog("https://blocklypipe.wilddogio.com/users");
+    var user_id = "classadoo_instructor";
+    // TODO (delete this), we don't want to clear every student every time.
+    ref.set({"classadoo_instructor" : []});
+    var teacher = ref.child(user_id);
 
     workspace.addChangeListener(function(masterEvent) {
-
       if (masterEvent.type == Blockly.Events.UI) {
         return;  // Don't mirror UI events.
       }
+      console.log("Sending teacher event: ", masterEvent);
 
-      console.log("we are in mirrorEvent");
-
-      // Convert event to JSON.  This could then be transmitted across the net.
+      // Convert event to JSON for transmitting across the net.
       var json = masterEvent.toJson();
       var wdmsg = {"sender":user_id, "blkmsg":json};
-      //console.log("event to be sent");
-      console.log(wdmsg);
 
-      //we only use blockid and block type to hash the event.
-      //we can add more to fine tuen this in the future.
-      var blockid = masterEvent.blockId;
-      var blktype = masterEvent.type;
-      var groupid = masterEvent.group;
-      var evtKey = blockid+blktype;
-      console.log(remoteEvts);
-      console.log(groupid);
-      if(remoteEvts[groupid]){
-        //if we see this event for this block in the pool, we assume this was triggered
-        //by remote event.
-        console.log("triggered by remote");
-
-        //should we use count ++  and count -- so we don't remove all the same type event?
-        //delete remoteEvts[evtKey];
-        //console.log(remoteEvts);
-        return;
-      }
-      //console.log(remoteEvts);
-      console.log("sending msg");
-      console.log(wdmsg);
-
-      ref.push(wdmsg);
+      teacher.push(wdmsg);
     });
 
     ref.on("child_added", function(snapshot) {
-        console.log("We have event from wilddog");
-        var wdmsg = snapshot.val();
-        //console.log(msg);
-        if(!wdmsg){
-            console.log("Nothing in database, returen");
-            return;
-        }
-
-        if(wdmsg.sender == user_id){
-            console.log("ignore message from myself");
-            return;
-        }
-        var blkmsg =wdmsg.blkmsg;
-
-        //blkmsg = msg;
-        console.log("receiving message");
-        console.log(blkmsg);
-
-        var slaveEvent = Blockly.Events.fromJson(blkmsg, workspace);
-
-        //console.log("recover event from json");
-        //console.log(slaveEvent);
-
-        try {
-
-            var sBlockid = slaveEvent.blockId;
-            var sBlktype = slaveEvent.type;
-            var sEvtKey = sBlockid+sBlktype;
-            //remoteEvts[sEvtKey] = true;
-            //console.log(remoteEvts);
-            //console.log(sEvtKey);
-            //console.log(slaveEvent);
-
-            //this run could cause trigger multiple events???
-
-            var existingGroup = Blockly.Events.getGroup();
-            var groupid = existingGroup;
-            if (!existingGroup) {
-                Blockly.Events.setGroup(true);
-                groupid = Blockly.Events.getGroup();
-            }
-            console.log("groupid is " + groupid);
-            remoteEvts[groupid] = true;
-            slaveEvent.run(true);
-            if (!existingGroup) {
-                Blockly.Events.setGroup(false);
-            }
-        }
-        catch(err) {
-            document.getElementById("errmsg").innerHTML = err.message;
-        }
+      if (snapshot.key() != "classadoo_instructor")
+      {
+        initStudent(ref, students_div, snapshot.key(), user_id);
+      }
     });
 
 }
@@ -223,6 +137,7 @@ Turtle.init = function() {
     blocklyDiv.style.top = Math.max(10, top - window.pageYOffset) + 'px';
     blocklyDiv.style.left = rtl ? '10px' : '420px';
     blocklyDiv.style.width = (window.innerWidth - 440) + 'px';
+    blocklyDiv.style.height = window.innerHeight - 100 + 'px';
   };
   window.addEventListener('scroll', function() {
     onresize();
@@ -245,10 +160,12 @@ Turtle.init = function() {
        'rtl': rtl,
        'toolbox': toolbox,
        'trashcan': true,
+       'scrollbars' : false,
        'zoom': BlocklyGames.LEVEL == BlocklyGames.MAX_LEVEL ?
            {'controls': true, 'wheel': true} : null});
 
-  initWildDog( BlocklyGames.workspace );
+  var students = document.getElementById('students');
+  initWildDog( BlocklyGames.workspace, students );
   // Prevent collisions with user-defined functions or variables.
   Blockly.JavaScript.addReservedWords('moveForward,moveBackward,' +
       'turnRight,turnLeft,penUp,penDown,penWidth,penColour,' +

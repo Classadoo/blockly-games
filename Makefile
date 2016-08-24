@@ -41,6 +41,10 @@ teacher-en: common-en
 	$(SOY_COMPILER) --outputPathFormat appengine/teacher/generated/en/soy.js --srcs appengine/teacher/template.soy
 	python build-app.py teacher en
 
+teacher-dash-en: common-en
+	$(SOY_COMPILER) --outputPathFormat appengine/teacher_dash/generated/en/soy.js --srcs appengine/teacher_dash/template.soy
+	python build-app.py teacher_dash en
+
 movie-en: common-en
 	$(SOY_COMPILER) --outputPathFormat appengine/movie/generated/en/soy.js --srcs appengine/movie/template.soy
 	python build-app.py movie en
