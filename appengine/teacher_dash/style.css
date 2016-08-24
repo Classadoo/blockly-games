@@ -6,11 +6,9 @@ html[dir="RTL"] button.primary {
   text-align: right;
 }
 
-#my_blockly {
-  position: fixed;
-}
-#teacher_canvas {
-  position: fixed;
+.blockly {
+  height: 200px;
+  width: 1000px;
 }
 #display {
   border: 1px solid #ccc;

@@ -8,7 +8,6 @@ html[dir="RTL"] button.primary {
 
 #blockly {
   position: fixed;
-  bottom: 10px;
 }
 #display {
   border: 1px solid #ccc;

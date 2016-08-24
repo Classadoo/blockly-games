@@ -35,10 +35,10 @@ goog.require('Turtle.soy');
 
 
 //myao this is the code to enable wilddog.
-var initWildDog = function(workspace){
+var initWildDog = function(workspace, teacher_workspace){
 
-    var ref = new Wilddog("https://blocklypipe.wilddogio.com/blcklygamemsg");
-    
+    var ref = new Wilddog("https://blocklypipe.wilddogio.com/users");
+
     function guid() {
       return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
         s4() + '-' + s4() + s4() + s4();
@@ -49,110 +49,94 @@ var initWildDog = function(workspace){
         .toString(16)
         .substring(1);
     }
-    
+
     var user_id = guid();
-    ref.remove();
+    var me = ref.child(user_id);
+    var teacher = ref.child("classadoo_instructor");
 
-    // Listen to events on master workspace.
-    var remoteEvts = {};
-    
+    var events_in_progress = {};
     workspace.addChangeListener(function(masterEvent) {
-
       if (masterEvent.type == Blockly.Events.UI) {
         return;  // Don't mirror UI events.
       }
-      
-      console.log("we are in mirrorEvent");
 
-      // Convert event to JSON.  This could then be transmitted across the net.
-      var json = masterEvent.toJson();
-      var wdmsg = {"sender":user_id, "blkmsg":json};
-      //console.log("event to be sent");
-      console.log(wdmsg);
-      
-      //we only use blockid and block type to hash the event.
-      //we can add more to fine tuen this in the future.
-      var blockid = masterEvent.blockId;
-      var blktype = masterEvent.type;
-      var groupid = masterEvent.group;
-      var evtKey = blockid+blktype;
-      console.log(remoteEvts);
-      console.log(groupid);
-      if(remoteEvts[groupid]){
-        //if we see this event for this block in the pool, we assume this was triggered
-        //by remote event.
-        console.log("triggered by remote");
-        
-        //should we use count ++  and count -- so we don't remove all the same type event?
-        //delete remoteEvts[evtKey];
-        //console.log(remoteEvts);
+      if (events_in_progress[masterEvent.blockId] === true)
+      {
+        console.log("dropping remote");
+        events_in_progress[masterEvent.blockId] = false;
         return;
       }
-      //console.log(remoteEvts);
-      console.log("sending msg");
-      console.log(wdmsg);
-      
-      ref.push(wdmsg);
-    });
-    
-    ref.on("child_added", function(snapshot) {
-        console.log("We have event from wilddog");
-        var wdmsg = snapshot.val();
-        //console.log(msg);
-        if(!wdmsg){
-            console.log("Nothing in database, returen");
-            return;
-        }
 
-        if(wdmsg.sender == user_id){
-            console.log("ignore message from myself");
-            return;
-        }
-        var blkmsg =wdmsg.blkmsg;
-        
-        //blkmsg = msg;
-        console.log("receiving message");
-        console.log(blkmsg);
-      
-        var slaveEvent = Blockly.Events.fromJson(blkmsg, workspace);
-      
-        //console.log("recover event from json");
-        //console.log(slaveEvent);
 
-        try {
+      // Convert event to JSON for transmitting across the net.
+      var json = masterEvent.toJson();
+      var wdmsg = {"sender":user_id, "blkmsg":json};
 
-            var sBlockid = slaveEvent.blockId;
-            var sBlktype = slaveEvent.type;
-            var sEvtKey = sBlockid+sBlktype;
-            //remoteEvts[sEvtKey] = true;
-            //console.log(remoteEvts);
-            //console.log(sEvtKey);
-            //console.log(slaveEvent);
-
-            //this run could cause trigger multiple events???
-            
-            var existingGroup = Blockly.Events.getGroup();
-            var groupid = existingGroup;
-            if (!existingGroup) {
-                Blockly.Events.setGroup(true);
-                groupid = Blockly.Events.getGroup();
-            }
-            console.log("groupid is " + groupid);
-            remoteEvts[groupid] = true;
-            slaveEvent.run(true);
-            if (!existingGroup) {
-                Blockly.Events.setGroup(false);
-            }    
-        } 
-        catch(err) {
-            document.getElementById("errmsg").innerHTML = err.message;
-        }
+      console.log("Sending student event", masterEvent);
+      me.push(wdmsg);
     });
 
+    teacher.on("child_added", function(snapshot) {
+      var wdmsg = snapshot.val();
+      if(!wdmsg){
+          console.log("Nothing in database, return");
+          return;
+      }
+
+      var blkmsg = wdmsg.blkmsg;
+      var slaveEvent = Blockly.Events.fromJson(blkmsg, teacher_workspace);
+
+      try {
+
+        /// TODO(aheine): don't worry about what's remote here. Figure out this groupid stuff.
+          var existingGroup = Blockly.Events.getGroup();
+          var groupid = existingGroup;
+          if (!existingGroup) {
+              Blockly.Events.setGroup(true);
+              groupid = Blockly.Events.getGroup();
+          }
+          slaveEvent.run(true);
+          if (!existingGroup) {
+              Blockly.Events.setGroup(false);
+          }
+      }
+      catch(err) {
+          document.getElementById("errmsg").innerHTML = err.message;
+      }
+    });
+
+    me.on("child_added", function(snapshot) {
+      var wdmsg = snapshot.val();
+      if(!wdmsg){
+          console.log("Nothing in database, return");
+          return;
+      }
+      if (wdmsg.sender == user_id)
+      {
+        return;
+      }
+
+      var blkmsg = wdmsg.blkmsg;
+      var slaveEvent = Blockly.Events.fromJson(blkmsg, workspace);
+
+      try {
+          var existingGroup = Blockly.Events.getGroup();
+          var groupid = existingGroup;
+          if (!existingGroup) {
+              Blockly.Events.setGroup(true);
+              groupid = Blockly.Events.getGroup();
+          }
+          events_in_progress[slaveEvent.blockId] = true;
+          slaveEvent.run(true);
+          if (!existingGroup) {
+              Blockly.Events.setGroup(false);
+          }
+      }
+      catch(err) {
+          document.getElementById("errmsg").innerHTML = err.message;
+      }
+    });
 }
-
-//myao end of the code to enable wilddog.
-
 
 BlocklyGames.NAME = 'turtle';
 
@@ -216,20 +200,40 @@ Turtle.init = function() {
   BlocklyInterface.init();
 
   var rtl = BlocklyGames.isRtl();
-  var blocklyDiv = document.getElementById('blockly');
+  var myBlocklyDiv = document.getElementById('my_blockly');
+  var teacherBlocklyDiv = document.getElementById('teacher_blockly');
+  var teacherLabelDiv = document.getElementById('teacher_label');
+  var teacherCanvasDiv = document.getElementById('teacher_canvas');
   var visualization = document.getElementById('visualization');
   var onresize = function(e) {
-    var top = visualization.offsetTop;
-    blocklyDiv.style.top = Math.max(10, top - window.pageYOffset) + 'px';
-    blocklyDiv.style.left = rtl ? '10px' : '420px';
-    blocklyDiv.style.width = (window.innerWidth - 440) + 'px';
+    var height = (teacherBlocklyDiv.style.display == "none") ? window.innerHeight - 100 : window.innerHeight/2 - 50;
+    var top = Math.max(10, visualization.offsetTop - window.pageYOffset);
+    var width = window.innerWidth - 440;
+
+    myBlocklyDiv.style.top =  top + 'px';
+    myBlocklyDiv.style.left = rtl ? '10px' : '420px';
+    myBlocklyDiv.style.width = width + 'px';
+    myBlocklyDiv.style.height = height + 'px';
+
+    teacherCanvasDiv.style.top = height + top + 5 + 'px';
+    teacherCanvasDiv.style.left = rtl ? '10px' : '420px';
+    teacherBlocklyDiv.style.width =  width + 'px';
+    teacherBlocklyDiv.style.height = height + 'px';
   };
   window.addEventListener('scroll', function() {
     onresize();
-    Blockly.svgResize(BlocklyGames.workspace);
+    Blockly.svgResize(BlocklyGames.workspace)
   });
   window.addEventListener('resize', onresize);
   onresize();
+
+  teacherLabelDiv.addEventListener("click", function()
+    {
+      var hidden = teacherBlocklyDiv.style.display == "none";
+       teacherBlocklyDiv.style.display = hidden ? "" : "none";
+      onresize();
+      Blockly.svgResize(BlocklyGames.workspace)
+    });
 
   if (BlocklyGames.LEVEL < BlocklyGames.MAX_LEVEL) {
     Blockly.FieldColour.COLUMNS = 3;
@@ -240,15 +244,22 @@ Turtle.init = function() {
   }
 
   var toolbox = document.getElementById('toolbox');
-  BlocklyGames.workspace = Blockly.inject('blockly',
+  BlocklyGames.workspace = Blockly.inject('my_blockly',
       {'media': 'third-party/blockly/media/',
        'rtl': rtl,
        'toolbox': toolbox,
        'trashcan': true,
        'zoom': BlocklyGames.LEVEL == BlocklyGames.MAX_LEVEL ?
            {'controls': true, 'wheel': true} : null});
-           
-  initWildDog( BlocklyGames.workspace );     
+   BlocklyGames.teacher_workspace = Blockly.inject('teacher_blockly',
+       {'media': 'third-party/blockly/media/',
+        'readOnly' : true,
+        'rtl': rtl,
+        'trashcan': true,
+        'zoom': BlocklyGames.LEVEL == BlocklyGames.MAX_LEVEL ?
+            {'controls': true, 'wheel': true} : null});
+
+  initWildDog( BlocklyGames.workspace, BlocklyGames.teacher_workspace );
   // Prevent collisions with user-defined functions or variables.
   Blockly.JavaScript.addReservedWords('moveForward,moveBackward,' +
       'turnRight,turnLeft,penUp,penDown,penWidth,penColour,' +
