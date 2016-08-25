@@ -28,8 +28,6 @@ goog.provide('Teacher_Dash');
 goog.require('BlocklyDialogs');
 goog.require('BlocklyGames');
 goog.require('BlocklyInterface');
-goog.require('Slider');
-goog.require('Turtle.Answers');
 goog.require('Turtle.Blocks');
 goog.require('Teacher_Dash.soy');
 
@@ -40,9 +38,9 @@ var initStudent = function(wilddog_students_ref, student_div, username, my_id)
   // Inject a new blockly canvas into the list of canvases.
   //
 
-  student_div.innerHTML = student_div.innerHTML + "<div>" + username + "</div>";
-  student_div.innerHTML = student_div.innerHTML + '<div class="blockly" id="' + username + '_blockly"></div>';
-
+  var new_student = document.createElement("div");
+  new_student.innerHTML = '<div>' + username + '</div><div class="blockly" id="' + username + '_blockly"></div>';
+  student_div.appendChild(new_student);
   //
   // Init a new wilddog connection for this canvas.
   //
@@ -55,9 +53,8 @@ var initStudent = function(wilddog_students_ref, student_div, username, my_id)
        'rtl': false,
        'scrollbars':true,
        'toolbox': toolbox,
-       'trashcan': true,
-       'zoom': BlocklyGames.LEVEL == BlocklyGames.MAX_LEVEL ?
-           {'controls': true, 'wheel': true} : null});
+       'trashcan': true
+     });
 
   //
   // Setup remote control of canvas.
