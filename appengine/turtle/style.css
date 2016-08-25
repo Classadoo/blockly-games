@@ -57,3 +57,6 @@ html[dir="RTL"] button.primary {
 .reddit {
   background-position: -63px -21px;
 }
+#teacher_canvas .blocklySvg {
+  background-color: #666 !important;
+}
