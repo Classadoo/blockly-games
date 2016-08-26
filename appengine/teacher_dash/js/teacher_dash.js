@@ -31,36 +31,33 @@ goog.require('BlocklyInterface');
 goog.require('Turtle.Blocks');
 goog.require('Teacher_Dash.soy');
 
-/// Initialize a two-way collaborative canvas with a new student.
-var initStudent = function(wilddog_students_ref, student_div, username, user_id)
+var newStudentBlockly = function(username)
 {
-
-  //
-  // Inject a new blockly canvas into the list of canvases.
-  //
-
   var new_student = document.createElement("div");
   new_student.innerHTML =
     '<span class="username">' + username + '</span>' +
     '<span class="level" id="' + username + '_level">Level ?</span>' +
     '<div class="blockly" id="' + username + '_blockly"></div>';
-  student_div.appendChild(new_student);
-
-  //
-  // Init a new wilddog connection for this canvas.
-  //
-
-  var events_ref = wilddog_students_ref.child(username).child("events");
-  var level_ref = wilddog_students_ref.child(username).child("level");
+  document.getElementById('students').appendChild(new_student);
 
   var toolbox = document.getElementById('toolbox');
-  var workspace = Blockly.inject(username + '_blockly',
+  return Blockly.inject(username + '_blockly',
       {'media': 'third-party/blockly/media/',
        'rtl': false,
        'scrollbars':true,
        'toolbox': toolbox,
        'trashcan': true
      });
+}
+
+/// Initialize a two-way collaborative canvas with a new student.
+var initStudent = function(username, user_id)
+{
+  //
+  // Inject a new blockly canvas into the list of canvases.
+  //
+
+  var workspace = newStudentBlockly(username);
 
   //
   // Setup remote control of canvas.
@@ -69,11 +66,12 @@ var initStudent = function(wilddog_students_ref, student_div, username, user_id)
   var events_in_progress = {};
   workspace.addChangeListener(function(masterEvent) {
     if (masterEvent.type == Blockly.Events.UI) {
-      return;  // Don't mirror UI events.
+      return;
     }
 
     //
-    // Check to see if this event was already incoming. Stop it here.
+    // Check to see if this event was triggered by Wilddog. If so, do not
+    // send it back.
     //
 
     if (events_in_progress[masterEvent.blockId + masterEvent.type] === true)
@@ -83,34 +81,25 @@ var initStudent = function(wilddog_students_ref, student_div, username, user_id)
       return;
     }
 
+    //
     // Convert event to JSON for transmitting across the net.
+    //
+
     var json = masterEvent.toJson();
     var wdmsg = {"sender":user_id, "blkmsg":json};
-
-    console.log("Sending student event", masterEvent);
-    events_ref.push(wdmsg);
+    push_to_user(wdmsg, null, username);
   });
 
   //
   // Setup remote reading of canvas.
   //
 
-  events_ref.on("child_added", function(snapshot) {
-    var wdmsg = snapshot.val();
-    if(!wdmsg){
-        console.log("Nothing in database, return");
-        return;
-    }
-
-    //
-    // Ignore updates from this site.
-    //
-
-    if (wdmsg.sender == user_id)
+  var student_event_callback = function(snapshot) {
+    var blkmsg = clean_event(snapshot, user_id);
+    if (!blkmsg)
     {
       return;
     }
-    var blkmsg = wdmsg.blkmsg;
     var slaveEvent = Blockly.Events.fromJson(blkmsg, workspace);
 
     try {
@@ -131,37 +120,34 @@ var initStudent = function(wilddog_students_ref, student_div, username, user_id)
     catch(err) {
         document.getElementById("errmsg").innerHTML = err.message;
     }
+  };
+  add_user_event_callback(username, student_event_callback);
+  add_user_remove_callback(username, function(old_snapshot)
+  {
+    workspace.clear();
   });
 
-  level_ref.on("value", function(snapshot)
+
+  add_user_level_callback(username, function(level)
   {
-    document.getElementById(username + "_level").innerHTML = "Level " + snapshot.val();
+    document.getElementById(username + "_level").innerHTML = "Level " + level;
   });
 }
 
 /// Initialize listener for new students and publisher for teacher updates.
-var initWildDog = function(students_div){
-  function guid() {
-    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-      s4() + '-' + s4() + s4() + s4();
-  }
+var initWildDog = function(){
 
-  function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
-  }
-
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users");
   var user_name = "classadoo_instructor";
   var user_id = guid();
 
-  ref.on("child_added", function(snapshot) {
-    if (snapshot.key() != user_name)
+  var new_student_callback = function(user) {
+    if (user.key() != user_name)
     {
-      initStudent(ref, students_div, snapshot.key(), user_id);
+      initStudent(user.key(), user_id);
     }
-  });
+  }
+
+  add_new_student_callback(new_student_callback);
 }
 
 //myao end of the code to enable wilddog.
@@ -182,8 +168,13 @@ Turtle.init = function() {
 
   BlocklyInterface.init();
 
-  var students = document.getElementById('students');
-  initWildDog( students );
+  var clearStudents = document.getElementById('clearStudents');
+  clearStudents.addEventListener("click", function()
+    {
+      clear_users();
+    });
+
+  initWildDog();
 };
 
 window.addEventListener('load', Turtle.init);

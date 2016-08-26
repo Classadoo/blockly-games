@@ -36,36 +36,21 @@ goog.require('Teacher.soy');
 
 /// Initialize listener for new students and publisher for teacher updates.
 var initWildDog = function(workspace, students_div){
-
-    var ref = new Wilddog("https://blocklypipe.wilddogio.com/users");
-    var user_id = "classadoo_instructor";
-    // TODO (delete this), we don't want to clear every student every time.
-    ref.set({"classadoo_instructor" : []});
-    var teacher = ref.child(user_id);
+    var user_id = guid();
+    var user_name = "classadoo_instructor";
+    push_to_user(null, null, user_name);
 
     workspace.addChangeListener(function(masterEvent) {
       if (masterEvent.type == Blockly.Events.UI) {
         return;  // Don't mirror UI events.
       }
-      console.log("Sending teacher event: ", masterEvent);
 
       // Convert event to JSON for transmitting across the net.
       var json = masterEvent.toJson();
-      var wdmsg = {"sender":user_id, "blkmsg":json};
-
-      teacher.push(wdmsg);
+      var wdmsg = {"sender" : user_id, "blkmsg" : json};
+      push_to_user(wdmsg, null, user_name);
     });
-
-    ref.on("child_added", function(snapshot) {
-      if (snapshot.key() != "classadoo_instructor")
-      {
-        initStudent(ref, students_div, snapshot.key(), user_id);
-      }
-    });
-
 }
-
-//myao end of the code to enable wilddog.
 
 
 BlocklyGames.NAME = 'turtle';

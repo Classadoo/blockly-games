@@ -44,27 +44,8 @@ function getUsername() {
 }
 
 var initWildDog = function(workspace, teacher_workspace){
-    var ref = new Wilddog("https://blocklypipe.wilddogio.com/users");
-
-    function guid() {
-      return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-        s4() + '-' + s4() + s4() + s4();
-    }
-
-    function s4() {
-      return Math.floor((1 + Math.random()) * 0x10000)
-        .toString(16)
-        .substring(1);
-    }
-
-    var user_name = getUsername();
     var user_id = guid();
-
-    var me = ref.child(user_name);
-    me.child("events").push({});
-    me.update({"level": BlocklyGames.LEVEL});
-
-    var teacher = ref.child("classadoo_instructor");
+    push_to_user(null, BlocklyGames.LEVEL, getUsername());
 
     var events_in_progress = {};
     workspace.addChangeListener(function(masterEvent) {
@@ -85,17 +66,15 @@ var initWildDog = function(workspace, teacher_workspace){
       var wdmsg = {"sender":user_id, "blkmsg":json};
 
       console.log("Sending student event", masterEvent);
-      me.child("events").push(wdmsg);
+      push_to_user(wdmsg, null, getUsername());
     });
 
-    teacher.on("child_added", function(snapshot) {
-      var wdmsg = snapshot.val();
-      if(!wdmsg){
-          console.log("Nothing in database, return");
-          return;
+    var teacher_event_callback = function(snapshot) {
+      blkmsg = clean_event(snapshot, user_id);
+      if (!blkmsg)
+      {
+        return;
       }
-
-      var blkmsg = wdmsg.blkmsg;
       var slaveEvent = Blockly.Events.fromJson(blkmsg, teacher_workspace);
 
       try {
@@ -115,20 +94,19 @@ var initWildDog = function(workspace, teacher_workspace){
       catch(err) {
           document.getElementById("errmsg").innerHTML = err.message;
       }
+    }
+    add_user_event_callback("classadoo_instructor", teacher_event_callback);
+    add_user_remove_callback("classadoo_instructor", function(old_snapshot)
+    {
+      teacher_workspace.clear();
     });
 
-    me.child("events").on("child_added", function(snapshot) {
-      var wdmsg = snapshot.val();
-      if(!wdmsg){
-          console.log("Nothing in database, return");
-          return;
-      }
-      if (wdmsg.sender == user_id)
+    self_event_callback = function(snapshot) {
+      blkmsg = clean_event(snapshot, user_id);
+      if (!blkmsg)
       {
         return;
       }
-
-      var blkmsg = wdmsg.blkmsg;
       var slaveEvent = Blockly.Events.fromJson(blkmsg, workspace);
 
       try {
@@ -147,7 +125,8 @@ var initWildDog = function(workspace, teacher_workspace){
       catch(err) {
           document.getElementById("errmsg").innerHTML = err.message;
       }
-    });
+    }
+    add_user_event_callback(getUsername(), self_event_callback);
 }
 
 BlocklyGames.NAME = 'turtle';
