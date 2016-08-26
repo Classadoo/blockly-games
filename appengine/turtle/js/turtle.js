@@ -69,10 +69,10 @@ var initWildDog = function(workspace, teacher_workspace){
         return;  // Don't mirror UI events.
       }
 
-      if (events_in_progress[masterEvent.blockId] === true)
+      if (events_in_progress[masterEvent.blockId + masterEvent.type] === true)
       {
-        console.log("dropping remote");
-        events_in_progress[masterEvent.blockId] = false;
+        console.log("don't send event triggered by wilddog.");
+        events_in_progress[masterEvent.blockId + masterEvent.type] = false;
         return;
       }
 
@@ -135,7 +135,7 @@ var initWildDog = function(workspace, teacher_workspace){
               Blockly.Events.setGroup(true);
               groupid = Blockly.Events.getGroup();
           }
-          events_in_progress[slaveEvent.blockId] = true;
+          events_in_progress[slaveEvent.blockId + slaveEvent.type] = true;
           slaveEvent.run(true);
           if (!existingGroup) {
               Blockly.Events.setGroup(false);
