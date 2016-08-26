@@ -32,8 +32,9 @@ goog.require('Turtle.Blocks');
 goog.require('Teacher_Dash.soy');
 
 /// Initialize a two-way collaborative canvas with a new student.
-var initStudent = function(wilddog_students_ref, student_div, username, my_id)
+var initStudent = function(wilddog_students_ref, student_div, username, user_id)
 {
+
   //
   // Inject a new blockly canvas into the list of canvases.
   //
@@ -79,7 +80,7 @@ var initStudent = function(wilddog_students_ref, student_div, username, my_id)
 
     // Convert event to JSON for transmitting across the net.
     var json = masterEvent.toJson();
-    var wdmsg = {"sender":my_id, "blkmsg":json};
+    var wdmsg = {"sender":user_id, "blkmsg":json};
 
     console.log("Sending student event", masterEvent);
     ref.push(wdmsg);
@@ -100,7 +101,7 @@ var initStudent = function(wilddog_students_ref, student_div, username, my_id)
     // Ignore updates from this site.
     //
 
-    if (wdmsg.sender == my_id)
+    if (wdmsg.sender == user_id)
     {
       return;
     }
@@ -129,16 +130,27 @@ var initStudent = function(wilddog_students_ref, student_div, username, my_id)
 
 /// Initialize listener for new students and publisher for teacher updates.
 var initWildDog = function(students_div){
+  function guid() {
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+      s4() + '-' + s4() + s4() + s4();
+  }
 
-    var ref = new Wilddog("https://blocklypipe.wilddogio.com/users");
-    var user_id = "classadoo_instructor";
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
 
-    ref.on("child_added", function(snapshot) {
-      if (snapshot.key() != "classadoo_instructor")
-      {
-        initStudent(ref, students_div, snapshot.key(), user_id);
-      }
-    });
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users");
+  var user_name = "classadoo_instructor";
+  var user_id = guid();
+
+  ref.on("child_added", function(snapshot) {
+    if (snapshot.key() != user_name)
+    {
+      initStudent(ref, students_div, snapshot.key(), user_id);
+    }
+  });
 }
 
 //myao end of the code to enable wilddog.
