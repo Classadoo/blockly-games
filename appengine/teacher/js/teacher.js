@@ -179,27 +179,6 @@ Turtle.init = function() {
   var sliderSvg = document.getElementById('slider');
   Turtle.speedSlider = new Slider(10, 35, 130, sliderSvg);
 
-  if (BlocklyGames.LEVEL == BlocklyGames.MAX_LEVEL) {
-    var defaultXml =
-        '<xml>' +
-        '  <block type="turtle_move" x="70" y="70">' +
-        '    <value name="VALUE">' +
-        '      <block type="math_number">' +
-        '        <field name="NUM">10</field>' +
-        '      </block>' +
-        '    </value>' +
-        '  </block>' +
-        '</xml>';
-  } else {
-    var defaultXml =
-        '<xml>' +
-        '  <block type="turtle_move_internal" x="70" y="70">' +
-        '    <field name="VALUE">100</field>' +
-        '  </block>' +
-        '</xml>';
-  }
-  BlocklyInterface.loadBlocks(defaultXml, true);
-
   Turtle.ctxDisplay = document.getElementById('display').getContext('2d');
   Turtle.ctxAnswer = document.getElementById('answer').getContext('2d');
   Turtle.ctxScratch = document.getElementById('scratch').getContext('2d');

@@ -71,10 +71,10 @@ var initStudent = function(wilddog_students_ref, student_div, username, user_id)
     // Check to see if this event was already incoming. Stop it here.
     //
 
-    if (events_in_progress[masterEvent.blockId] === true)
+    if (events_in_progress[masterEvent.blockId + masterEvent.type] === true)
     {
       console.log("dropping remote");
-      events_in_progress[masterEvent.blockId] = false;
+      events_in_progress[masterEvent.blockId + masterEvent.type] = false;
       return;
     }
 
@@ -116,7 +116,8 @@ var initStudent = function(wilddog_students_ref, student_div, username, user_id)
           groupid = Blockly.Events.getGroup();
       }
 
-      events_in_progress[slaveEvent.blockId] = true;
+      console.log(slaveEvent.blockId + slaveEvent.type);
+      events_in_progress[slaveEvent.blockId + slaveEvent.type] = true;
       slaveEvent.run(true);
       if (!existingGroup) {
           Blockly.Events.setGroup(false);
