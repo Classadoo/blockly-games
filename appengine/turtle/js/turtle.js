@@ -33,10 +33,17 @@ goog.require('Turtle.Answers');
 goog.require('Turtle.Blocks');
 goog.require('Turtle.soy');
 
+/// HACK (aheine): get the user name in a better way
+function getUsername() {
+    var url = window.location.href;
+    var regex = new RegExp("[?&]username(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
 
-//myao this is the code to enable wilddog.
 var initWildDog = function(workspace, teacher_workspace){
-
     var ref = new Wilddog("https://blocklypipe.wilddogio.com/users");
 
     function guid() {
@@ -50,8 +57,10 @@ var initWildDog = function(workspace, teacher_workspace){
         .substring(1);
     }
 
+    var user_name = getUsername();
     var user_id = guid();
-    var me = ref.child(user_id);
+
+    var me = ref.child(user_name);
     var teacher = ref.child("classadoo_instructor");
 
     var events_in_progress = {};
@@ -204,9 +213,12 @@ Turtle.init = function() {
   var teacherBlocklyDiv = document.getElementById('teacher_blockly');
   var teacherLabelDiv = document.getElementById('teacher_label');
   var teacherCanvasDiv = document.getElementById('teacher_canvas');
+  var toggleTeacherBlocks = document.getElementById('toggleTeacherBlocks');
   var visualization = document.getElementById('visualization');
+
+  var teacherBlocksHidden = false;
   var onresize = function(e) {
-    var height = (teacherBlocklyDiv.style.display == "none") ? window.innerHeight - 100 : window.innerHeight/2 - 50;
+    var height = teacherBlocksHidden ? window.innerHeight - 100 : window.innerHeight/2 - 50;
     var top = Math.max(10, visualization.offsetTop - window.pageYOffset);
     var width = window.innerWidth - 440;
 
@@ -218,7 +230,7 @@ Turtle.init = function() {
     teacherCanvasDiv.style.top = height + top + 5 + 'px';
     teacherCanvasDiv.style.left = rtl ? '10px' : '420px';
     teacherBlocklyDiv.style.width =  width + 'px';
-    teacherBlocklyDiv.style.height = height + 'px';
+    teacherBlocklyDiv.style.height = (teacherBlocksHidden ? 0 : height) + 'px';
   };
   window.addEventListener('scroll', function() {
     onresize();
@@ -227,10 +239,10 @@ Turtle.init = function() {
   window.addEventListener('resize', onresize);
   onresize();
 
-  teacherLabelDiv.addEventListener("click", function()
+  toggleTeacherBlocks.addEventListener("click", function()
     {
-      var hidden = teacherBlocklyDiv.style.display == "none";
-       teacherBlocklyDiv.style.display = hidden ? "" : "none";
+      teacherBlocksHidden = !teacherBlocksHidden;
+      toggleTeacherBlocks.textContent = teacherBlocksHidden ? "Show" : "Hide"
       onresize();
       Blockly.svgResize(BlocklyGames.workspace)
     });
