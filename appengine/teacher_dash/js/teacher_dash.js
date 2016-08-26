@@ -40,13 +40,18 @@ var initStudent = function(wilddog_students_ref, student_div, username, user_id)
   //
 
   var new_student = document.createElement("div");
-  new_student.innerHTML = '<div>' + username + '</div><div class="blockly" id="' + username + '_blockly"></div>';
+  new_student.innerHTML =
+    '<span class="username">' + username + '</span>' +
+    '<span class="level" id="' + username + '_level">Level ?</span>' +
+    '<div class="blockly" id="' + username + '_blockly"></div>';
   student_div.appendChild(new_student);
+
   //
   // Init a new wilddog connection for this canvas.
   //
 
-  var ref = wilddog_students_ref.child(username);
+  var events_ref = wilddog_students_ref.child(username).child("events");
+  var level_ref = wilddog_students_ref.child(username).child("level");
 
   var toolbox = document.getElementById('toolbox');
   var workspace = Blockly.inject(username + '_blockly',
@@ -83,14 +88,14 @@ var initStudent = function(wilddog_students_ref, student_div, username, user_id)
     var wdmsg = {"sender":user_id, "blkmsg":json};
 
     console.log("Sending student event", masterEvent);
-    ref.push(wdmsg);
+    events_ref.push(wdmsg);
   });
 
   //
   // Setup remote reading of canvas.
   //
 
-  ref.on("child_added", function(snapshot) {
+  events_ref.on("child_added", function(snapshot) {
     var wdmsg = snapshot.val();
     if(!wdmsg){
         console.log("Nothing in database, return");
@@ -126,6 +131,11 @@ var initStudent = function(wilddog_students_ref, student_div, username, user_id)
     catch(err) {
         document.getElementById("errmsg").innerHTML = err.message;
     }
+  });
+
+  level_ref.on("value", function(snapshot)
+  {
+    document.getElementById(username + "_level").innerHTML = "Level " + snapshot.val();
   });
 }
 

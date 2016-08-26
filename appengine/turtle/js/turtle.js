@@ -61,6 +61,9 @@ var initWildDog = function(workspace, teacher_workspace){
     var user_id = guid();
 
     var me = ref.child(user_name);
+    me.child("events").push({});
+    me.update({"level": BlocklyGames.LEVEL});
+
     var teacher = ref.child("classadoo_instructor");
 
     var events_in_progress = {};
@@ -71,7 +74,7 @@ var initWildDog = function(workspace, teacher_workspace){
 
       if (events_in_progress[masterEvent.blockId + masterEvent.type] === true)
       {
-        console.log("don't send event triggered by wilddog.");
+        console.log("don't send event triggered by wilddog.", masterEvent);
         events_in_progress[masterEvent.blockId + masterEvent.type] = false;
         return;
       }
@@ -82,7 +85,7 @@ var initWildDog = function(workspace, teacher_workspace){
       var wdmsg = {"sender":user_id, "blkmsg":json};
 
       console.log("Sending student event", masterEvent);
-      me.push(wdmsg);
+      me.child("events").push(wdmsg);
     });
 
     teacher.on("child_added", function(snapshot) {
@@ -114,7 +117,7 @@ var initWildDog = function(workspace, teacher_workspace){
       }
     });
 
-    me.on("child_added", function(snapshot) {
+    me.child("events").on("child_added", function(snapshot) {
       var wdmsg = snapshot.val();
       if(!wdmsg){
           console.log("Nothing in database, return");
@@ -156,7 +159,8 @@ BlocklyInterface.nextLevel = function() {
   if (BlocklyGames.LEVEL < BlocklyGames.MAX_LEVEL) {
     window.location = window.location.protocol + '//' +
         window.location.host + window.location.pathname +
-        '?lang=' + BlocklyGames.LANG + '&level=' + (BlocklyGames.LEVEL + 1);
+        '?lang=' + BlocklyGames.LANG + '&level=' + (BlocklyGames.LEVEL + 1) +
+        '&username=' + getUsername();
   } else {
     BlocklyInterface.indexPage();
   }
@@ -204,7 +208,8 @@ Turtle.init = function() {
       {lang: BlocklyGames.LANG,
        level: BlocklyGames.LEVEL,
        maxLevel: BlocklyGames.MAX_LEVEL,
-       html: BlocklyGames.IS_HTML});
+       html: BlocklyGames.IS_HTML,
+       suffix: "&username="+getUsername() });
 
   BlocklyInterface.init();
 
