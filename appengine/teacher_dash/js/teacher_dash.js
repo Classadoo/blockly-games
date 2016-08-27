@@ -68,8 +68,14 @@ var initStudent = function(username, user_id)
 
   var events_in_progress = {};
   var local_event_handler = function(masterEvent) {
+    //
+    // Ignore UI events (except selecting blocks)
+    //
     if (masterEvent.type == Blockly.Events.UI) {
-      return;
+      if (masterEvent.element != "selected")
+      {
+        return;
+      }
     }
 
     //

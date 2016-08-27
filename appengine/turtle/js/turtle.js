@@ -78,8 +78,12 @@ var initWildDog = function(workspace, teacher_workspace){
       var slaveEvent = Blockly.Events.fromJson(blkmsg, teacher_workspace);
 
       try {
-
-        /// TODO(aheine): don't worry about what's remote here. Figure out this groupid stuff.
+        if (slaveEvent.type == "ui" && slaveEvent.newValue)
+        {
+          teacher_workspace.highlightBlock(slaveEvent.newValue);
+        }
+        else
+        {
           var existingGroup = Blockly.Events.getGroup();
           var groupid = existingGroup;
           if (!existingGroup) {
@@ -90,6 +94,7 @@ var initWildDog = function(workspace, teacher_workspace){
           if (!existingGroup) {
               Blockly.Events.setGroup(false);
           }
+        }
       }
       catch(err) {
         console.log("Error running slave event", err.message);
@@ -110,6 +115,12 @@ var initWildDog = function(workspace, teacher_workspace){
       var slaveEvent = Blockly.Events.fromJson(blkmsg, workspace);
 
       try {
+        if (slaveEvent.type == "ui" && slaveEvent.newValue)
+        {
+          BlocklyInterface.highlight(slaveEvent.newValue);
+        }
+        else
+        {
           var existingGroup = Blockly.Events.getGroup();
           var groupid = existingGroup;
           if (!existingGroup) {
@@ -126,6 +137,7 @@ var initWildDog = function(workspace, teacher_workspace){
           if (!existingGroup) {
               Blockly.Events.setGroup(false);
           }
+        }
       }
       catch(err) {
           document.getElementById("errmsg").innerHTML = err.message;
@@ -260,6 +272,9 @@ Turtle.init = function() {
             {'controls': true, 'wheel': true} : null});
 
   initWildDog( BlocklyGames.workspace, BlocklyGames.teacher_workspace );
+  BlocklyGames.workspace.traceOn(true);
+  BlocklyGames.teacher_workspace.traceOn(true);
+
   // Prevent collisions with user-defined functions or variables.
   Blockly.JavaScript.addReservedWords('moveForward,moveBackward,' +
       'turnRight,turnLeft,penUp,penDown,penWidth,penColour,' +

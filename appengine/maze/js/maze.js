@@ -110,22 +110,30 @@ var initWildDog = function(workspace, teacher_workspace){
       }
       var slaveEvent = Blockly.Events.fromJson(blkmsg, workspace);
       console.log("Received", slaveEvent.type);
+
       try {
-          var existingGroup = Blockly.Events.getGroup();
-          var groupid = existingGroup;
-          if (!existingGroup) {
-              Blockly.Events.setGroup(true);
-              groupid = Blockly.Events.getGroup();
-          }
-          events_in_progress[slaveEvent.blockId + slaveEvent.type] = true;
-          // Create will automatically trigger a move, so don't send our move command back to the student.
-          if (slaveEvent.type == "create")
+          if (slaveEvent.type == "ui" && slaveEvent.newValue)
           {
-            events_in_progress[slaveEvent.blockId + "move"] = true;
+            BlocklyInterface.highlight(slaveEvent.newValue);
           }
-          slaveEvent.run(true);
-          if (!existingGroup) {
-              Blockly.Events.setGroup(false);
+          else
+          {
+            var existingGroup = Blockly.Events.getGroup();
+            var groupid = existingGroup;
+            if (!existingGroup) {
+                Blockly.Events.setGroup(true);
+                groupid = Blockly.Events.getGroup();
+            }
+            events_in_progress[slaveEvent.blockId + slaveEvent.type] = true;
+            // Create will automatically trigger a move, so don't send our move command back to the student.
+            if (slaveEvent.type == "create")
+            {
+              events_in_progress[slaveEvent.blockId + "move"] = true;
+            }
+            slaveEvent.run(true);
+            if (!existingGroup) {
+                Blockly.Events.setGroup(false);
+            }
           }
       }
       catch(err) {
@@ -656,7 +664,7 @@ Maze.init = function() {
 
 
   initWildDog( BlocklyGames.workspace, BlocklyGames.teacher_workspace );
-
+  BlocklyGames.workspace.traceOn(true);
 
   Maze.drawMap();
 
@@ -894,7 +902,7 @@ Maze.resetButtonClick = function(e) {
   var runButton = document.getElementById('runButton');
   runButton.style.display = 'inline';
   document.getElementById('resetButton').style.display = 'none';
-  BlocklyGames.workspace.traceOn(false);
+  BlocklyGames.workspace.traceOn(true);
   Maze.reset(false);
   Maze.levelHelp();
 };
