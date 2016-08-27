@@ -45,7 +45,7 @@ function getUsername() {
 
 var initWildDog = function(workspace, teacher_workspace){
     var user_id = guid();
-    push_to_user(null, BlocklyGames.LEVEL, getUsername());
+    push_to_user(null, "Turtle-" + BlocklyGames.LEVEL, getUsername());
 
     var events_in_progress = {};
     workspace.addChangeListener(function(masterEvent) {
