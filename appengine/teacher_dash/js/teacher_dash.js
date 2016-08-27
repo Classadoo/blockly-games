@@ -39,7 +39,7 @@ var newStudentBlockly = function(username)
   new_student.id = username + "_container";
   new_student.innerHTML =
     '<span class="username">' + username + '</span>' +
-    '<span class="level" id="' + username + '_level">Level ?</span>' +
+    '<span class="user_level" id="' + username + '_level">Level ?</span>' +
     '<div class="blockly" id="' + username + '_blockly"></div>';
   document.getElementById('students').appendChild(new_student);
 

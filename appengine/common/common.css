@@ -36,6 +36,9 @@ html[dir="RTL"] .farSide {
   background-color: #ddd;
   color: #000;
 }
+.game_link {
+  padding: 6px
+}
 #containerCode {
   direction: ltr;
   background-color: #eee;
