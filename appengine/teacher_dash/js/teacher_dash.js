@@ -36,6 +36,7 @@ goog.require('Teacher_Dash.soy');
 var newStudentBlockly = function(username)
 {
   var new_student = document.createElement("div");
+  new_student.id = username + "_container";
   new_student.innerHTML =
     '<span class="username">' + username + '</span>' +
     '<span class="level" id="' + username + '_level">Level ?</span>' +
@@ -114,6 +115,11 @@ var initStudent = function(username, user_id)
 
       console.log(slaveEvent.blockId + slaveEvent.type);
       events_in_progress[slaveEvent.blockId + slaveEvent.type] = true;
+      // Create will automatically trigger a move, so don't send our move command back to the student.
+      if (slaveEvent.type == "create")
+      {
+        events_in_progress[slaveEvent.blockId + "move"] = true;
+      }
       slaveEvent.run(true);
       if (!existingGroup) {
           Blockly.Events.setGroup(false);
@@ -126,7 +132,8 @@ var initStudent = function(username, user_id)
   add_user_event_callback(username, student_event_callback);
   add_user_remove_callback(username, function(old_snapshot)
   {
-    workspace.clear();
+    var container = document.getElementById(username + "_container");
+    container.parentElement.removeChild(container);
   });
 
 
