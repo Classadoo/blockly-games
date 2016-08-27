@@ -42,8 +42,14 @@ var initWildDog = function(workspace, students_div){
     push_to_user(null, null, user_name);
 
     workspace.addChangeListener(function(masterEvent) {
+      //
+      // Ignore UI events (except selecting blocks)
+      //
       if (masterEvent.type == Blockly.Events.UI) {
-        return;  // Don't mirror UI events.
+        if (masterEvent.element != "selected")
+        {
+          return;
+        }
       }
 
       // Convert event to JSON for transmitting across the net.
