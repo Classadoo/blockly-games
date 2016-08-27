@@ -35,6 +35,71 @@ goog.require('goog.math');
 
 BlocklyGames.NAME = 'puzzle';
 
+
+/// HACK (aheine): get the user name in a better way
+function getUsername() {
+    var url = window.location.href;
+    var regex = new RegExp("[?&]username(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+var initWildDog = function(workspace){
+    var user_id = guid();
+    push_to_user(null, BlocklyGames.LEVEL, getUsername());
+
+    var events_in_progress = {};
+    workspace.addChangeListener(function(masterEvent) {
+      if (masterEvent.type == Blockly.Events.UI) {
+        return;  // Don't mirror UI events.
+      }
+
+      if (events_in_progress[masterEvent.blockId + masterEvent.type] === true)
+      {
+        console.log("don't send event triggered by wilddog.", masterEvent);
+        events_in_progress[masterEvent.blockId + masterEvent.type] = false;
+        return;
+      }
+
+
+      // Convert event to JSON for transmitting across the net.
+      var json = masterEvent.toJson();
+      var wdmsg = {"sender":user_id, "blkmsg":json};
+
+      console.log("Sending student event", masterEvent);
+      push_to_user(wdmsg, null, getUsername());
+    });
+
+    var self_event_callback = function(snapshot) {
+      var blkmsg = clean_event(snapshot, user_id);
+      if (!blkmsg)
+      {
+        return;
+      }
+      var slaveEvent = Blockly.Events.fromJson(blkmsg, workspace);
+
+      try {
+          var existingGroup = Blockly.Events.getGroup();
+          var groupid = existingGroup;
+          if (!existingGroup) {
+              Blockly.Events.setGroup(true);
+              groupid = Blockly.Events.getGroup();
+          }
+          events_in_progress[slaveEvent.blockId + slaveEvent.type] = true;
+          slaveEvent.run(true);
+          if (!existingGroup) {
+              Blockly.Events.setGroup(false);
+          }
+      }
+      catch(err) {
+          document.getElementById("errmsg").innerHTML = err.message;
+      }
+    }
+    add_user_event_callback(getUsername(), self_event_callback);
+}
+
 /**
  * Initialize Blockly and the puzzle.  Called on page load.
  */
@@ -61,6 +126,8 @@ Puzzle.init = function() {
        'rtl': rtl,
        'scrollbars': false,
        'trashcan': false});
+
+  initWildDog( BlocklyGames.workspace );
 
   var savedBlocks =
       BlocklyGames.loadFromLocalStorage(BlocklyGames.NAME, BlocklyGames.LEVEL);

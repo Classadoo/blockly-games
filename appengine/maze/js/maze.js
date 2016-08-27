@@ -34,6 +34,104 @@ goog.require('Maze.soy');
 
 BlocklyGames.NAME = 'maze';
 
+
+/// HACK (aheine): get the user name in a better way
+function getUsername() {
+    var url = window.location.href;
+    var regex = new RegExp("[?&]username(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+var initWildDog = function(workspace, teacher_workspace){
+    var user_id = guid();
+    push_to_user(null, BlocklyGames.LEVEL, getUsername());
+
+    var events_in_progress = {};
+    workspace.addChangeListener(function(masterEvent) {
+      if (masterEvent.type == Blockly.Events.UI) {
+        return;  // Don't mirror UI events.
+      }
+
+      if (events_in_progress[masterEvent.blockId + masterEvent.type] === true)
+      {
+        console.log("don't send event triggered by wilddog.", masterEvent);
+        events_in_progress[masterEvent.blockId + masterEvent.type] = false;
+        return;
+      }
+
+
+      // Convert event to JSON for transmitting across the net.
+      var json = masterEvent.toJson();
+      var wdmsg = {"sender":user_id, "blkmsg":json};
+
+      console.log("Sending student event", masterEvent);
+      push_to_user(wdmsg, null, getUsername());
+    });
+
+    var teacher_event_callback = function(snapshot) {
+      var blkmsg = clean_event(snapshot, user_id);
+      if (!blkmsg)
+      {
+        return;
+      }
+      var slaveEvent = Blockly.Events.fromJson(blkmsg, teacher_workspace);
+
+      try {
+
+        /// TODO(aheine): don't worry about what's remote here. Figure out this groupid stuff.
+          var existingGroup = Blockly.Events.getGroup();
+          var groupid = existingGroup;
+          if (!existingGroup) {
+              Blockly.Events.setGroup(true);
+              groupid = Blockly.Events.getGroup();
+          }
+          slaveEvent.run(true);
+          if (!existingGroup) {
+              Blockly.Events.setGroup(false);
+          }
+      }
+      catch(err) {
+          console.log("Error running slave event", err.message);
+      }
+    }
+    add_user_event_callback("classadoo_instructor", teacher_event_callback);
+    add_user_remove_callback("classadoo_instructor", function(old_snapshot)
+    {
+      teacher_workspace.clear();
+    });
+
+    var self_event_callback = function(snapshot) {
+      var blkmsg = clean_event(snapshot, user_id);
+      if (!blkmsg)
+      {
+        return;
+      }
+      var slaveEvent = Blockly.Events.fromJson(blkmsg, workspace);
+
+      try {
+          var existingGroup = Blockly.Events.getGroup();
+          var groupid = existingGroup;
+          if (!existingGroup) {
+              Blockly.Events.setGroup(true);
+              groupid = Blockly.Events.getGroup();
+          }
+          events_in_progress[slaveEvent.blockId + slaveEvent.type] = true;
+          slaveEvent.run(true);
+          if (!existingGroup) {
+              Blockly.Events.setGroup(false);
+          }
+      }
+      catch(err) {
+          document.getElementById("errmsg").innerHTML = err.message;
+      }
+    }
+    add_user_event_callback(getUsername(), self_event_callback);
+}
+
+
 /**
  * Go to the next level.
  */
@@ -459,7 +557,8 @@ Maze.init = function() {
        level: BlocklyGames.LEVEL,
        maxLevel: BlocklyGames.MAX_LEVEL,
        skin: Maze.SKIN_ID,
-       html: BlocklyGames.IS_HTML});
+       html: BlocklyGames.IS_HTML,
+       suffix: "&username="+getUsername() });
 
   BlocklyInterface.init();
 
@@ -491,25 +590,49 @@ Maze.init = function() {
   var arrow = document.createTextNode(Blockly.FieldDropdown.ARROW_CHAR);
   pegmanButtonArrow.appendChild(arrow);
 
+
   var rtl = BlocklyGames.isRtl();
-  var blocklyDiv = document.getElementById('blockly');
+  var myBlocklyDiv = document.getElementById('my_blockly');
+  var teacherBlocklyDiv = document.getElementById('teacher_blockly');
+  var teacherLabelDiv = document.getElementById('teacher_label');
+  var teacherCanvasDiv = document.getElementById('teacher_canvas');
+  var toggleTeacherBlocks = document.getElementById('toggleTeacherBlocks');
   var visualization = document.getElementById('visualization');
+
+  var teacherBlocksHidden = false;
   var onresize = function(e) {
-    var top = visualization.offsetTop;
-    blocklyDiv.style.top = Math.max(10, top - window.pageYOffset) + 'px';
-    blocklyDiv.style.left = rtl ? '10px' : '420px';
-    blocklyDiv.style.width = (window.innerWidth - 440) + 'px';
+    var height = teacherBlocksHidden ? window.innerHeight - 100 : window.innerHeight/2 - 50;
+    var top = Math.max(10, visualization.offsetTop - window.pageYOffset);
+    var width = window.innerWidth - 440;
+
+    myBlocklyDiv.style.top =  top + 'px';
+    myBlocklyDiv.style.left = rtl ? '10px' : '420px';
+    myBlocklyDiv.style.width = width + 'px';
+    myBlocklyDiv.style.height = height + 'px';
+
+    teacherCanvasDiv.style.top = height + top + 5 + 'px';
+    teacherCanvasDiv.style.left = rtl ? '10px' : '420px';
+    teacherBlocklyDiv.style.width =  width + 'px';
+    teacherBlocklyDiv.style.height = (teacherBlocksHidden ? 0 : height) + 'px';
   };
   window.addEventListener('scroll', function() {
     onresize();
-    Blockly.svgResize(BlocklyGames.workspace);
+    Blockly.svgResize(BlocklyGames.workspace)
   });
   window.addEventListener('resize', onresize);
   onresize();
 
+  toggleTeacherBlocks.addEventListener("click", function()
+    {
+      teacherBlocksHidden = !teacherBlocksHidden;
+      toggleTeacherBlocks.textContent = teacherBlocksHidden ? "Show" : "Hide"
+      onresize();
+      Blockly.svgResize(BlocklyGames.workspace)
+    });
+
   var toolbox = document.getElementById('toolbox');
   var scale = 1 + (1 - (BlocklyGames.LEVEL / BlocklyGames.MAX_LEVEL)) / 3;
-  BlocklyGames.workspace = Blockly.inject('blockly',
+  BlocklyGames.workspace = Blockly.inject('my_blockly',
       {'media': 'third-party/blockly/media/',
        'maxBlocks': Maze.MAX_BLOCKS,
        'rtl': rtl,
@@ -521,6 +644,15 @@ Maze.init = function() {
   // Not really needed, there are no user-defined functions or variables.
   Blockly.JavaScript.addReservedWords('moveForward,moveBackward,' +
       'turnRight,turnLeft,isPathForward,isPathRight,isPathBackward,isPathLeft');
+  BlocklyGames.teacher_workspace = Blockly.inject('teacher_blockly',
+      {'media': 'third-party/blockly/media/',
+       'readOnly' : true,
+       'rtl': rtl,
+       'zoom': {'startScale': scale}});
+
+
+  initWildDog( BlocklyGames.workspace, BlocklyGames.teacher_workspace );
+
 
   Maze.drawMap();
 

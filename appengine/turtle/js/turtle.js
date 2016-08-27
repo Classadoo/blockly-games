@@ -70,7 +70,7 @@ var initWildDog = function(workspace, teacher_workspace){
     });
 
     var teacher_event_callback = function(snapshot) {
-      blkmsg = clean_event(snapshot, user_id);
+      var blkmsg = clean_event(snapshot, user_id);
       if (!blkmsg)
       {
         return;
@@ -92,7 +92,7 @@ var initWildDog = function(workspace, teacher_workspace){
           }
       }
       catch(err) {
-          document.getElementById("errmsg").innerHTML = err.message;
+        console.log("Error running slave event", err.message);
       }
     }
     add_user_event_callback("classadoo_instructor", teacher_event_callback);
@@ -101,8 +101,8 @@ var initWildDog = function(workspace, teacher_workspace){
       teacher_workspace.clear();
     });
 
-    self_event_callback = function(snapshot) {
-      blkmsg = clean_event(snapshot, user_id);
+    var self_event_callback = function(snapshot) {
+      var blkmsg = clean_event(snapshot, user_id);
       if (!blkmsg)
       {
         return;
@@ -251,7 +251,6 @@ Turtle.init = function() {
        {'media': 'third-party/blockly/media/',
         'readOnly' : true,
         'rtl': rtl,
-        'trashcan': true,
         'zoom': BlocklyGames.LEVEL == BlocklyGames.MAX_LEVEL ?
             {'controls': true, 'wheel': true} : null});
 
@@ -347,22 +346,6 @@ Turtle.hideHelp = function() {
   }
 };
 
-/**
- * Show the help pop-up to encourage clicking on the toolbox categories.
- */
-Turtle.showCategoryHelp = function() {
-  if (Turtle.categoryClicked_ || BlocklyDialogs.isDialogVisible_) {
-    return;
-  }
-  var help = document.getElementById('helpToolbox');
-  var style = {
-    width: '25%',
-    left: '525px',
-    top: '3.3em'
-  };
-  var origin = document.getElementById(':0');  // Toolbox's tree root.
-  BlocklyDialogs.showDialog(help, origin, true, false, style, null);
-};
 
 
 /**
@@ -372,18 +355,6 @@ Turtle.showCategoryHelp = function() {
  */
 Turtle.categoryClicked_ = false;
 
-/**
- * Monitor to see if the user finds the categories in level one.
- * @param {!Blockly.Events.Abstract} e Custom data for event.
- * @private
- */
-Turtle.watchCategories_ = function(e) {
-  if (e.type == Blockly.Events.UI && e.element == 'category') {
-    Turtle.categoryClicked_ = true;
-    BlocklyDialogs.hideDialog(false);
-    BlocklyGames.workspace.removeChangeListener(Turtle.watchCategories_);
-  }
-};
 
 /**
  * On startup draw the expected answer and save it to the answer canvas.
