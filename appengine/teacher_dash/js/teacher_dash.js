@@ -67,7 +67,7 @@ var initStudent = function(username, user_id)
   //
 
   var events_in_progress = {};
-  workspace.addChangeListener(function(masterEvent) {
+  var local_event_handler = function(masterEvent) {
     if (masterEvent.type == Blockly.Events.UI) {
       return;
     }
@@ -91,7 +91,8 @@ var initStudent = function(username, user_id)
     var json = masterEvent.toJson();
     var wdmsg = {"sender":user_id, "blkmsg":json};
     push_to_user(wdmsg, null, username);
-  });
+  };
+  workspace.addChangeListener(local_event_handler);
 
   //
   // Setup remote reading of canvas.
@@ -136,13 +137,19 @@ var initStudent = function(username, user_id)
     if (container)
     {
       container.parentElement.removeChild(container);
+      workspace.removeChangeListener(local_event_handler);
+      workspace.clear();
     }
   });
 
 
   add_user_level_callback(username, function(level)
   {
-    document.getElementById(username + "_level").innerHTML = "Level " + level;
+    var level_div = document.getElementById(username + "_level");
+    if (level_div)
+    {
+      level_div.innerHTML = "Level " + level;
+    }
   });
 }
 

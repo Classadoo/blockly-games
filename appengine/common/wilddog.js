@@ -62,7 +62,11 @@ var add_user_remove_callback = function(user_name, callback)
 var add_new_student_callback = function(callback)
 {
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/");
-  ref.on("child_added", callback);
+  ref.on("child_added", function(snapshot)
+  {
+    console.log("New student ", snapshot.key());
+    callback(snapshot);
+  });
 }
 
 //

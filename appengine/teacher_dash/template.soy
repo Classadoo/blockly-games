@@ -367,6 +367,25 @@
  */
 {template .toolbox}
   <xml id="toolbox" style="display: none">
+
+
+    <category name="{msg meaning="Games.maze" desc="Maze"}Maze{/msg}">
+      <block type="maze_moveForward"></block>
+      <block type="maze_turn"><field name="DIR">turnLeft</field></block>
+      <block type="maze_turn"><field name="DIR">turnRight</field></block>
+      {if $ij.level > 2}
+        <block type="maze_forever"></block>
+        {if $ij.level == 6}
+          <block type="maze_if"><field name="DIR">isPathLeft</field></block>
+        {elseif $ij.level > 6}
+          <block type="maze_if"></block>
+          {if $ij.level > 8}
+            <block type="maze_ifElse"></block>
+          {/if}
+        {/if}
+      {/if}
+    </category>
+
     {if $ij.level == 10}
       <category name="{msg meaning="Games.turtle" desc="IBID"}Turtle{/msg}">
         <block type="turtle_move">
