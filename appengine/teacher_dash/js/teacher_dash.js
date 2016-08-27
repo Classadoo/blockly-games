@@ -133,7 +133,10 @@ var initStudent = function(username, user_id)
   add_user_remove_callback(username, function(old_snapshot)
   {
     var container = document.getElementById(username + "_container");
-    container.parentElement.removeChild(container);
+    if (container)
+    {
+      container.parentElement.removeChild(container);
+    }
   });
 
 
