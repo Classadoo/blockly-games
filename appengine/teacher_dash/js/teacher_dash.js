@@ -29,6 +29,8 @@ goog.require('BlocklyDialogs');
 goog.require('BlocklyGames');
 goog.require('BlocklyInterface');
 goog.require('Turtle.Blocks');
+goog.require('Puzzle.Blocks');
+goog.require('Maze.Blocks');
 goog.require('Teacher_Dash.soy');
 
 var newStudentBlockly = function(username)
@@ -118,7 +120,7 @@ var initStudent = function(username, user_id)
       }
     }
     catch(err) {
-        document.getElementById("errmsg").innerHTML = err.message;
+        console.log("Error running slave event: ", err.message);
     }
   };
   add_user_event_callback(username, student_event_callback);

@@ -1,6 +1,11 @@
-#blockly {
+#my_blockly {
   position: fixed;
-  bottom: 10px;
+}
+#teacher_canvas {
+  position: fixed;
+}
+#teacher_canvas .blocklySvg {
+  background-color: #666 !important;
 }
 #visualization {
   position: relative;

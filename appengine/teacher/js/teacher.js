@@ -31,6 +31,7 @@ goog.require('BlocklyInterface');
 goog.require('Slider');
 goog.require('Turtle.Answers');
 goog.require('Turtle.Blocks');
+goog.require('Maze.Blocks');
 goog.require('Teacher.soy');
 
 
@@ -226,8 +227,6 @@ Turtle.showHelp = function() {
     BlocklyInterface.injectReadonly('sampleHelp4', xml);
   }
 
-  BlocklyDialogs.showDialog(help, button, true, true, style, Turtle.hideHelp);
-  BlocklyDialogs.startDialogKeyDown();
 };
 
 /**
@@ -240,23 +239,6 @@ Turtle.hideHelp = function() {
     // If the user doesn't find them, point them out.
     setTimeout(Turtle.showCategoryHelp, 5000);
   }
-};
-
-/**
- * Show the help pop-up to encourage clicking on the toolbox categories.
- */
-Turtle.showCategoryHelp = function() {
-  if (Turtle.categoryClicked_ || BlocklyDialogs.isDialogVisible_) {
-    return;
-  }
-  var help = document.getElementById('helpToolbox');
-  var style = {
-    width: '25%',
-    left: '525px',
-    top: '3.3em'
-  };
-  var origin = document.getElementById(':0');  // Toolbox's tree root.
-  BlocklyDialogs.showDialog(help, origin, true, false, style, null);
 };
 
 

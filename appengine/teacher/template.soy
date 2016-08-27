@@ -11,49 +11,221 @@
  */
 
 /**
- * Translated messages for use in JavaScript.
- */
+* Translated messages for use in JavaScript.
+*/
 {template .messages}
-  {call BlocklyGames.soy.messages /}
-  <div style="display: none">
-    // Block text and their associated tooltips and URLs (interleaved to
-    // assist with translation).
-    <span id="Turtle_moveTooltip">{msg meaning="Turtle.moveTooltip" desc="tooltip - In this and subsequent messages, 'turtle' refers to a stylized turtle on the screen to represent a position and direction.  This imaginary turtle is carrying a pen in its tail, so moving the turtle draws a line (or curve, etc.).  You are encouraged to play with the [https://blockly-demo.appspot.com/static/apps/turtle/index.html Turtle application] before doing this translation."}Moves the turtle forward or backward by the specified amount.{/msg}</span>
-    <span id="Turtle_moveForward">{msg meaning="Turtle.moveForward" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of a verb telling a turtle to move (walk) in the direction he/she is facing.  This is followed by a number indicating how far (how many pixels) to go.  Prefer a translation that has text in common with the translation of 'move backward'.  See [[Translating:Blockly#Drop-Down_Menus]]."}move forward by{/msg}</span>
-    <span id="Turtle_moveBackward">{msg meaning="Turtle.moveBackward" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of a verb telling a turtle to move (walk) in the direction opposite to where he/she is facing.  This is followed by a number indicating how far (how many pixels) to go.  Prefer a translation that has text in common with the translation of 'move forward'."}move backward by{/msg}</span>
+ {call BlocklyGames.soy.messages /}
+ <div style="display: none">
 
-    <span id="Turtle_turnTooltip">{msg meaning="Turtle.turnTooltip" desc="'Left' means counter-clockwise/anti-clockwise, and 'right' means clockwise."}Turns the turtle left or right by the specified number of degrees.{/msg}</span>
-    <span id="Turtle_turnRight">{msg meaning="Turtle.turnRight" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of verb telling a turtle to rotate clockwise.  This is followed by a number indicating how far (how many degrees) to turn.  Prefer a translation that has text in common with the translation of 'turn left by'."}turn right by{/msg}</span>
-    <span id="Turtle_turnLeft">{msg meaning="Turtle.turnLeft" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of verb telling a turtle to rotate counter-clockwise (anti-clockwise).  This is followed by a number indicating how far (how many degrees) to turn.  Prefer a translation that has text in common with the translation of 'turn right by'."}turn left by{/msg}</span>
+ <!-- TURTLE blocks -->
 
-    <span id="Turtle_widthTooltip">{msg meaning="Turtle.widthTooltip" desc="tooltip"}Changes the width of the pen.{/msg}</span>
-    <span id="Turtle_setWidth">{msg meaning="Turtle.setWidth" desc="block text - Infinitive or imperative of a verb to set the width of the lines that should be drawn in the future by an imaginary pen.  This is followed by a number indicating the width in pixels (1 or greater)."}set width to{/msg}</span>
+   <span id="Turtle_moveTooltip">{msg meaning="Turtle.moveTooltip" desc="tooltip - In this and subsequent messages, 'turtle' refers to a stylized turtle on the screen to represent a position and direction.  This imaginary turtle is carrying a pen in its tail, so moving the turtle draws a line (or curve, etc.).  You are encouraged to play with the [https://blockly-demo.appspot.com/static/apps/turtle/index.html Turtle application] before doing this translation."}Moves the turtle forward or backward by the specified amount.{/msg}</span>
+   <span id="Turtle_moveForward">{msg meaning="Turtle.moveForward" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of a verb telling a turtle to move (walk) in the direction he/she is facing.  This is followed by a number indicating how far (how many pixels) to go.  Prefer a translation that has text in common with the translation of 'move backward'.  See [[Translating:Blockly#Drop-Down_Menus]]."}move forward by{/msg}</span>
+   <span id="Turtle_moveBackward">{msg meaning="Turtle.moveBackward" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of a verb telling a turtle to move (walk) in the direction opposite to where he/she is facing.  This is followed by a number indicating how far (how many pixels) to go.  Prefer a translation that has text in common with the translation of 'move forward'."}move backward by{/msg}</span>
 
-    <span id="Turtle_colourTooltip">{msg meaning="Turtle.colourTooltip" desc="tooltip - Changes the colour of ink in the pen carried by the turtle."}Changes the colour of the pen.{/msg}</span>
-    <span id="Turtle_setColour">{msg meaning="Turtle.setColour" desc="block text - Infinitive or imperative of a verb to specify the colour of the lines that should be drawn in the future by an imaginary pen.  This is followed by a block showing the colour"}set colour to{/msg}</span>
+   <span id="Turtle_turnTooltip">{msg meaning="Turtle.turnTooltip" desc="'Left' means counter-clockwise/anti-clockwise, and 'right' means clockwise."}Turns the turtle left or right by the specified number of degrees.{/msg}</span>
+   <span id="Turtle_turnRight">{msg meaning="Turtle.turnRight" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of verb telling a turtle to rotate clockwise.  This is followed by a number indicating how far (how many degrees) to turn.  Prefer a translation that has text in common with the translation of 'turn left by'."}turn right by{/msg}</span>
+   <span id="Turtle_turnLeft">{msg meaning="Turtle.turnLeft" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of verb telling a turtle to rotate counter-clockwise (anti-clockwise).  This is followed by a number indicating how far (how many degrees) to turn.  Prefer a translation that has text in common with the translation of 'turn right by'."}turn left by{/msg}</span>
 
-    <span id="Turtle_penTooltip">{msg meaning="Turtle.penTooltip" desc="tooltip - Lifting the pen off the writing surface prevents anything from being drawn.  Lowering it (after it has been lifted) enables it to draw again."}Lifts or lowers the pen, to stop or start drawing.{/msg}</span>
-    <span id="Turtle_penUp">{msg meaning="Turtle.penUp" desc="block text - Infinitive or imperative of a verb to lift up a pen so that moving it leaves no mark on the writing surface."}pen up{/msg}</span>
-    <span id="Turtle_penDown">{msg meaning="Turtle.penDown" desc="block text - Infinitive or imperative of a verb to lower a raised pen so that moving it leaves a mark on the writing surface."}pen down{/msg}</span>
+   <span id="Turtle_widthTooltip">{msg meaning="Turtle.widthTooltip" desc="tooltip"}Changes the width of the pen.{/msg}</span>
+   <span id="Turtle_setWidth">{msg meaning="Turtle.setWidth" desc="block text - Infinitive or imperative of a verb to set the width of the lines that should be drawn in the future by an imaginary pen.  This is followed by a number indicating the width in pixels (1 or greater)."}set width to{/msg}</span>
 
-    <span id="Turtle_turtleVisibilityTooltip">{msg meaning="Turtle.turtleVisibilityTooltip" desc="tooltip"}Makes the turtle (circle and arrow) visible or invisible.{/msg}</span>
-    <span id="Turtle_hideTurtle">{msg meaning="Turtle.hideTurtle" desc="block text - Infinitive or imperative of a verb telling a turtle to hide itself (become invisible)."}hide turtle{/msg}</span>
-    <span id="Turtle_showTurtle">{msg meaning="Turtle.showTurtle" desc="block text - Infinitive or imperative of a verb telling a turtle to show itself (become visible after having been invisible)."}show turtle{/msg}</span>
+   <span id="Turtle_colourTooltip">{msg meaning="Turtle.colourTooltip" desc="tooltip - Changes the colour of ink in the pen carried by the turtle."}Changes the colour of the pen.{/msg}</span>
+   <span id="Turtle_setColour">{msg meaning="Turtle.setColour" desc="block text - Infinitive or imperative of a verb to specify the colour of the lines that should be drawn in the future by an imaginary pen.  This is followed by a block showing the colour"}set colour to{/msg}</span>
 
-    <span id="Turtle_printHelpUrl">{msg meaning="Turtle.printHelpUrl" desc="URL - Information about printing or typography."}https://en.wikipedia.org/wiki/Printing{/msg}</span>
-    <span id="Turtle_printTooltip">{msg meaning="Turtle.printTooltip" desc="tooltip - Note that 'print' refers to displaying text on the screen, not on an external printer."}Draws text in the turtle's direction at its location.{/msg}</span>
-    <span id="Turtle_print">{{msg meaning="Turtle.print" desc="block text - Infinitive or imperative of a verb telling a turtle to display text on the screen.  This is always followed by a block indicating what should be printed.\n{lb}{lb}Identical|Print{rb}{rb}"}}print{{/msg}}</span>
+   <span id="Turtle_penTooltip">{msg meaning="Turtle.penTooltip" desc="tooltip - Lifting the pen off the writing surface prevents anything from being drawn.  Lowering it (after it has been lifted) enables it to draw again."}Lifts or lowers the pen, to stop or start drawing.{/msg}</span>
+   <span id="Turtle_penUp">{msg meaning="Turtle.penUp" desc="block text - Infinitive or imperative of a verb to lift up a pen so that moving it leaves no mark on the writing surface."}pen up{/msg}</span>
+   <span id="Turtle_penDown">{msg meaning="Turtle.penDown" desc="block text - Infinitive or imperative of a verb to lower a raised pen so that moving it leaves a mark on the writing surface."}pen down{/msg}</span>
 
-    <span id="Turtle_fontHelpUrl">{msg meaning="Turtle.fontHelpUrl" desc="URL - Information about typographic fonts."}https://en.wikipedia.org/wiki/Font{/msg}</span>
-    <span id="Turtle_fontTooltip">{msg meaning="Turtle.fontTooltip" desc="tooltip - This is shown on the block that lets the user specify the font [family], size, and style that should be used for subsequent displays of text."}Sets the font used by the print block.{/msg}</span>
-    <span id="Turtle_font">{msg meaning="Turtle.font" desc="block text - This precedes a dropdown menu specifying the typographic font [family] that should be used when displaying text."}font{/msg}</span>
-    <span id="Turtle_fontSize">{{msg meaning="Turtle.fontSize" desc="block text - This precedes a number specifying the size of the typographic font that should be used when displaying text.  This appears in the same block as 'font', so that word should not be repeated.\n{lb}{lb}Identical|Font size{rb}{rb}"}}font size{{/msg}}</span>
-    <span id="Turtle_fontNormal">{msg meaning="Turtle.fontNormal" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Specifies that a typographic font should be normal (neither in italics or bold)."}normal{/msg}</span>
-    <span id="Turtle_fontBold">{msg meaning="Turtle.fontBold" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Specifies that a typographic font should be [https://en.wikipedia.org/wiki/Emphasis_(typography) bold]."}bold{/msg}</span>
-    <span id="Turtle_fontItalic">{msg meaning="Turtle.fontItalic" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Specifies that a typographic font should be [https://en.wikipedia.org/wiki/Italics italic]."}italic{/msg}</span>
+   <span id="Turtle_turtleVisibilityTooltip">{msg meaning="Turtle.turtleVisibilityTooltip" desc="tooltip"}Makes the turtle (circle and arrow) visible or invisible.{/msg}</span>
+   <span id="Turtle_hideTurtle">{msg meaning="Turtle.hideTurtle" desc="block text - Infinitive or imperative of a verb telling a turtle to hide itself (become invisible)."}hide turtle{/msg}</span>
+   <span id="Turtle_showTurtle">{msg meaning="Turtle.showTurtle" desc="block text - Infinitive or imperative of a verb telling a turtle to show itself (become visible after having been invisible)."}show turtle{/msg}</span>
 
-    <span id="Turtle_submitDisabled">{msg meaning="Turtle.submitDisabled" desc="Error message."}Run your program until it stops. Then you may submit your drawing to the gallery.{/msg}</span>
-  </div>
+   <span id="Turtle_printHelpUrl">{msg meaning="Turtle.printHelpUrl" desc="URL - Information about printing or typography."}https://en.wikipedia.org/wiki/Printing{/msg}</span>
+   <span id="Turtle_printTooltip">{msg meaning="Turtle.printTooltip" desc="tooltip - Note that 'print' refers to displaying text on the screen, not on an external printer."}Draws text in the turtle's direction at its location.{/msg}</span>
+   <span id="Turtle_print">{{msg meaning="Turtle.print" desc="block text - Infinitive or imperative of a verb telling a turtle to display text on the screen.  This is always followed by a block indicating what should be printed.\n{lb}{lb}Identical|Print{rb}{rb}"}}print{{/msg}}</span>
+
+   <span id="Turtle_fontHelpUrl">{msg meaning="Turtle.fontHelpUrl" desc="URL - Information about typographic fonts."}https://en.wikipedia.org/wiki/Font{/msg}</span>
+   <span id="Turtle_fontTooltip">{msg meaning="Turtle.fontTooltip" desc="tooltip - This is shown on the block that lets the user specify the font [family], size, and style that should be used for subsequent displays of text."}Sets the font used by the print block.{/msg}</span>
+   <span id="Turtle_font">{msg meaning="Turtle.font" desc="block text - This precedes a dropdown menu specifying the typographic font [family] that should be used when displaying text."}font{/msg}</span>
+   <span id="Turtle_fontSize">{{msg meaning="Turtle.fontSize" desc="block text - This precedes a number specifying the size of the typographic font that should be used when displaying text.  This appears in the same block as 'font', so that word should not be repeated.\n{lb}{lb}Identical|Font size{rb}{rb}"}}font size{{/msg}}</span>
+   <span id="Turtle_fontNormal">{msg meaning="Turtle.fontNormal" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Specifies that a typographic font should be normal (neither in italics or bold)."}normal{/msg}</span>
+   <span id="Turtle_fontBold">{msg meaning="Turtle.fontBold" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Specifies that a typographic font should be [https://en.wikipedia.org/wiki/Emphasis_(typography) bold]."}bold{/msg}</span>
+   <span id="Turtle_fontItalic">{msg meaning="Turtle.fontItalic" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Specifies that a typographic font should be [https://en.wikipedia.org/wiki/Italics italic]."}italic{/msg}</span>
+
+   <span id="Turtle_submitDisabled">{msg meaning="Turtle.submitDisabled" desc="Error message."}Run your program until it stops. Then you may submit your drawing to the gallery.{/msg}</span>
+
+   <!-- MAZE blocks -->
+
+   <span id="Maze_moveForward">{msg meaning="Maze.moveForward" desc="block text - Imperative or infinitive of a verb for a person moving (walking) in the direction he/she is facing."}move forward{/msg}</span>
+   <span id="Maze_turnLeft">{msg meaning="Maze.turnLeft" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Imperative or infinitive of a verb for a person turning his head and body one quarter rotation counter-clockwise.  Prefer a translation that has text in common with the translation of 'turn right'.  See [[Translating:Blockly#Drop-Down_Menus]]."}turn left{/msg}</span>
+   <span id="Maze_turnRight">{msg meaning="Maze.turnRight" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Imperative or infinitive of a verb for a person turning his head and body one quarter rotation clockwise.  Prefer a translation that has text in common with the translation of 'turn left'.  See [[Translating:Blockly#Drop-Down_Menus]]."}turn right{/msg}</span>
+   <span id="Maze_doCode">{msg meaning="Maze.doCode" desc="block text - Imperative or infinitive of a verb preceding one or more commands to a person.  This is part of [https://github.com/google/blockly/wiki/Loops#repeat repeat] and [https://github.com/google/blockly/wiki/IfElse#If_blocks if] blocks."}do{/msg}</span>
+   <span id="Maze_elseCode">{msg meaning="Maze.elseCode" desc="block text - Conjunction meaning 'otherwise', introducing commands to be performed if a previous condition was not true, as in 'if x>3, do this, else do that'.  See [https://github.com/google/blockly/wiki/IfElse#If-Else_blocks]."}else{/msg}</span>
+   // The helpIfElse definition was copied up here ahead of when it is needed
+   // so that it is adjacent to the previous definition.
+   <span id="Maze_helpIfElse">{msg meaning="Maze.helpIfElse" desc="callout - This is shown when the 'if-else' block is introduced.  For 'if-else' concatenate the words for 'if' and 'else/otherwise'."}If-else blocks will do one thing or the other.{/msg}</span>
+   <span id="Maze_pathAhead">{msg meaning="Maze.pathAhead" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Condensed form of 'if there is a path ahead', as in: 'if path ahead, go forward'.  Prefer translation that has text in common with 'if path to the left' and 'if path to the right'."}if path ahead{/msg}</span>
+   <span id="Maze_pathLeft">{msg meaning="Maze.pathLeft" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Condensed form of 'if there is a path to the left', as in: 'if path to the left, turn left'."}if path to the left{/msg}</span>
+   <span id="Maze_pathRight">{msg meaning="Maze.pathRight" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Condensed form of 'if there is a path to the right', as in: 'if path to the right, turn right'."}if path to the right{/msg}</span>
+   <span id="Maze_repeatUntil">{msg meaning="Maze.repeatUntil" desc="block text - Imperative or infinitive of a verb to repeat the following commands.  The phrase is followed by the symbol denoting the end of the maze."}repeat until{/msg}</span>
+   <span id="Maze_moveForwardTooltip">{msg meaning="Maze.moveForwardTooltip" desc="tooltip - Moves the icon on the screen representing the player forward one square on the maze board."}Moves the player forward one space.{/msg}</span>
+   <span id="Maze_turnTooltip">{msg meaning="Maze.turnTooltip" desc="tooltip - Turns the icon on the screen representing the player 90 degrees counter-clockwise (left) or clockwise (right)."}Turns the player left or right by 90 degrees.{/msg}</span>
+   <span id="Maze_ifTooltip">{msg meaning="Maze.ifTooltip" desc="tooltip - 'path' refers to a path through a maze."}If there is a path in the specified direction, then do some actions.{/msg}</span>
+   <span id="Maze_ifelseTooltip">{msg meaning="Maze.ifelseTooltip" desc="tooltip - 'path' refers to a path through a maze."}If there is a path in the specified direction, then do the first block of actions. Otherwise, do the second block of actions.{/msg}</span>
+   <span id="Maze_whileTooltip">{msg meaning="Maze.whileTooltip" desc="tooltip - Repeat the enclosed commands until the maze has been successfully completed (the end point reached)."}Repeat the enclosed actions until finish point is reached.{/msg}</span>
+   <span id="Maze_capacity0">{msg meaning="Maze.capacity0" desc="warning - No more blocks may be added until some are removed.  Please include '%0' in the translated string.  It will be replaced with '0' and made bold."}You have %0 blocks left.{/msg}</span>
+   <span id="Maze_capacity1">{{msg meaning="Maze.capacity1" desc="warning - Only one more block may be added. Please include '%1' in the translated string. It will be replaced with '1' and made bold.\n\nSee also:\n* {lb}{lb}msg-blockly|Maze.capacity2{rb}{rb}"}}You have %1 block left.{{/msg}}</span>
+   <span id="Maze_capacity2">{{msg meaning="Maze.capacity2" desc="warning - Only %2 more blocks may be used, where %2 is an integer greater than 1.\n\nSee also:\n* {lb}{lb}msg-blockly|Maze.capacity1{rb}{rb}"}}You have %2 blocks left.{{/msg}}</span>
+
+
+   <!-- PUZZLE blocks -->
+
+
+   <span id="Puzzle_animal1">
+     {{msg meaning="Puzzle.animal1" desc="Duck: The bird.\n{lb}{lb}Identical|Duck{rb}{rb}"}}
+       Duck
+     {{/msg}}
+   </span>
+   <span id="Puzzle_animal1Pic">duck.jpg</span>
+   <span id="Puzzle_animal1PicHeight">70</span>
+   <span id="Puzzle_animal1PicWidth">100</span>
+   <span id="Puzzle_animal1Legs">&nbsp;&nbsp;2&nbsp;&nbsp;</span>
+   <span id="Puzzle_animal1Trait1">
+     {{msg meaning="Puzzle.animal1Trait1" desc="Feathers: A trait that ducks have.\n{lb}{lb}Identical|Feather{rb}{rb}"}}
+        Feathers
+     {{/msg}}
+   </span>
+   <span id="Puzzle_animal1Trait2">
+     {{msg meaning="Puzzle.animal1Trait2" desc="Beak: A trait that ducks have.\n{lb}{lb}Identical|Beak{rb}{rb}"}}
+       Beak
+     {{/msg}}
+   </span>
+   <span id="Puzzle_animal1HelpUrl">
+     {msg meaning="Puzzle.animal1HelpUrl" desc="The URL of a page with basic information about ducks."}
+       https://en.wikipedia.org/wiki/Duck
+     {/msg}
+   </span>
+
+   <span id="Puzzle_animal2">
+     {{msg meaning="Puzzle.animal2" desc="Cat: The animal.\n{lb}{lb}Identical|Cat{rb}{rb}"}}
+       Cat
+     {{/msg}}
+   </span>
+   <span id="Puzzle_animal2Pic">cat.jpg</span>
+   <span id="Puzzle_animal2PicHeight">70</span>
+   <span id="Puzzle_animal2PicWidth">100</span>
+   <span id="Puzzle_animal2Legs">&nbsp;&nbsp;4&nbsp;&nbsp;</span>
+   <span id="Puzzle_animal2Trait1">
+     {{msg meaning="Puzzle.animal2Trait1" desc="Whiskers: A trait that cats have.\n{lb}{lb}Identical|Whisker{rb}{rb}"}}
+       Whiskers
+     {{/msg}}
+   </span>
+   <span id="Puzzle_animal2Trait2">
+     {{msg meaning="Puzzle.animal2Trait2" desc="Fur: A trait that cats have.\n{lb}{lb}Identical|Fur{rb}{rb}"}}
+       Fur
+     {{/msg}}
+   </span>
+   <span id="Puzzle_animal2HelpUrl">
+     {msg meaning="Puzzle.animal2HelpUrl" desc="The URL of a page with basic information about cats."}
+       https://en.wikipedia.org/wiki/Cat
+     {/msg}
+   </span>
+
+   <span id="Puzzle_animal3">
+     {{msg meaning="Puzzle.animal3" desc="Bee: The insect.\n{lb}{lb}Identical|Bee{rb}{rb}"}}
+       Bee
+     {{/msg}}
+   </span>
+   <span id="Puzzle_animal3Pic">bee.jpg</span>
+   <span id="Puzzle_animal3PicHeight">70</span>
+   <span id="Puzzle_animal3PicWidth">100</span>
+   <span id="Puzzle_animal3Legs">&nbsp;&nbsp;6&nbsp;&nbsp;</span>
+   <span id="Puzzle_animal3Trait1">
+     {{msg meaning="Puzzle.animal3Trait1" desc="Honey: A trait that bees have.\n{lb}{lb}Identical|Honey{rb}{rb}"}}
+       Honey
+     {{/msg}}
+   </span>
+   <span id="Puzzle_animal3Trait2">
+     {{msg meaning="Puzzle.animal3Trait2" desc="Stinger: A trait that bees have.\n{lb}{lb}Identical|Stinger{rb}{rb}"}}
+       Stinger
+     {{/msg}}
+   </span>
+   <span id="Puzzle_animal3HelpUrl">
+     {msg meaning="Puzzle.animal3HelpUrl" desc="The URL of a page with basic information about bees."}
+       https://en.wikipedia.org/wiki/Bee
+     {/msg}
+   </span>
+
+   <span id="Puzzle_animal4">
+     {{msg meaning="Puzzle.animal4" desc="Snail: The animal.\n{lb}{lb}Identical|Snail{rb}{rb}"}}
+       Snail
+     {{/msg}}
+   </span>
+   <span id="Puzzle_animal4Pic">snail.jpg</span>
+   <span id="Puzzle_animal4PicHeight">70</span>
+   <span id="Puzzle_animal4PicWidth">100</span>
+   <span id="Puzzle_animal4Legs">&nbsp;&nbsp;0&nbsp;&nbsp;</span>
+   <span id="Puzzle_animal4Trait1">
+     {{msg meaning="Puzzle.animal4Trait1" desc="Shell: A trait that snails have.\n{lb}{lb}Identical|Shell{rb}{rb}"}}
+       Shell
+     {{/msg}}
+   </span>
+   <span id="Puzzle_animal4Trait2">
+     {{msg meaning="Puzzle.animal4Trait2" desc="Slime: A trait that snails have.\n{lb}{lb}Identical|Slime{rb}{rb}"}}
+       Slime
+     {{/msg}}
+   </span>
+   <span id="Puzzle_animal4HelpUrl">
+     {msg meaning="Puzzle.animal4HelpUrl" desc="The URL of a page with basic information about snails."}
+       https://en.wikipedia.org/wiki/Snail
+     {/msg}
+   </span>
+
+   <span id="Puzzle_picture">
+     {{msg meaning="Puzzle.picture" desc="Prompt for a picture of an animal.\n{lb}{lb}Identical|Picture{rb}{rb}"}}
+       picture:
+     {{/msg}}
+   </span>
+   <span id="Puzzle_legs">
+     {{msg meaning="Puzzle.legs" desc="Prompt for the number of legs that an animal has.\n{lb}{lb}Identical|Leg{rb}{rb}"}}
+       legs:
+     {{/msg}}
+   </span>
+   <span id="Puzzle_legsChoose">
+     {{msg meaning="Puzzle.legsChoose" desc="Initial text displayed in a dropdown menu from which the user should choose an option.\n{lb}{lb}Identical|Choose{rb}{rb}"}}
+       choose...
+     {{/msg}}
+   </span>
+   <span id="Puzzle_traits">
+     {{msg meaning="Puzzle.traits" desc="Prompt for a couple of traits of an animal (e.g. Duck: feathers, beak).\n{lb}{lb}Identical|Trait{rb}{rb}"}}
+       traits:
+     {{/msg}}
+   </span>
+   <span id="Puzzle_error0">
+     {msg meaning="Puzzle.error0" desc="A congratulatory message displayed if the user placed all of the blocks correctly.\n\nParameters:\n* %1 - number of blocks correctly placed.  It is always an integer greater than 1.\n\nThe use of a new line character is optional."}
+       Perfect!\nAll %1 blocks are correct.
+     {/msg}
+   </span>
+   <span id="Puzzle_error1">
+     {msg meaning="Puzzle.error1" desc="An encouraging error message displayed if the user placed all blocks except 1 correctly.\n\nIf the number of incorrect blocks is 2 or more, Puzzle.error2 is used instead."}
+       Almost! One block is incorrect.
+     {/msg}
+   </span>
+   <span id="Puzzle_error2">
+     {msg meaning="Puzzle.error2" desc="An error message displayed if the user misplaced multiple blocks.\n\nParameters:\n* %1 - number of blocks incorrectly placed, which is always greater than 1 (or the message Puzzle.error1 would be used)."}
+       %1 blocks are incorrect.
+     {/msg}
+   </span>
+   <span id="Puzzle_tryAgain">
+      {msg meaning="Puzzle.tryAgain" desc="A message indicating that a visually distinguished block is incorrect and that the user should try to fix it.\n\nThe use of a new line character is optional."}
+        The highlighted block is not correct.\nKeep trying.
+      {/msg}
+   </span>
+
+
+ </div>
+
 {/template}
 
 /**
@@ -264,6 +436,26 @@
  */
 {template .toolbox}
   <xml id="toolbox" style="display: none">
+
+
+  <category name="{msg meaning="Games.maze" desc="Maze"}Maze{/msg}">
+    <block type="maze_moveForward"></block>
+    <block type="maze_turn"><field name="DIR">turnLeft</field></block>
+    <block type="maze_turn"><field name="DIR">turnRight</field></block>
+    {if $ij.level > 2}
+      <block type="maze_forever"></block>
+      {if $ij.level == 6}
+        <block type="maze_if"><field name="DIR">isPathLeft</field></block>
+      {elseif $ij.level > 6}
+        <block type="maze_if"></block>
+        {if $ij.level > 8}
+          <block type="maze_ifElse"></block>
+        {/if}
+      {/if}
+    {/if}
+  </category>
+
+
     {if $ij.level == 10}
       <category name="{msg meaning="Games.turtle" desc="IBID"}Turtle{/msg}">
         <block type="turtle_move">
