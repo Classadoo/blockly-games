@@ -9,26 +9,28 @@
 //
 var push_to_user = function(msg, level, user_name)
 {
-  console.log("Sending ", msg, user_name);
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + user_name);
 
   if (msg)
   {
+    console.log("Sending ", msg.blkmsg.type, msg, user_name);
     ref.child("events").push(msg);
   }
   else {
+    console.log("Clearing messages");
     ref.child("events").set({});
   }
 
   if (level != null)
   {
+    console.log("Sending new level", level);
     ref.update({"level": level});
   }
 
 }
 
 //
-// Add a callback for when a new blockly event occurs in a user object.
+// Add a callback for when a new blockly event lands in wilddog.
 //
 var add_user_event_callback = function(user_name, callback)
 {

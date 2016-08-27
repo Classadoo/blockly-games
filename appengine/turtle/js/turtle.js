@@ -117,6 +117,11 @@ var initWildDog = function(workspace, teacher_workspace){
               groupid = Blockly.Events.getGroup();
           }
           events_in_progress[slaveEvent.blockId + slaveEvent.type] = true;
+          // Create will automatically trigger a move, so don't send our move command back to the student.
+          if (slaveEvent.type == "create")
+          {
+            events_in_progress[slaveEvent.blockId + "move"] = true;
+          }
           slaveEvent.run(true);
           if (!existingGroup) {
               Blockly.Events.setGroup(false);
