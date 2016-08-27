@@ -137,7 +137,7 @@ var initStudent = function(username, user_id)
     }
   };
   add_user_event_callback(username, student_event_callback);
-  add_user_remove_callback(username, function(old_snapshot)
+  add_user_remove_callback(username, function()
   {
     var container = document.getElementById(username + "_container");
     if (container)

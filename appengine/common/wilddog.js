@@ -43,16 +43,29 @@ var add_user_event_callback = function(user_name, callback)
 }
 
 //
-// Add a callback from when data is removed from a user.
-// For now, we should assume this means the user is all cleared.
+// Add a callback from when a user is deleted or his blocks are removed.
+// (For now, we should assume this means the user is all cleared.)
 //
 var add_user_remove_callback = function(user_name, callback)
 {
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + user_name + "/events");
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/");
+
+  // Watch out for the user being deleted.
   ref.on('child_removed', function(old_snapshot)
   {
+    if (old_snapshot.key() == user_name)
+    {
+      console.log("Child removed", user_name);
+      callback();
+    }
+  });
+
+  // Watch out for the user's events being removed.
+  var blocks_ref = ref.child(user_name).child("events");
+  blocks_ref.on('child_removed', function(old_snapshot)
+  {
     console.log("Child removed", user_name);
-    callback(old_snapshot);
+    callback();
   });
 }
 

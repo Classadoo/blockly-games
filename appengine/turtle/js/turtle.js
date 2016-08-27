@@ -304,21 +304,6 @@ Turtle.init = function() {
   setTimeout(BlocklyInterface.importInterpreter, 1);
   // Lazy-load the syntax-highlighting.
   setTimeout(BlocklyInterface.importPrettify, 1);
-
-  BlocklyGames.bindClick('helpButton', Turtle.showHelp);
-  if (location.hash.length < 2 &&
-      !BlocklyGames.loadFromLocalStorage(BlocklyGames.NAME,
-                                         BlocklyGames.LEVEL)) {
-    setTimeout(Turtle.showHelp, 1000);
-    if (BlocklyGames.LEVEL == 9) {
-      setTimeout(BlocklyDialogs.abortOffer, 5 * 60 * 1000);
-    }
-  }
-  if (BlocklyGames.LEVEL == 1) {
-    // Previous apps did not have categories.
-    // If the user doesn't find them, point them out.
-    BlocklyGames.workspace.addChangeListener(Turtle.watchCategories_);
-  }
 };
 
 if (window.location.pathname.match(/readonly.html$/)) {
