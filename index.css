@@ -1,0 +1,34 @@
+body {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', 'Droid Sans Mono', monospace;
+    height: 100%;
+}
+
+.login-wrapper {
+	margin-top: 15%;
+	text-align: center;
+}
+
+.join-button {
+	background-color: lightblue;
+	border: 2px solid grey;
+	border-radius: 3px;
+	font-size: 22px;
+}
+
+.name-input {
+	font-size: 22px;
+}
+
+.region-select.selected {
+	background: lightblue
+}
+
+.region-select {
+	background: lightgrey;
+	margin: 0px;
+	font-size: 22px;
+}
+
+.region-input {
+	margin-bottom: 15px;
+}
