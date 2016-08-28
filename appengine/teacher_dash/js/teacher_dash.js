@@ -139,15 +139,8 @@ var initStudent = function(username, user_id)
   add_user_event_callback(username, student_event_callback);
   add_user_remove_callback(username, function()
   {
-    var container = document.getElementById(username + "_container");
-    if (container)
-    {
-      container.parentElement.removeChild(container);
-      workspace.removeChangeListener(local_event_handler);
       workspace.clear();
-    }
   });
-
 
   add_user_level_callback(username, function(level)
   {
