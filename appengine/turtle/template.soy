@@ -103,17 +103,6 @@
           {/call}
         </h1>
       </td>
-      <td class="farSide">
-        <select id="languageMenu"></select>
-        &nbsp;
-        <button id="linkButton" title="{msg meaning="Games.linkTooltip" desc="IBID"}Save and link to blocks.{/msg}">
-          <img src="common/1x1.gif" class="link icon21">
-        </button>
-        &nbsp;
-        <button id="helpButton">
-          {{msg meaning="Games.help" desc="IBID"}}Help{{/msg}}
-        </button>
-      </td>
     </tr>
   </table>
   <div id="visualization">
@@ -505,11 +494,9 @@
         </block>
           <block type="turtle_pen"></block>
       </category>
-      {if $ij.level > 2}
         <category name="{msg meaning="Games.catColour" desc="IBID"}Colour{/msg}">
           <block type="turtle_colour_internal"></block>
         </category>
-      {/if}
       <category name="{msg meaning="Games.catLoops" desc="IBID"}Loops{/msg}">
         <block type="turtle_repeat_internal">
           <field name="TIMES">4</field>
