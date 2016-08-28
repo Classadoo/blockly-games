@@ -629,7 +629,12 @@ Turtle.executeChunk_ = function() {
   if (!Turtle.pause) {
     document.getElementById('spinner').style.visibility = 'hidden';
     BlocklyGames.workspace.highlightBlock(null);
-    Turtle.checkAnswer();
+
+    // First level is just a playground. Don't check the answer.
+    if (BlocklyGames.LEVEL > 1)
+    {
+      Turtle.checkAnswer();
+    }
     // Image complete; allow the user to submit this image to Reddit.
     Turtle.canSubmit = true;
   }

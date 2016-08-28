@@ -43,25 +43,27 @@ Turtle.answer = function() {
 
   switch (BlocklyGames.LEVEL) {
     case 1:
+      break;
+    case 2:
       // Square.
       for (var count = 0; count < 4; count++) {
         Turtle.move(100);
         Turtle.turn(90);
       }
       break;
-    case 2:
+    case 3:
       // Pentagon.
       for (var count = 0; count < 5; count++) {
         Turtle.move(100);
         Turtle.turn(72);
       }
       break;
-    case 3:
+    case 4:
       // Star.
       Turtle.penColour('#ffff00');
       drawStar(100);
       break;
-    case 4:
+    case 5:
       // Pen up/down.
       Turtle.penColour('#ffff00');
       drawStar(50);
@@ -70,7 +72,7 @@ Turtle.answer = function() {
       Turtle.penDown(true);
       Turtle.move(20);
       break;
-    case 5:
+    case 6:
       // Four stars.
       Turtle.penColour('#ffff00');
       for (var count = 0; count < 4; count++) {
@@ -81,7 +83,7 @@ Turtle.answer = function() {
         drawStar(50);
       }
       break;
-    case 6:
+    case 7:
       // Three stars and a line.
       Turtle.penColour('#ffff00');
       for (var count = 0; count < 3; count++) {
@@ -98,7 +100,7 @@ Turtle.answer = function() {
       Turtle.penColour('#ffffff');
       Turtle.move(50);
       break;
-    case 7:
+    case 8:
       // Three stars and 4 lines.
       Turtle.penColour('#ffff00');
       for (var count = 0; count < 3; count++) {
@@ -119,7 +121,7 @@ Turtle.answer = function() {
         Turtle.turn(45);
       }
       break;
-    case 8:
+    case 9:
       // Three stars and a circle.
       Turtle.penColour('#ffff00');
       for (var count = 0; count < 3; count++) {
@@ -134,35 +136,6 @@ Turtle.answer = function() {
       Turtle.move(100);
       Turtle.penDown(true);
       Turtle.penColour('#ffffff');
-      for (var count = 0; count < 360; count++) {
-        Turtle.move(50);
-        Turtle.move(-50);
-        Turtle.turn(1);
-      }
-      break;
-    case 9:
-      // Three stars and a crescent.
-      Turtle.penColour('#ffff00');
-      for (var count = 0; count < 3; count++) {
-        Turtle.penDown(false);
-        Turtle.move(150);
-        Turtle.turn(120);
-        Turtle.penDown(true);
-        drawStar(50);
-      }
-      Turtle.penDown(false);
-      Turtle.turn(-90);
-      Turtle.move(100);
-      Turtle.penDown(true);
-      Turtle.penColour('#ffffff');
-      for (var count = 0; count < 360; count++) {
-        Turtle.move(50);
-        Turtle.move(-50);
-        Turtle.turn(1);
-      }
-      Turtle.turn(120);
-      Turtle.move(20);
-      Turtle.penColour('#000000');
       for (var count = 0; count < 360; count++) {
         Turtle.move(50);
         Turtle.move(-50);
