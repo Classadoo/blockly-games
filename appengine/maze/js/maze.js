@@ -152,7 +152,7 @@ BlocklyInterface.nextLevel = function() {
     window.location = window.location.protocol + '//' +
         window.location.host + window.location.pathname +
         '?lang=' + BlocklyGames.LANG + '&level=' + (BlocklyGames.LEVEL + 1) +
-        '&skin=' + Maze.SKIN_ID;
+        '&username=' + getUsername();
   } else {
     BlocklyInterface.indexPage();
   }
@@ -574,9 +574,6 @@ Maze.init = function() {
 
   BlocklyInterface.init();
 
-  // Setup the Pegman menu.
-  var pegmanImg = document.querySelector('#pegmanButton>img');
-  pegmanImg.style.backgroundImage = 'url(' + Maze.SKIN.sprite + ')';
   var pegmanMenu = document.getElementById('pegmanMenu');
   var handlerFactory = function(n) {
     return function() {
@@ -596,12 +593,6 @@ Maze.init = function() {
     Blockly.bindEvent_(div, 'mousedown', null, handlerFactory(i));
   }
   Blockly.bindEvent_(window, 'resize', null, Maze.hidePegmanMenu);
-  var pegmanButton = document.getElementById('pegmanButton');
-  Blockly.bindEvent_(pegmanButton, 'mousedown', null, Maze.showPegmanMenu);
-  var pegmanButtonArrow = document.getElementById('pegmanButtonArrow');
-  var arrow = document.createTextNode(Blockly.FieldDropdown.ARROW_CHAR);
-  pegmanButtonArrow.appendChild(arrow);
-
 
   var rtl = BlocklyGames.isRtl();
   var myBlocklyDiv = document.getElementById('my_blockly');
@@ -746,8 +737,6 @@ Maze.showPegmanMenu = function(e) {
   if (BlocklyInterface.eventSpam(e)) {
     return;
   }
-  var button = document.getElementById('pegmanButton');
-  Blockly.addClass_(button, 'buttonHover');
   menu.style.top = (button.offsetTop + button.offsetHeight) + 'px';
   menu.style.left = button.offsetLeft + 'px';
   menu.style.display = 'block';
@@ -771,7 +760,6 @@ Maze.hidePegmanMenu = function(e) {
     return;
   }
   document.getElementById('pegmanMenu').style.display = 'none';
-  Blockly.removeClass_(document.getElementById('pegmanButton'), 'buttonHover');
   if (Maze.pegmanMenuMouse_) {
     Blockly.unbindEvent_(Maze.pegmanMenuMouse_);
     delete Maze.pegmanMenuMouse_;
