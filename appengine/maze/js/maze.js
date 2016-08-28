@@ -840,7 +840,6 @@ Maze.runButtonClick = function(e) {
       Maze.result != Maze.ResultType.SUCCESS &&
       !BlocklyGames.loadFromLocalStorage(BlocklyGames.NAME,
                                          BlocklyGames.LEVEL)) {
-    Maze.levelHelp();
     return;
   }
   var runButton = document.getElementById('runButton');
@@ -904,7 +903,6 @@ Maze.resetButtonClick = function(e) {
   document.getElementById('resetButton').style.display = 'none';
   BlocklyGames.workspace.traceOn(true);
   Maze.reset(false);
-  Maze.levelHelp();
 };
 
 /**
@@ -1028,7 +1026,6 @@ Maze.animate = function() {
   var action = Maze.log.shift();
   if (!action) {
     BlocklyInterface.highlight(null);
-    Maze.levelHelp();
     return;
   }
   BlocklyInterface.highlight(action[1]);
