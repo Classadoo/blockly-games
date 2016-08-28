@@ -31,6 +31,7 @@ goog.require('BlocklyInterface');
 goog.require('Slider');
 goog.require('Turtle.Answers');
 goog.require('Turtle.Blocks');
+goog.require('Maze.Blocks');
 goog.require('Turtle.soy');
 
 /// HACK (aheine): get the user name in a better way
