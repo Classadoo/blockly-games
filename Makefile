@@ -2,9 +2,9 @@
 # Definitions
 ##############################
 
-USER_APPS = {index,puzzle,maze,bird,turtle,movie,pond/docs,pond/tutor,pond/duck}
-ALL_JSON = {./,index,puzzle,maze,bird,turtle,movie,pond/docs,pond,pond/tutor,pond/duck}
-ALL_TEMPLATES = appengine/template.soy,appengine/index/template.soy,appengine/puzzle/template.soy,appengine/maze/template.soy,appengine/bird/template.soy,appengine/turtle/template.soy,appengine/movie/template.soy,appengine/pond/docs/template.soy,appengine/pond/template.soy,appengine/pond/tutor/template.soy,appengine/pond/duck/template.soy
+USER_APPS = {index,puzzle,maze,bird,teacher,teacher-dash,turtle-collab,turtle,movie,pond/docs,pond/tutor,pond/duck}
+ALL_JSON = {./,index,puzzle,maze,bird,teacher,teacher-dash,turtle-collab,turtle,movie,pond/docs,pond,pond/tutor,pond/duck}
+ALL_TEMPLATES = appengine/template.soy,appengine/index/template.soy,appengine/puzzle/template.soy,appengine/maze/template.soy,appengine/bird/template.soy,appengine/teacher/template.soy,appengine/teacher_dash/template.soy,appengine/turtle_collab/template.soy,appengine/turtle/template.soy,appengine/movie/template.soy,appengine/pond/docs/template.soy,appengine/pond/template.soy,appengine/pond/tutor/template.soy,appengine/pond/duck/template.soy
 
 APP_ENGINE_THIRD_PARTY = appengine/third-party
 SOY_COMPILER = java -jar third-party/SoyToJsSrcCompiler.jar --shouldProvideRequireSoyNamespaces --isUsingIjData
@@ -36,6 +36,10 @@ bird-en: common-en
 turtle-en: common-en
 	$(SOY_COMPILER) --outputPathFormat appengine/turtle/generated/en/soy.js --srcs appengine/turtle/template.soy
 	python build-app.py turtle en
+
+turtle-collab-en: common-en
+	$(SOY_COMPILER) --outputPathFormat appengine/turtle_collab/generated/en/soy.js --srcs appengine/turtle_collab/template.soy
+	python build-app.py turtle_collab en
 
 teacher-en: common-en
 	$(SOY_COMPILER) --outputPathFormat appengine/teacher/generated/en/soy.js --srcs appengine/teacher/template.soy
