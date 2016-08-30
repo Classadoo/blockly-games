@@ -47,17 +47,17 @@ goog.require('BlocklyGames');
 /**
  * Common HSV hue for all blocks in this category.
  */
-Turtle.Blocks.HUE = 160;
+Turtle_Collab.Blocks.HUE = 160;
 
 /**
  * Left turn arrow to be appended to messages.
  */
-Turtle.Blocks.LEFT_TURN = ' \u21BA';
+Turtle_Collab.Blocks.LEFT_TURN = ' \u21BA';
 
 /**
  * Left turn arrow to be appended to messages.
  */
-Turtle.Blocks.RIGHT_TURN = ' \u21BB';
+Turtle_Collab.Blocks.RIGHT_TURN = ' \u21BB';
 
 // Extensions to Blockly's language and JavaScript generator.
 
@@ -70,7 +70,7 @@ Blockly.Blocks['turtle_move'] = {
     var DIRECTIONS =
         [[BlocklyGames.getMsg('Turtle_moveForward'), 'moveForward'],
          [BlocklyGames.getMsg('Turtle_moveBackward'), 'moveBackward']];
-    this.setColour(Turtle.Blocks.HUE);
+    this.setColour(Turtle_Collab.Blocks.HUE);
     this.appendValueInput('VALUE')
         .setCheck('Number')
         .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR');
@@ -102,7 +102,7 @@ Blockly.Blocks['turtle_move_internal'] = {
          ['50', '50'],
          ['100', '100'],
          ['150', '150']];
-    this.setColour(Turtle.Blocks.HUE);
+    this.setColour(Turtle_Collab.Blocks.HUE);
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR')
         .appendField(new Blockly.FieldDropdown(VALUES), 'VALUE');
@@ -129,9 +129,9 @@ Blockly.Blocks['turtle_turn'] = {
         [[BlocklyGames.getMsg('Turtle_turnRight'), 'turnRight'],
          [BlocklyGames.getMsg('Turtle_turnLeft'), 'turnLeft']];
     // Append arrows to direction messages.
-    DIRECTIONS[0][0] += Turtle.Blocks.RIGHT_TURN;
-    DIRECTIONS[1][0] += Turtle.Blocks.LEFT_TURN;
-    this.setColour(Turtle.Blocks.HUE);
+    DIRECTIONS[0][0] += Turtle_Collab.Blocks.RIGHT_TURN;
+    DIRECTIONS[1][0] += Turtle_Collab.Blocks.LEFT_TURN;
+    this.setColour(Turtle_Collab.Blocks.HUE);
     this.appendValueInput('VALUE')
         .setCheck('Number')
         .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR');
@@ -166,9 +166,9 @@ Blockly.Blocks['turtle_turn_internal'] = {
          ['120\u00B0', '120'],
          ['144\u00B0', '144']];
     // Append arrows to direction messages.
-    DIRECTIONS[0][0] += Turtle.Blocks.RIGHT_TURN;
-    DIRECTIONS[1][0] += Turtle.Blocks.LEFT_TURN;
-    this.setColour(Turtle.Blocks.HUE);
+    DIRECTIONS[0][0] += Turtle_Collab.Blocks.RIGHT_TURN;
+    DIRECTIONS[1][0] += Turtle_Collab.Blocks.LEFT_TURN;
+    this.setColour(Turtle_Collab.Blocks.HUE);
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR')
         .appendField(new Blockly.FieldDropdown(VALUES), 'VALUE');
@@ -191,7 +191,7 @@ Blockly.Blocks['turtle_width'] = {
    * @this Blockly.Block
    */
   init: function() {
-    this.setColour(Turtle.Blocks.HUE);
+    this.setColour(Turtle_Collab.Blocks.HUE);
     this.appendValueInput('WIDTH')
         .setCheck('Number')
         .appendField(BlocklyGames.getMsg('Turtle_setWidth'));
@@ -228,7 +228,7 @@ Blockly.Blocks['turtle_pen'] = {
       ],
       "previousStatement": null,
       "nextStatement": null,
-      "colour": Turtle.Blocks.HUE,
+      "colour": Turtle_Collab.Blocks.HUE,
       "tooltip": BlocklyGames.getMsg('Turtle_penTooltip')
     });
   }
@@ -307,7 +307,7 @@ Blockly.Blocks['turtle_visibility'] = {
       ],
       "previousStatement": null,
       "nextStatement": null,
-      "colour": Turtle.Blocks.HUE,
+      "colour": Turtle_Collab.Blocks.HUE,
       "tooltip": BlocklyGames.getMsg('Turtle_turtleVisibilityTooltip')
     });
   }
@@ -326,7 +326,7 @@ Blockly.Blocks['turtle_print'] = {
    */
   init: function() {
     this.setHelpUrl(BlocklyGames.getMsg('Turtle_printHelpUrl'));
-    this.setColour(Turtle.Blocks.HUE);
+    this.setColour(Turtle_Collab.Blocks.HUE);
     this.appendValueInput('TEXT')
         .appendField(BlocklyGames.getMsg('Turtle_print'));
     this.setPreviousStatement(true);
@@ -359,7 +359,7 @@ Blockly.Blocks['turtle_font'] = {
          [BlocklyGames.getMsg('Turtle_fontItalic'), 'italic'],
          [BlocklyGames.getMsg('Turtle_fontBold'), 'bold']];
     this.setHelpUrl(BlocklyGames.getMsg('Turtle_fontHelpUrl'));
-    this.setColour(Turtle.Blocks.HUE);
+    this.setColour(Turtle_Collab.Blocks.HUE);
     this.appendDummyInput()
         .appendField(BlocklyGames.getMsg('Turtle_font'))
         .appendField(new Blockly.FieldDropdown(FONTLIST), 'FONT');
