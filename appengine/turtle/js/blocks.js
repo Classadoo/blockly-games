@@ -98,7 +98,7 @@ Blockly.Blocks['turtle_move_internal'] = {
         [[BlocklyGames.getMsg('Turtle_moveForward'), 'moveForward'],
          [BlocklyGames.getMsg('Turtle_moveBackward'), 'moveBackward']];
     var VALUES =
-        [['jonesin', '20'],
+        [['20', '20'],
          ['50', '50'],
          ['100', '100'],
          ['150', '150']];
@@ -254,37 +254,6 @@ Blockly.Blocks['turtle_colour'] = {
     this.setNextStatement(true);
     this.setTooltip(BlocklyGames.getMsg('Turtle_colourTooltip'));
   }
-};
-
-Blockly.Blocks['turtle_arbitrary'] = {
-  /**
-   * Block for arbitrary code.
-   * @this Blockly.Block
-   */
-  init: function() {
-    this.jsonInit({
-      "message0": "%1(%2, %3);",
-      "args0": [
-        {
-          "type": "input_value",
-          "name": "SCRIPT",
-        }
-      ],
-      "inputsInline": true,
-      "previousStatement": null,
-      "nextStatement": null,
-      "colour": 0
-    });
-  }
-};
-
-Blockly.Javascript['turtle_arbitrary'] = function(block) {
-  /**
-   * Block for arbitrary code.
-   * @this Blockly.Block
-   */
-   // Generate JavaScript for arbitrary code.
-   return block.getFieldValue('SCRIPT');
 };
 
 Blockly.JavaScript['turtle_colour'] = function(block) {
