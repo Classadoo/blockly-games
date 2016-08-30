@@ -31,121 +31,8 @@ goog.require('BlocklyInterface');
 goog.require('Slider');
 goog.require('Turtle.Answers');
 goog.require('Turtle.Blocks');
-goog.require('Maze.Blocks');
 goog.require('Turtle.soy');
 
-/// HACK (aheine): get the user name in a better way
-function getUsername() {
-    var url = window.location.href;
-    var regex = new RegExp("[?&]username(=([^&#]*)|&|#|$)"),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
-
-var initWildDog = function(workspace, teacher_workspace){
-    var user_id = guid();
-    push_to_user(null, "Turtle-" + BlocklyGames.LEVEL, getUsername());
-
-    var events_in_progress = {};
-    workspace.addChangeListener(function(masterEvent) {
-      if (masterEvent.type == Blockly.Events.UI) {
-        return;  // Don't mirror UI events.
-      }
-
-      if (events_in_progress[masterEvent.blockId + masterEvent.type] === true)
-      {
-        console.log("don't send event triggered by wilddog.", masterEvent);
-        events_in_progress[masterEvent.blockId + masterEvent.type] = false;
-        return;
-      }
-
-
-      // Convert event to JSON for transmitting across the net.
-      var json = masterEvent.toJson();
-      var wdmsg = {"sender":user_id, "blkmsg":json};
-
-      console.log("Sending student event", masterEvent);
-      push_to_user(wdmsg, null, getUsername());
-    });
-
-    var teacher_event_callback = function(snapshot) {
-      var blkmsg = clean_event(snapshot, user_id);
-      if (!blkmsg)
-      {
-        return;
-      }
-      var slaveEvent = Blockly.Events.fromJson(blkmsg, teacher_workspace);
-
-      try {
-        if (slaveEvent.type == "ui" && slaveEvent.newValue)
-        {
-          teacher_workspace.highlightBlock(slaveEvent.newValue);
-        }
-        else
-        {
-          var existingGroup = Blockly.Events.getGroup();
-          var groupid = existingGroup;
-          if (!existingGroup) {
-              Blockly.Events.setGroup(true);
-              groupid = Blockly.Events.getGroup();
-          }
-          slaveEvent.run(true);
-          if (!existingGroup) {
-              Blockly.Events.setGroup(false);
-          }
-        }
-      }
-      catch(err) {
-        console.log("Error running slave event", err.message);
-      }
-    }
-    add_user_event_callback("classadoo_instructor", teacher_event_callback);
-    add_user_remove_callback("classadoo_instructor", function(old_snapshot)
-    {
-      teacher_workspace.clear();
-    });
-
-    var self_event_callback = function(snapshot) {
-      var blkmsg = clean_event(snapshot, user_id);
-      if (!blkmsg)
-      {
-        return;
-      }
-      var slaveEvent = Blockly.Events.fromJson(blkmsg, workspace);
-
-      try {
-        if (slaveEvent.type == "ui" && slaveEvent.newValue)
-        {
-          BlocklyInterface.highlight(slaveEvent.newValue);
-        }
-        else
-        {
-          var existingGroup = Blockly.Events.getGroup();
-          var groupid = existingGroup;
-          if (!existingGroup) {
-              Blockly.Events.setGroup(true);
-              groupid = Blockly.Events.getGroup();
-          }
-          events_in_progress[slaveEvent.blockId + slaveEvent.type] = true;
-          // Create will automatically trigger a move, so don't send our move command back to the student.
-          if (slaveEvent.type == "create")
-          {
-            events_in_progress[slaveEvent.blockId + "move"] = true;
-          }
-          slaveEvent.run(true);
-          if (!existingGroup) {
-              Blockly.Events.setGroup(false);
-          }
-        }
-      }
-      catch(err) {
-          document.getElementById("errmsg").innerHTML = err.message;
-      }
-    }
-    add_user_event_callback(getUsername(), self_event_callback);
-}
 
 BlocklyGames.NAME = 'turtle';
 
@@ -156,8 +43,7 @@ BlocklyInterface.nextLevel = function() {
   if (BlocklyGames.LEVEL < BlocklyGames.MAX_LEVEL) {
     window.location = window.location.protocol + '//' +
         window.location.host + window.location.pathname +
-        '?lang=' + BlocklyGames.LANG + '&level=' + (BlocklyGames.LEVEL + 1) +
-        '&username=' + getUsername();
+        '?lang=' + BlocklyGames.LANG + '&level=' + (BlocklyGames.LEVEL + 1);
   } else {
     BlocklyInterface.indexPage();
   }
@@ -205,49 +91,25 @@ Turtle.init = function() {
       {lang: BlocklyGames.LANG,
        level: BlocklyGames.LEVEL,
        maxLevel: BlocklyGames.MAX_LEVEL,
-       html: BlocklyGames.IS_HTML,
-       suffix: "&username="+getUsername() });
+       html: BlocklyGames.IS_HTML});
 
   BlocklyInterface.init();
 
   var rtl = BlocklyGames.isRtl();
-  var myBlocklyDiv = document.getElementById('my_blockly');
-  var teacherBlocklyDiv = document.getElementById('teacher_blockly');
-  var teacherLabelDiv = document.getElementById('teacher_label');
-  var teacherCanvasDiv = document.getElementById('teacher_canvas');
-  var toggleTeacherBlocks = document.getElementById('toggleTeacherBlocks');
+  var blocklyDiv = document.getElementById('blockly');
   var visualization = document.getElementById('visualization');
-
-  var teacherBlocksHidden = false;
   var onresize = function(e) {
-    var height = teacherBlocksHidden ? window.innerHeight - 100 : window.innerHeight/2 - 50;
-    var top = Math.max(10, visualization.offsetTop - window.pageYOffset);
-    var width = window.innerWidth - 440;
-
-    myBlocklyDiv.style.top =  top + 'px';
-    myBlocklyDiv.style.left = rtl ? '10px' : '420px';
-    myBlocklyDiv.style.width = width + 'px';
-    myBlocklyDiv.style.height = height + 'px';
-
-    teacherCanvasDiv.style.top = height + top + 5 + 'px';
-    teacherCanvasDiv.style.left = rtl ? '10px' : '420px';
-    teacherBlocklyDiv.style.width =  width + 'px';
-    teacherBlocklyDiv.style.height = (teacherBlocksHidden ? 0 : height) + 'px';
+    var top = visualization.offsetTop;
+    blocklyDiv.style.top = Math.max(10, top - window.pageYOffset) + 'px';
+    blocklyDiv.style.left = rtl ? '10px' : '420px';
+    blocklyDiv.style.width = (window.innerWidth - 440) + 'px';
   };
   window.addEventListener('scroll', function() {
     onresize();
-    Blockly.svgResize(BlocklyGames.workspace)
+    Blockly.svgResize(BlocklyGames.workspace);
   });
   window.addEventListener('resize', onresize);
   onresize();
-
-  toggleTeacherBlocks.addEventListener("click", function()
-    {
-      teacherBlocksHidden = !teacherBlocksHidden;
-      toggleTeacherBlocks.textContent = teacherBlocksHidden ? "Show" : "Hide"
-      onresize();
-      Blockly.svgResize(BlocklyGames.workspace)
-    });
 
   if (BlocklyGames.LEVEL < BlocklyGames.MAX_LEVEL) {
     Blockly.FieldColour.COLUMNS = 3;
@@ -258,24 +120,13 @@ Turtle.init = function() {
   }
 
   var toolbox = document.getElementById('toolbox');
-  BlocklyGames.workspace = Blockly.inject('my_blockly',
+  BlocklyGames.workspace = Blockly.inject('blockly',
       {'media': 'third-party/blockly/media/',
        'rtl': rtl,
        'toolbox': toolbox,
        'trashcan': true,
        'zoom': BlocklyGames.LEVEL == BlocklyGames.MAX_LEVEL ?
            {'controls': true, 'wheel': true} : null});
-   BlocklyGames.teacher_workspace = Blockly.inject('teacher_blockly',
-       {'media': 'third-party/blockly/media/',
-        'readOnly' : true,
-        'rtl': rtl,
-        'zoom': BlocklyGames.LEVEL == BlocklyGames.MAX_LEVEL ?
-            {'controls': true, 'wheel': true} : null});
-
-  initWildDog( BlocklyGames.workspace, BlocklyGames.teacher_workspace );
-  BlocklyGames.workspace.traceOn(true);
-  BlocklyGames.teacher_workspace.traceOn(true);
-
   // Prevent collisions with user-defined functions or variables.
   Blockly.JavaScript.addReservedWords('moveForward,moveBackward,' +
       'turnRight,turnLeft,penUp,penDown,penWidth,penColour,' +
@@ -288,6 +139,27 @@ Turtle.init = function() {
   // Initialize the slider.
   var sliderSvg = document.getElementById('slider');
   Turtle.speedSlider = new Slider(10, 35, 130, sliderSvg);
+
+  if (BlocklyGames.LEVEL == BlocklyGames.MAX_LEVEL) {
+    var defaultXml =
+        '<xml>' +
+        '  <block type="turtle_move" x="70" y="70">' +
+        '    <value name="VALUE">' +
+        '      <block type="math_number">' +
+        '        <field name="NUM">10</field>' +
+        '      </block>' +
+        '    </value>' +
+        '  </block>' +
+        '</xml>';
+  } else {
+    var defaultXml =
+        '<xml>' +
+        '  <block type="turtle_move_internal" x="70" y="70">' +
+        '    <field name="VALUE">100</field>' +
+        '  </block>' +
+        '</xml>';
+  }
+  BlocklyInterface.loadBlocks(defaultXml, true);
 
   Turtle.ctxDisplay = document.getElementById('display').getContext('2d');
   Turtle.ctxAnswer = document.getElementById('answer').getContext('2d');
@@ -305,6 +177,21 @@ Turtle.init = function() {
   setTimeout(BlocklyInterface.importInterpreter, 1);
   // Lazy-load the syntax-highlighting.
   setTimeout(BlocklyInterface.importPrettify, 1);
+
+  BlocklyGames.bindClick('helpButton', Turtle.showHelp);
+  if (location.hash.length < 2 &&
+      !BlocklyGames.loadFromLocalStorage(BlocklyGames.NAME,
+                                         BlocklyGames.LEVEL)) {
+    setTimeout(Turtle.showHelp, 1000);
+    if (BlocklyGames.LEVEL == 9) {
+      setTimeout(BlocklyDialogs.abortOffer, 5 * 60 * 1000);
+    }
+  }
+  if (BlocklyGames.LEVEL == 1) {
+    // Previous apps did not have categories.
+    // If the user doesn't find them, point them out.
+    BlocklyGames.workspace.addChangeListener(Turtle.watchCategories_);
+  }
 };
 
 if (window.location.pathname.match(/readonly.html$/)) {
@@ -315,6 +202,30 @@ if (window.location.pathname.match(/readonly.html$/)) {
   window.addEventListener('load', Turtle.init);
 }
 
+/**
+ * Show the help pop-up.
+ */
+Turtle.showHelp = function() {
+  var help = document.getElementById('help');
+  var button = document.getElementById('helpButton');
+  var style = {
+    width: '50%',
+    left: '25%',
+    top: '5em'
+  };
+
+  if (BlocklyGames.LEVEL == 3) {
+    var xml = '<xml><block type="turtle_colour_internal" x="5" y="10">' +
+        '<field name="COLOUR">#ffff00</field></block></xml>';
+    BlocklyInterface.injectReadonly('sampleHelp3', xml);
+  } else if (BlocklyGames.LEVEL == 4) {
+    var xml = '<xml><block type="turtle_pen" x="5" y="10"></block></xml>';
+    BlocklyInterface.injectReadonly('sampleHelp4', xml);
+  }
+
+  BlocklyDialogs.showDialog(help, button, true, true, style, Turtle.hideHelp);
+  BlocklyDialogs.startDialogKeyDown();
+};
 
 /**
  * Hide the help pop-up.
@@ -328,6 +239,22 @@ Turtle.hideHelp = function() {
   }
 };
 
+/**
+ * Show the help pop-up to encourage clicking on the toolbox categories.
+ */
+Turtle.showCategoryHelp = function() {
+  if (Turtle.categoryClicked_ || BlocklyDialogs.isDialogVisible_) {
+    return;
+  }
+  var help = document.getElementById('helpToolbox');
+  var style = {
+    width: '25%',
+    left: '525px',
+    top: '3.3em'
+  };
+  var origin = document.getElementById(':0');  // Toolbox's tree root.
+  BlocklyDialogs.showDialog(help, origin, true, false, style, null);
+};
 
 
 /**
@@ -337,6 +264,18 @@ Turtle.hideHelp = function() {
  */
 Turtle.categoryClicked_ = false;
 
+/**
+ * Monitor to see if the user finds the categories in level one.
+ * @param {!Blockly.Events.Abstract} e Custom data for event.
+ * @private
+ */
+Turtle.watchCategories_ = function(e) {
+  if (e.type == Blockly.Events.UI && e.element == 'category') {
+    Turtle.categoryClicked_ = true;
+    BlocklyDialogs.hideDialog(false);
+    BlocklyGames.workspace.removeChangeListener(Turtle.watchCategories_);
+  }
+};
 
 /**
  * On startup draw the expected answer and save it to the answer canvas.
@@ -606,12 +545,7 @@ Turtle.executeChunk_ = function() {
   if (!Turtle.pause) {
     document.getElementById('spinner').style.visibility = 'hidden';
     BlocklyGames.workspace.highlightBlock(null);
-
-    // First level is just a playground. Don't check the answer.
-    if (BlocklyGames.LEVEL > 1)
-    {
-      Turtle.checkAnswer();
-    }
+    Turtle.checkAnswer();
     // Image complete; allow the user to submit this image to Reddit.
     Turtle.canSubmit = true;
   }

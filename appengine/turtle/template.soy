@@ -16,9 +16,8 @@
 {template .messages}
   {call BlocklyGames.soy.messages /}
   <div style="display: none">
-
-  <!-- TURTLE blocks -->
-
+    // Block text and their associated tooltips and URLs (interleaved to
+    // assist with translation).
     <span id="Turtle_moveTooltip">{msg meaning="Turtle.moveTooltip" desc="tooltip - In this and subsequent messages, 'turtle' refers to a stylized turtle on the screen to represent a position and direction.  This imaginary turtle is carrying a pen in its tail, so moving the turtle draws a line (or curve, etc.).  You are encouraged to play with the [https://blockly-demo.appspot.com/static/apps/turtle/index.html Turtle application] before doing this translation."}Moves the turtle forward or backward by the specified amount.{/msg}</span>
     <span id="Turtle_moveForward">{msg meaning="Turtle.moveForward" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of a verb telling a turtle to move (walk) in the direction he/she is facing.  This is followed by a number indicating how far (how many pixels) to go.  Prefer a translation that has text in common with the translation of 'move backward'.  See [[Translating:Blockly#Drop-Down_Menus]]."}move forward by{/msg}</span>
     <span id="Turtle_moveBackward">{msg meaning="Turtle.moveBackward" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of a verb telling a turtle to move (walk) in the direction opposite to where he/she is facing.  This is followed by a number indicating how far (how many pixels) to go.  Prefer a translation that has text in common with the translation of 'move forward'."}move backward by{/msg}</span>
@@ -54,30 +53,6 @@
     <span id="Turtle_fontItalic">{msg meaning="Turtle.fontItalic" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Specifies that a typographic font should be [https://en.wikipedia.org/wiki/Italics italic]."}italic{/msg}</span>
 
     <span id="Turtle_submitDisabled">{msg meaning="Turtle.submitDisabled" desc="Error message."}Run your program until it stops. Then you may submit your drawing to the gallery.{/msg}</span>
-
-    <!-- MAZE blocks -->
-
-    <span id="Maze_moveForward">{msg meaning="Maze.moveForward" desc="block text - Imperative or infinitive of a verb for a person moving (walking) in the direction he/she is facing."}move forward{/msg}</span>
-    <span id="Maze_turnLeft">{msg meaning="Maze.turnLeft" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Imperative or infinitive of a verb for a person turning his head and body one quarter rotation counter-clockwise.  Prefer a translation that has text in common with the translation of 'turn right'.  See [[Translating:Blockly#Drop-Down_Menus]]."}turn left{/msg}</span>
-    <span id="Maze_turnRight">{msg meaning="Maze.turnRight" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Imperative or infinitive of a verb for a person turning his head and body one quarter rotation clockwise.  Prefer a translation that has text in common with the translation of 'turn left'.  See [[Translating:Blockly#Drop-Down_Menus]]."}turn right{/msg}</span>
-    <span id="Maze_doCode">{msg meaning="Maze.doCode" desc="block text - Imperative or infinitive of a verb preceding one or more commands to a person.  This is part of [https://github.com/google/blockly/wiki/Loops#repeat repeat] and [https://github.com/google/blockly/wiki/IfElse#If_blocks if] blocks."}do{/msg}</span>
-    <span id="Maze_elseCode">{msg meaning="Maze.elseCode" desc="block text - Conjunction meaning 'otherwise', introducing commands to be performed if a previous condition was not true, as in 'if x>3, do this, else do that'.  See [https://github.com/google/blockly/wiki/IfElse#If-Else_blocks]."}else{/msg}</span>
-    // The helpIfElse definition was copied up here ahead of when it is needed
-    // so that it is adjacent to the previous definition.
-    <span id="Maze_helpIfElse">{msg meaning="Maze.helpIfElse" desc="callout - This is shown when the 'if-else' block is introduced.  For 'if-else' concatenate the words for 'if' and 'else/otherwise'."}If-else blocks will do one thing or the other.{/msg}</span>
-    <span id="Maze_pathAhead">{msg meaning="Maze.pathAhead" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Condensed form of 'if there is a path ahead', as in: 'if path ahead, go forward'.  Prefer translation that has text in common with 'if path to the left' and 'if path to the right'."}if path ahead{/msg}</span>
-    <span id="Maze_pathLeft">{msg meaning="Maze.pathLeft" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Condensed form of 'if there is a path to the left', as in: 'if path to the left, turn left'."}if path to the left{/msg}</span>
-    <span id="Maze_pathRight">{msg meaning="Maze.pathRight" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Condensed form of 'if there is a path to the right', as in: 'if path to the right, turn right'."}if path to the right{/msg}</span>
-    <span id="Maze_repeatUntil">{msg meaning="Maze.repeatUntil" desc="block text - Imperative or infinitive of a verb to repeat the following commands.  The phrase is followed by the symbol denoting the end of the maze."}repeat until{/msg}</span>
-    <span id="Maze_moveForwardTooltip">{msg meaning="Maze.moveForwardTooltip" desc="tooltip - Moves the icon on the screen representing the player forward one square on the maze board."}Moves the player forward one space.{/msg}</span>
-    <span id="Maze_turnTooltip">{msg meaning="Maze.turnTooltip" desc="tooltip - Turns the icon on the screen representing the player 90 degrees counter-clockwise (left) or clockwise (right)."}Turns the player left or right by 90 degrees.{/msg}</span>
-    <span id="Maze_ifTooltip">{msg meaning="Maze.ifTooltip" desc="tooltip - 'path' refers to a path through a maze."}If there is a path in the specified direction, then do some actions.{/msg}</span>
-    <span id="Maze_ifelseTooltip">{msg meaning="Maze.ifelseTooltip" desc="tooltip - 'path' refers to a path through a maze."}If there is a path in the specified direction, then do the first block of actions. Otherwise, do the second block of actions.{/msg}</span>
-    <span id="Maze_whileTooltip">{msg meaning="Maze.whileTooltip" desc="tooltip - Repeat the enclosed commands until the maze has been successfully completed (the end point reached)."}Repeat the enclosed actions until finish point is reached.{/msg}</span>
-    <span id="Maze_capacity0">{msg meaning="Maze.capacity0" desc="warning - No more blocks may be added until some are removed.  Please include '%0' in the translated string.  It will be replaced with '0' and made bold."}You have %0 blocks left.{/msg}</span>
-    <span id="Maze_capacity1">{{msg meaning="Maze.capacity1" desc="warning - Only one more block may be added. Please include '%1' in the translated string. It will be replaced with '1' and made bold.\n\nSee also:\n* {lb}{lb}msg-blockly|Maze.capacity2{rb}{rb}"}}You have %1 block left.{{/msg}}</span>
-    <span id="Maze_capacity2">{{msg meaning="Maze.capacity2" desc="warning - Only %2 more blocks may be used, where %2 is an integer greater than 1.\n\nSee also:\n* {lb}{lb}msg-blockly|Maze.capacity1{rb}{rb}"}}You have %2 blocks left.{{/msg}}</span>
-
   </div>
 {/template}
 
@@ -99,9 +74,20 @@
             {param level: $ij.level /}
             {param maxLevel: $ij.maxLevel /}
             {param lang: $ij.lang /}
-            {param suffix: $ij.suffix /}
+            {param suffix}{/param}
           {/call}
         </h1>
+      </td>
+      <td class="farSide">
+        <select id="languageMenu"></select>
+        &nbsp;
+        <button id="linkButton" title="{msg meaning="Games.linkTooltip" desc="IBID"}Save and link to blocks.{/msg}">
+          <img src="common/1x1.gif" class="link icon21">
+        </button>
+        &nbsp;
+        <button id="helpButton">
+          {{msg meaning="Games.help" desc="IBID"}}Help{{/msg}}
+        </button>
       </td>
     </tr>
   </table>
@@ -173,14 +159,7 @@
   {/if}
 
   {call .toolbox /}
-  <div id="my_blockly"></div>
-
-  <div id="teacher_canvas">
-    <div id="teacher_label">Teacher Blocks
-      <button type="button" id="toggleTeacherBlocks">Hide</button>
-    </div>
-    <div id="teacher_blockly"></div>
-  </div>
+  <div id="blockly"></div>
 
   {call BlocklyGames.soy.dialog /}
   {call BlocklyGames.soy.doneDialog /}
@@ -492,11 +471,15 @@
         <block type="turtle_turn_internal">
           <field name="VALUE">90</field>
         </block>
+        {if $ij.level > 3}
           <block type="turtle_pen"></block>
+        {/if}
       </category>
+      {if $ij.level > 2}
         <category name="{msg meaning="Games.catColour" desc="IBID"}Colour{/msg}">
           <block type="turtle_colour_internal"></block>
         </category>
+      {/if}
       <category name="{msg meaning="Games.catLoops" desc="IBID"}Loops{/msg}">
         <block type="turtle_repeat_internal">
           <field name="TIMES">4</field>
