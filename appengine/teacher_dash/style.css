@@ -7,7 +7,7 @@ html[dir="RTL"] button.primary {
 }
 
 .blockly {
-  height: 200px;
+  height: 300px;
   width: 1000px;
 }
 #display {
