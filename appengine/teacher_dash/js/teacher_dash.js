@@ -29,6 +29,8 @@ goog.require('BlocklyDialogs');
 goog.require('BlocklyGames');
 goog.require('BlocklyInterface');
 goog.require('Turtle.Blocks');
+
+goog.require('Heroes.Blocks');
 goog.require('Puzzle.Blocks');
 goog.require('Maze.Blocks');
 goog.require('Teacher_Dash.soy');
