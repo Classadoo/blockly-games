@@ -40,8 +40,14 @@ var newStudentBlockly = function(username)
   new_student.innerHTML =
     '<span class="username">' + username + '</span>' +
     '<span class="user_level" id="' + username + '_level">Level ?</span>' +
+    '<button type="button" class="user_clear" id="' + username + '_clear">Clear</button>' +
     '<div class="blockly" id="' + username + '_blockly"></div>';
   document.getElementById('students').appendChild(new_student);
+
+  document.getElementById(username + '_clear').addEventListener("click", function()
+  {
+    clear_one_user(username);
+  });
 
   var toolbox = document.getElementById('toolbox');
   return Blockly.inject(username + '_blockly',
@@ -188,9 +194,9 @@ Turtle.init = function() {
 
   var clearStudents = document.getElementById('clearStudents');
   clearStudents.addEventListener("click", function()
-    {
-      clear_users();
-    });
+  {
+    clear_users();
+  });
 
   initWildDog();
 };
