@@ -311,7 +311,7 @@ Heroes.drawHero = function() {
     if (Heroes.visible) {
       if (Heroes.hero)
       {
-        Heroes.ctxDisplay.drawImage(Heroes.hero, Heroes.x, Heroes.y, 45, 45);
+        Heroes.ctxDisplay.drawImage(Heroes.hero, Heroes.x, Heroes.y, Heroes.radius * 2, Heroes.radius * 2);
       }
       else
       {
@@ -434,13 +434,17 @@ Heroes.initInterpreter = function(interpreter, scope) {
   interpreter.setProperty(scope, 'addItem',
       interpreter.createNativeFunction(wrapper));
 
-
   wrapper = function(which, fn, id) {
-    Heroes.setArrow(which.data, fn.toString(), id.toString());
+    Heroes.setButtonCallback(which.data, fn.toString(), id.toString());
   };
-  interpreter.setProperty(scope, 'setArrow',
+  interpreter.setProperty(scope, 'setButtonCallback',
       interpreter.createNativeFunction(wrapper));
 
+  wrapper = function(fn, id) {
+    Heroes.setCollisionCallback(fn.toString(), id.toString());
+  };
+  interpreter.setProperty(scope, 'setCollisionCallback',
+      interpreter.createNativeFunction(wrapper));
 
   wrapper = function(image, id) {
     Heroes.setBackground(image.toString(), id.toString());
@@ -541,16 +545,24 @@ Heroes.move = function(x, y, id) {
  * Add an item to the screen.
  */
 Heroes.items = [];
+Heroes.item_radius = 5;
+Heroes.radius = 22;
 Heroes.addItem = function(x, y, vx, vy, id) {
-  this.items.push(new Item(x, y, vx, vy));
+  this.items.push(new Item(x, y, vx, vy, Heroes.item_rad*2));
   Heroes.animate(id);
 };
 
-// For override.
+// Events for override.
 Heroes.key_events = {};
-Heroes.setArrow = function(which, fn, id)
+Heroes.collision_event = "";
+Heroes.setButtonCallback = function(which, fn, id)
 {
   this.key_events[which] = fn;
+  this.animate(id);
+}
+Heroes.setCollisionCallback = function(fn, id)
+{
+  this.collision_event = fn;
   this.animate(id);
 }
 
@@ -575,6 +587,9 @@ Heroes.startGame = function() {
 
   this.eventLoop = setInterval(function()
     {
+      //
+      // Check for key presses.
+      //
 
       for (event in self.key_events)
       {
@@ -584,6 +599,18 @@ Heroes.startGame = function() {
           while (Heroes.interpreter.step()){};
         }
       }
+
+      //
+      // Check for collision events.
+      //
+
+      Heroes.items.forEach(function(element){
+        if (compute_distance(element.x + Heroes.item_radius, element.y + Heroes.item_radius, Heroes.x + Heroes.radius, Heroes.y + Heroes.radius) < (Heroes.radius + Heroes.item_radius))
+        {
+          Heroes.interpreter.appendCode(self.collision_event);
+          while (Heroes.interpreter.step()){};
+        }
+      });
 
       Heroes.display();
     }, 50);
@@ -655,3 +682,8 @@ Heroes.drawFont = function(font, size, style, id) {
   Heroes.ctxScratch.font = style + ' ' + size + 'pt ' + font;
   Heroes.animate(id);
 };
+
+var compute_distance = function(x1, y1, x2, y2)
+{
+  return Math.sqrt((x2 - x1)**2 + (y2 - y1)**2);
+}

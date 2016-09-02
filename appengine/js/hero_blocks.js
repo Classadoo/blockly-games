@@ -252,11 +252,10 @@ Blockly.Blocks['heroes_on_arrow'] = {
             [BlocklyGames.getMsg('Heroes_rightArrow'), '39'],
              [BlocklyGames.getMsg('Heroes_spaceBar'), '32']];
      this.setColour(Heroes.Blocks.HUE);
-     this.appendValueInput('VALUE')
-         .setCheck('Number')
+     this.appendDummyInput('VALUE')
          .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR');
-     this.setPreviousStatement(true);
-     this.setNextStatement(true);
+     this.setPreviousStatement(false);
+     this.setNextStatement(false);
      this.appendStatementInput('DO0')
          .appendField(Blockly.Msg.CONTROLS_IF_MSG_THEN);
    }
@@ -276,7 +275,42 @@ Blockly.JavaScript['heroes_on_arrow'] = function(block) {
   // Trim the spaces and newlines (for the stupid interpreter), and pass it thru as a string.
   //
 
-  var code = 'setArrow(' + direction_number + ', \"' + branch.trim().replace("\n", "") + '\", \'block_id_' + block.id +'\')';
+  var code = 'setButtonCallback(' + direction_number + ', \"' + branch.trim().replace("\n", "") + '\", \'block_id_' + block.id +'\')';
+  return code + '\n';
+};
+
+
+Blockly.Blocks['heroes_on_collision'] = {
+  /**
+   * Block for if/elseif/else condition.
+   * @this Blockly.Block
+   */
+
+   init: function() {
+     this.setColour(Heroes.Blocks.HUE);
+     this.setPreviousStatement(false);
+     this.setNextStatement(false);
+     this.appendDummyInput()
+         .appendField("On Collision");
+     this.appendStatementInput('DO0')
+         .appendField(Blockly.Msg.CONTROLS_IF_MSG_THEN);
+   }
+};
+
+
+Blockly.JavaScript['heroes_on_collision'] = function(block) {
+
+  //
+  // Get user code from inside event.
+  //
+
+  var branch = Blockly.JavaScript.statementToCode(block, 'DO0');
+
+  //
+  // Trim the spaces and newlines (for the stupid interpreter), and pass it thru as a string.
+  //
+
+  var code = 'setCollisionCallback(\"' + branch.trim().replace("\n", "") + '\", \'block_id_' + block.id +'\')';
   return code + '\n';
 };
 
