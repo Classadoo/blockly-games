@@ -82,6 +82,12 @@ Heroes.setHero = function(hero, id)
   Heroes.animate(id);
 }
 
+Heroes.addPoints = function(delta)
+{
+  Heroes.points = Heroes.points || 0;
+  Heroes.points += delta;
+}
+
 /**
  * Initialize Blockly and the heroes.  Called on page load.
  */
@@ -284,6 +290,8 @@ Heroes.display = function() {
   Heroes.ctxDisplay.drawImage(Heroes.ctxScratch.canvas, 0, 0);
 
   Heroes.drawHero();
+
+  Heroes.drawHUD();
 };
 
 Heroes.drawBackground = function()
@@ -311,7 +319,8 @@ Heroes.drawHero = function() {
     if (Heroes.visible) {
       if (Heroes.hero)
       {
-        Heroes.ctxDisplay.drawImage(Heroes.hero, Heroes.x - Heroes.radius, Heroes.y - Heroes.radius, Heroes.radius * 2, Heroes.radius * 2);
+        Heroes.ctxDisplay.drawImage(Heroes.hero, Heroes.x - Heroes.radius,
+          Heroes.y - Heroes.radius, Heroes.radius * 2, Heroes.radius * 2);
       }
       else
       {
@@ -357,6 +366,14 @@ Heroes.drawHero = function() {
     }
 }
 
+Heroes.drawHUD = function()
+{
+  if (Heroes.points !== undefined)
+  {
+    Heroes.ctxDisplay.font = "15px Arial";
+    Heroes.ctxDisplay.fillText("Points: " + Heroes.points, 30, 30);
+  }
+}
 
 /**
  * Click the run button.  Start the program.
@@ -456,6 +473,12 @@ Heroes.initInterpreter = function(interpreter, scope) {
     Heroes.setHero(hero.toString(), id.toString());
   };
   interpreter.setProperty(scope, 'setHero',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(num, id) {
+    Heroes.addPoints(num.data, id.toString());
+  };
+  interpreter.setProperty(scope, 'addPoints',
       interpreter.createNativeFunction(wrapper));
 };
 
