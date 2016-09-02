@@ -20,7 +20,6 @@
 
 goog.provide('Items');
 
-
 function Item(x, y, vx, vy) {
 
   this.x = x || 0;
@@ -29,13 +28,13 @@ function Item(x, y, vx, vy) {
   this.vy = vy || 0;
 }
 
-// Draws this item to a given context
+// Draws this item to a given context.
 Item.prototype.draw = function(ctx, rad) {
   ctx.fillStyle = "#AA3333";
   ctx.fillRect(this.x - rad, this.y - rad, rad * 2, rad * 2);
 
   var inner_rad = rad/2;
-  ctx.fillStyle = "#AABB00";
+  ctx.fillStyle = "#CCCC00";
   ctx.fillRect(this.x - inner_rad, this.y - inner_rad, inner_rad * 2, inner_rad * 2);
 }
 

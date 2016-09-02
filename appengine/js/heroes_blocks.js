@@ -90,6 +90,28 @@ Blockly.JavaScript['heroes_move'] = function(block) {
       '(' + value + ', \'block_id_' + block.id + '\');';
 };
 
+Blockly.Blocks['heroes_add_points'] = {
+  /**
+   * Block for moving forward or backwards.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(Heroes.Blocks.HUE);
+    this.appendValueInput('VALUE')
+        .setCheck('Number')
+        .appendField("Add points: ");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+  }
+};
+
+Blockly.JavaScript['heroes_add_points'] = function(block) {
+  // Generate JavaScript for adding or removing points.
+  var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+      Blockly.JavaScript.ORDER_NONE) || '0';
+  return 'addPoints(' + value + ', \'block_id_' + block.id + '\');';
+};
+
 Blockly.Blocks['heroes_set_background'] = {
   /**
    * Block for moving forward or backwards.
