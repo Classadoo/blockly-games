@@ -277,7 +277,7 @@ Heroes.display = function() {
   // Draw the user layer.
   for (var i=0; i<Heroes.items.length; i++)
   {
-    Heroes.items[i].draw(Heroes.ctxScratch);
+    Heroes.items[i].draw(Heroes.ctxScratch, Heroes.item_radius);
     Heroes.items[i].processEvents();
   }
   Heroes.ctxDisplay.globalCompositeOperation = 'source-over';
@@ -311,7 +311,7 @@ Heroes.drawHero = function() {
     if (Heroes.visible) {
       if (Heroes.hero)
       {
-        Heroes.ctxDisplay.drawImage(Heroes.hero, Heroes.x, Heroes.y, Heroes.radius * 2, Heroes.radius * 2);
+        Heroes.ctxDisplay.drawImage(Heroes.hero, Heroes.x - Heroes.radius, Heroes.y - Heroes.radius, Heroes.radius * 2, Heroes.radius * 2);
       }
       else
       {
@@ -602,15 +602,18 @@ Heroes.startGame = function() {
 
       //
       // Check for collision events.
+      // Iterate in reverse so the index isn't affected when we remove elements.
       //
 
-      Heroes.items.forEach(function(element){
-        if (compute_distance(element.x + Heroes.item_radius, element.y + Heroes.item_radius, Heroes.x + Heroes.radius, Heroes.y + Heroes.radius) < (Heroes.radius + Heroes.item_radius))
+      var i = Heroes.items.length
+      while (i--) {
+        if (compute_distance(Heroes.items[i].x, Heroes.items[i].y, Heroes.x, Heroes.y) < (Heroes.radius + Heroes.item_radius))
         {
           Heroes.interpreter.appendCode(self.collision_event);
           while (Heroes.interpreter.step()){};
+          Heroes.items.splice(i, 1);
         }
-      });
+      }
 
       Heroes.display();
     }, 50);
