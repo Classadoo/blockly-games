@@ -27,13 +27,16 @@ function Item(x, y, vx, vy) {
   this.y = y || 0;
   this.vx = vx || 0;
   this.vy = vy || 0;
-  this.fill = '#AABBAA';
 }
 
 // Draws this item to a given context
-Item.prototype.draw = function(ctx) {
-  ctx.fillStyle = this.fill;
-  ctx.fillRect(this.x, this.y, 10, 10);
+Item.prototype.draw = function(ctx, rad) {
+  ctx.fillStyle = "#AA3333";
+  ctx.fillRect(this.x - rad, this.y - rad, rad * 2, rad * 2);
+
+  var inner_rad = rad/2;
+  ctx.fillStyle = "#AABB00";
+  ctx.fillRect(this.x - inner_rad, this.y - inner_rad, inner_rad * 2, inner_rad * 2);
 }
 
 Item.prototype.processEvents = function()
