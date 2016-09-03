@@ -20,28 +20,17 @@
 
 goog.provide('Heroes');
 
+goog.require('ItemObject');
+goog.require('HeroObject');
+
 goog.require('BlocklyDialogs');
 goog.require('BlocklyGames');
 goog.require('BlocklyInterface');
-goog.require('Items');
 goog.require('Slider');
 goog.require('Heroes.Blocks');
 goog.require('Heroes.soy');
 
 BlocklyGames.NAME = 'heroes';
-
-/**
- * Go to the next level.
- */
-BlocklyInterface.nextLevel = function() {
-  if (BlocklyGames.LEVEL < BlocklyGames.MAX_LEVEL) {
-    window.location = window.location.protocol + '//' +
-        window.location.host + window.location.pathname +
-        '?lang=' + BlocklyGames.LANG + '&level=' + (BlocklyGames.LEVEL + 1);
-  } else {
-    BlocklyInterface.indexPage();
-  }
-};
 
 Heroes.HEIGHT = 400;
 Heroes.WIDTH = 600;
@@ -105,11 +94,11 @@ Heroes.init = function() {
     Heroes.backgrounds["village"] = new Image();
     Heroes.backgrounds["village"].src = "heroes/village.jpg";
 
-    Heroes.heroes = {};
-    Heroes.heroes["eagle"] = new Image();
-    Heroes.heroes["eagle"].src = "heroes/eagle.png";
-    Heroes.heroes["lion"] = new Image();
-    Heroes.heroes["lion"].src = "heroes/lion.png";
+    Heroes.HERO_NAMES = [];
+    Heroes.addHero("Leo", "lion", Heroes.WIDTH/2, Heroes.HEIGHT/2);
+    Heroes.addHero("William", "eagle", Heroes.WIDTH/3, Heroes.HEIGHT/2);
+    Heroes.addHero("Andrew", "human", Heroes.WIDTH/3 * 2, Heroes.HEIGHT/2);
+
 
   // Render the Soy template.
   document.body.innerHTML = Heroes.soy.start({}, null,
@@ -130,19 +119,20 @@ Heroes.init = function() {
 
   var teacherBlocksHidden = false;
   var onresize = function(e) {
-    var height = teacherBlocksHidden ? window.innerHeight - 100 : window.innerHeight/2 - 50;
+    var my_height = teacherBlocksHidden ? window.innerHeight - 100 : window.innerHeight/3*2 - 50;
+    var teacher_height = teacherBlocksHidden ? 0 : window.innerHeight/3*1 - 50;
     var top = Math.max(10, visualization.offsetTop - window.pageYOffset);
     var width = window.innerWidth - 640;
 
     myBlocklyDiv.style.top =  top + 'px';
     myBlocklyDiv.style.left = rtl ? '10px' : '620px';
     myBlocklyDiv.style.width = width + 'px';
-    myBlocklyDiv.style.height = height + 'px';
+    myBlocklyDiv.style.height = my_height + 'px';
 
-    teacherCanvasDiv.style.top = height + top + 5 + 'px';
+    teacherCanvasDiv.style.top = my_height + top + 5 + 'px';
     teacherCanvasDiv.style.left = rtl ? '10px' : '620px';
     teacherBlocklyDiv.style.width =  width + 'px';
-    teacherBlocklyDiv.style.height = (teacherBlocksHidden ? 0 : height) + 'px';
+    teacherBlocklyDiv.style.height = teacher_height + 'px';
   };
   window.addEventListener('scroll', function() {
     onresize();
@@ -159,13 +149,6 @@ Heroes.init = function() {
       Blockly.svgResize(BlocklyGames.workspace)
     });
 
-  if (BlocklyGames.LEVEL < BlocklyGames.MAX_LEVEL) {
-    Blockly.FieldColour.COLUMNS = 3;
-    Blockly.FieldColour.COLOURS =
-        ['#ff0000', '#ffcc33', '#ffff00',
-         '#009900', '#3333ff', '#cc33cc',
-         '#ffffff', '#999999', '#000000'];
-  }
 
   var toolbox = document.getElementById('toolbox');
   BlocklyGames.workspace = Blockly.inject('my_blockly',
@@ -173,16 +156,13 @@ Heroes.init = function() {
        'rtl': rtl,
        'toolbox': toolbox,
        'trashcan': true,
-       'zoom': BlocklyGames.LEVEL == BlocklyGames.MAX_LEVEL ?
-           {'controls': true, 'wheel': true} : null});
+       'zoom': {'controls': true, 'wheel': false}});
    BlocklyGames.teacher_workspace = Blockly.inject('teacher_blockly',
        {'media': 'third-party/blockly/media/',
         'readOnly' : true,
-        'rtl': rtl,
-        'zoom': BlocklyGames.LEVEL == BlocklyGames.MAX_LEVEL ?
-            {'controls': true, 'wheel': true} : null});
+        'rtl': rtl});
 
-  initStudentWilddog( "Heroes", BlocklyGames.workspace, BlocklyGames.teacher_workspace );
+  initStudentWilddog( "Heroes", "", BlocklyGames.workspace, BlocklyGames.teacher_workspace );
   BlocklyGames.workspace.traceOn(true);
   BlocklyGames.teacher_workspace.traceOn(true);
 
@@ -220,14 +200,6 @@ Heroes.init = function() {
       !BlocklyGames.loadFromLocalStorage(BlocklyGames.NAME,
                                          BlocklyGames.LEVEL)) {
     setTimeout(Heroes.showHelp, 1000);
-    if (BlocklyGames.LEVEL == 9) {
-      setTimeout(BlocklyDialogs.abortOffer, 5 * 60 * 1000);
-    }
-  }
-  if (BlocklyGames.LEVEL == 1) {
-    // Previous apps did not have categories.
-    // If the user doesn't find them, point them out.
-    BlocklyGames.workspace.addChangeListener(Heroes.watchCategories_);
   }
 };
 
@@ -245,14 +217,17 @@ if (window.location.pathname.match(/readonly.html$/)) {
  * pending tasks.
  */
 Heroes.reset = function() {
-  // Starting location and heading of the heroes.
-  Heroes.x = Heroes.WIDTH / 2;
-  Heroes.y = Heroes.HEIGHT / 2;
-  Heroes.heading = 0;
-  Heroes.penDownValue = true;
-  Heroes.visible = true;
+  // Starting location of the heroes.
+  for (var hero in Heroes.heroes)
+  {
+    // TODO(aheine).
+  }
+
+
+
   Heroes.background = null;
-  Heroes.hero = null;
+
+  Heroes.points = undefined;
 
   // Clear the canvas.
   Heroes.ctxScratch.canvas.width = Heroes.ctxScratch.canvas.width;
@@ -280,16 +255,21 @@ Heroes.reset = function() {
 Heroes.display = function() {
   Heroes.drawBackground();
 
-  // Draw the user layer.
+  // Draw the items.
   for (var i=0; i<Heroes.items.length; i++)
   {
     Heroes.items[i].draw(Heroes.ctxScratch, Heroes.item_radius);
     Heroes.items[i].processEvents();
   }
+  // Draw the heroes.
+  for (var hero in Heroes.heroes)
+  {
+    Heroes.heroes[hero].draw(Heroes.ctxScratch);
+    Heroes.heroes[hero].speak(Heroes.ctxScratch, Heroes.words[hero]);
+  }
+
   Heroes.ctxDisplay.globalCompositeOperation = 'source-over';
   Heroes.ctxDisplay.drawImage(Heroes.ctxScratch.canvas, 0, 0);
-
-  Heroes.drawHero();
 
   Heroes.drawHUD();
 };
@@ -313,63 +293,11 @@ Heroes.drawBackground = function()
   }
 }
 
-Heroes.drawHero = function() {
-
-    // Draw the heroes.
-    if (Heroes.visible) {
-      if (Heroes.hero)
-      {
-        Heroes.ctxDisplay.drawImage(Heroes.hero, Heroes.x - Heroes.radius,
-          Heroes.y - Heroes.radius, Heroes.radius * 2, Heroes.radius * 2);
-      }
-      else
-      {
-        // Make the heroes the colour of the pen.
-        Heroes.ctxDisplay.strokeStyle = Heroes.ctxScratch.strokeStyle;
-        Heroes.ctxDisplay.fillStyle = Heroes.ctxScratch.fillStyle;
-
-        // Draw the heroes body.
-        var radius = Heroes.ctxScratch.lineWidth / 2 + 10;
-        Heroes.ctxDisplay.beginPath();
-        Heroes.ctxDisplay.arc(Heroes.x, Heroes.y, radius, 0, 2 * Math.PI, false);
-        Heroes.ctxDisplay.lineWidth = 3;
-        Heroes.ctxDisplay.stroke();
-
-        // Draw the heroes head.
-        var WIDTH = 0.3;
-        var HEAD_TIP = 10;
-        var ARROW_TIP = 4;
-        var BEND = 6;
-        var radians = 2 * Math.PI * Heroes.heading / 360;
-        var tipX = Heroes.x + (radius + HEAD_TIP) * Math.sin(radians);
-        var tipY = Heroes.y - (radius + HEAD_TIP) * Math.cos(radians);
-        radians -= WIDTH;
-        var leftX = Heroes.x + (radius + ARROW_TIP) * Math.sin(radians);
-        var leftY = Heroes.y - (radius + ARROW_TIP) * Math.cos(radians);
-        radians += WIDTH / 2;
-        var leftControlX = Heroes.x + (radius + BEND) * Math.sin(radians);
-        var leftControlY = Heroes.y - (radius + BEND) * Math.cos(radians);
-        radians += WIDTH;
-        var rightControlX = Heroes.x + (radius + BEND) * Math.sin(radians);
-        var rightControlY = Heroes.y - (radius + BEND) * Math.cos(radians);
-        radians += WIDTH / 2;
-        var rightX = Heroes.x + (radius + ARROW_TIP) * Math.sin(radians);
-        var rightY = Heroes.y - (radius + ARROW_TIP) * Math.cos(radians);
-        Heroes.ctxDisplay.beginPath();
-        Heroes.ctxDisplay.moveTo(tipX, tipY);
-        Heroes.ctxDisplay.lineTo(leftX, leftY);
-        Heroes.ctxDisplay.bezierCurveTo(leftControlX, leftControlY,
-            rightControlX, rightControlY, rightX, rightY);
-        Heroes.ctxDisplay.closePath();
-        Heroes.ctxDisplay.fill();
-      }
-    }
-}
-
 Heroes.drawHUD = function()
 {
   if (Heroes.points !== undefined)
   {
+    Heroes.ctxDisplay.fillStyle = "#FFFFFF";
     Heroes.ctxDisplay.font = "15px Arial";
     Heroes.ctxDisplay.fillText("Points: " + Heroes.points, 30, 30);
   }
@@ -421,26 +349,26 @@ Heroes.resetButtonClick = function(e) {
  */
 Heroes.initInterpreter = function(interpreter, scope) {
   // API
-  var wrapper = function(distance, id) {
-    Heroes.move(0, distance.valueOf(), id.toString());
+  var wrapper = function(who, distance, id) {
+    Heroes.move(who.toString(), 0, distance.valueOf(), id.toString());
   };
   interpreter.setProperty(scope, 'moveUp',
       interpreter.createNativeFunction(wrapper));
 
-  wrapper = function(distance, id) {
-    Heroes.move(0, -distance.valueOf(), id.toString());
+  wrapper = function(who, distance, id) {
+    Heroes.move(who.toString(), 0, -distance.valueOf(), id.toString());
   };
   interpreter.setProperty(scope, 'moveDown',
       interpreter.createNativeFunction(wrapper));
 
-  wrapper = function(distance, id) {
-    Heroes.move(-distance.valueOf(), 0, id.toString());
+  wrapper = function(who, distance, id) {
+    Heroes.move(who.toString(), -distance.valueOf(), 0, id.toString());
   };
   interpreter.setProperty(scope, 'moveLeft',
       interpreter.createNativeFunction(wrapper));
 
-  wrapper = function(distance, id) {
-    Heroes.move(distance.valueOf(), 0, id.toString());
+  wrapper = function(who, distance, id) {
+    Heroes.move(who.toString(), distance.valueOf(), 0, id.toString());
   };
   interpreter.setProperty(scope, 'moveRight',
       interpreter.createNativeFunction(wrapper));
@@ -451,14 +379,20 @@ Heroes.initInterpreter = function(interpreter, scope) {
   interpreter.setProperty(scope, 'addItem',
       interpreter.createNativeFunction(wrapper));
 
+  wrapper = function(name, type, x, y, id) {
+    Heroes.addHero(name.toString(), type.toString(), x.data, y.data, id.toString());
+  };
+  interpreter.setProperty(scope, 'addHero',
+      interpreter.createNativeFunction(wrapper));
+
   wrapper = function(which, fn, id) {
     Heroes.setButtonCallback(which.data, fn.toString(), id.toString());
   };
   interpreter.setProperty(scope, 'setButtonCallback',
       interpreter.createNativeFunction(wrapper));
 
-  wrapper = function(fn, id) {
-    Heroes.setCollisionCallback(fn.toString(), id.toString());
+  wrapper = function(a, b, fn, id) {
+    Heroes.setCollisionCallback(a.toString(), b.toString(), fn.toString(), id.toString());
   };
   interpreter.setProperty(scope, 'setCollisionCallback',
       interpreter.createNativeFunction(wrapper));
@@ -479,6 +413,12 @@ Heroes.initInterpreter = function(interpreter, scope) {
     Heroes.addPoints(num.data, id.toString());
   };
   interpreter.setProperty(scope, 'addPoints',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(who, what, seconds, id) {
+    Heroes.speak(who.toString(), what.toString(), seconds.data, id.toString());
+  };
+  interpreter.setProperty(scope, 'speak',
       interpreter.createNativeFunction(wrapper));
 };
 
@@ -544,48 +484,64 @@ Heroes.animate = function(id) {
   }
 };
 
-/**
- * Move the heroes forward or backward.
- * @param {number} distance Pixels to move.
- * @param {?string} id ID of block.
- */
-Heroes.move = function(x, y, id) {
-  if (Heroes.penDownValue) {
-    Heroes.ctxScratch.beginPath();
-    Heroes.ctxScratch.moveTo(Heroes.x, Heroes.y);
-  }
-  Heroes.x += x;
-  Heroes.y -= y;
-
-  if (Heroes.penDownValue) {
-    Heroes.ctxScratch.lineTo(Heroes.x, Heroes.y);
-    Heroes.ctxScratch.stroke();
-  }
-  Heroes.animate(id);
-};
 
 /**
  * Add an item to the screen.
  */
 Heroes.items = [];
 Heroes.item_radius = 5;
-Heroes.radius = 22;
 Heroes.addItem = function(x, y, vx, vy, id) {
   this.items.push(new Item(x, y, vx, vy, Heroes.item_rad*2));
   Heroes.animate(id);
 };
 
+
+//
+// Heroes actions.
+//
+Heroes.radius = 22;
+Heroes.heroes = {};
+Heroes.addHero = function(name, type, x, y, id) {
+  this.heroes[name] = new Hero(type, 22, x, y);
+  Heroes.HERO_NAMES.push([name, name]);
+  Heroes.animate(id);
+};
+Heroes.move = function(who, x, y, id) {
+
+  Heroes.heroes[who].x += x;
+  Heroes.heroes[who].y -= y;
+
+};
+
+Heroes.words = {};
+Heroes.word_timeouts = {};
+Heroes.speak = function(who, what, seconds, id)
+{
+  Heroes.words[who] = what;
+  clearTimeout(Heroes.word_timeouts[who]);
+  Heroes.word_timeouts[who] = setTimeout(function()
+  {
+    Heroes.words[who] = "";
+  }, seconds*1000);
+  Heroes.animate(id);
+}
+
+Heroes.Heroes = [];
+
 // Events for override.
 Heroes.key_events = {};
-Heroes.collision_event = "";
 Heroes.setButtonCallback = function(which, fn, id)
 {
   this.key_events[which] = fn;
   this.animate(id);
 }
-Heroes.setCollisionCallback = function(fn, id)
+Heroes.collision_events = {};
+Heroes.collisions_in_progress = {};
+Heroes.setCollisionCallback = function(a, b, fn, id)
 {
-  this.collision_event = fn;
+  console.log(a,b);
+  Heroes.collision_events[a] = Heroes.collision_events[a] || {};
+  Heroes.collision_events[a][b] = fn;
   this.animate(id);
 }
 
@@ -623,24 +579,59 @@ Heroes.startGame = function() {
         }
       }
 
-      //
-      // Check for collision events.
-      // Iterate in reverse so the index isn't affected when we remove elements.
-      //
-
-      var i = Heroes.items.length
-      while (i--) {
-        if (compute_distance(Heroes.items[i].x, Heroes.items[i].y, Heroes.x, Heroes.y) < (Heroes.radius + Heroes.item_radius))
-        {
-          Heroes.interpreter.appendCode(self.collision_event);
-          while (Heroes.interpreter.step()){};
-          Heroes.items.splice(i, 1);
-        }
-      }
+      Heroes.checkCollisions();
 
       Heroes.display();
     }, 50);
 };
+
+//
+// Check for collision events.
+//
+Heroes.checkCollisions = function()
+{
+  for (var a in Heroes.collision_events)
+  {
+    var hero_a = Heroes.heroes[a];
+    for (var b in Heroes.collision_events[a])
+    {
+      // Assume B is either an item or a hero.
+      if (b == "item")
+      {
+        // Iterate in reverse so the index isn't affected when we remove elements.
+        var i = Heroes.items.length
+        var item;
+        while (i--) {
+          item = Heroes.items[i];
+          if (compute_distance(item.x, item.y, hero_a.x, hero_a.y) < (hero_a.radius + Heroes.item_radius))
+          {
+            Heroes.interpreter.appendCode(Heroes.collision_events[a][b]);
+            while (Heroes.interpreter.step()){};
+            Heroes.items.splice(i, 1);
+          }
+        }
+      }
+      else
+      {
+        var hero_b = Heroes.heroes[b];
+        if (compute_distance(hero_b.x, hero_b.y, hero_a.x, hero_a.y) < (hero_a.radius + hero_b.radius))
+        {
+          if (Heroes.collisions_in_progress[a + b] == false)
+          {
+            Heroes.interpreter.appendCode(Heroes.collision_events[a][b]);
+            while (Heroes.interpreter.step()){};
+            Heroes.items.splice(i, 1);
+          }
+          Heroes.collisions_in_progress[a + b] = true;
+        }
+        else
+        {
+          Heroes.collisions_in_progress[a + b] = false;
+        }
+      }
+    }
+  }
+}
 
 /**
  * Lift or lower the pen.
@@ -711,5 +702,5 @@ Heroes.drawFont = function(font, size, style, id) {
 
 var compute_distance = function(x1, y1, x2, y2)
 {
-  return Math.sqrt((x2 - x1)**2 + (y2 - y1)**2);
+  return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
 }

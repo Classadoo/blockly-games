@@ -152,9 +152,9 @@ function getUsername() {
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-var initStudentWilddog = function(game, workspace, teacher_workspace){
+var initStudentWilddog = function(game, level, workspace, teacher_workspace){
     var user_id = guid();
-    push_to_user(null, game + "-" + BlocklyGames.LEVEL, getUsername());
+    push_to_user(null, game + "-" + level, getUsername());
 
     var events_in_progress = {};
     workspace.addChangeListener(function(masterEvent) {
