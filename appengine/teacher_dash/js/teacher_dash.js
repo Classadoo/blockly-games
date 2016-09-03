@@ -57,7 +57,8 @@ var newStudentBlockly = function(username)
        'rtl': false,
        'scrollbars':true,
        'toolbox': toolbox,
-       'trashcan': true
+       'trashcan': true,
+       'zoom': {'controls': true, 'wheel': true}
      });
 }
 

@@ -499,10 +499,10 @@ Heroes.addItem = function(x, y, vx, vy, id) {
 //
 // Heroes actions.
 //
-Heroes.radius = 22;
+Heroes.radius = 32;
 Heroes.heroes = {};
 Heroes.addHero = function(name, type, x, y, id) {
-  this.heroes[name] = new Hero(type, 22, x, y);
+  this.heroes[name] = new Hero(type, Heroes.radius, x, y);
   Heroes.HERO_NAMES.push([name, name]);
   Heroes.animate(id);
 };
@@ -513,6 +513,9 @@ Heroes.move = function(who, x, y, id) {
 
 };
 
+//
+// Hero speech.
+//
 Heroes.words = {};
 Heroes.word_timeouts = {};
 Heroes.speak = function(who, what, seconds, id)
@@ -539,7 +542,6 @@ Heroes.collision_events = {};
 Heroes.collisions_in_progress = {};
 Heroes.setCollisionCallback = function(a, b, fn, id)
 {
-  console.log(a,b);
   Heroes.collision_events[a] = Heroes.collision_events[a] || {};
   Heroes.collision_events[a][b] = fn;
   this.animate(id);
