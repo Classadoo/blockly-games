@@ -274,11 +274,11 @@ Blockly.Blocks['heroes_add_item'] = {
      this.appendValueInput('VX')
          .setCheck('Number')
          .setAlign(Blockly.ALIGN_RIGHT)
-         .appendField('VX');
+         .appendField('Speed X');
      this.appendValueInput('VY')
          .setCheck('Number')
          .setAlign(Blockly.ALIGN_RIGHT)
-         .appendField('VY');
+         .appendField('Speed Y');
      this.setPreviousStatement(true);
      this.setNextStatement(true);
    }
