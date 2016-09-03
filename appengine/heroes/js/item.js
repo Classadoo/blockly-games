@@ -18,7 +18,7 @@
  */
 'use strict';
 
-goog.provide('Items');
+goog.provide('ItemObject');
 
 function Item(x, y, vx, vy) {
 

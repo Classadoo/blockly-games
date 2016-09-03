@@ -43,6 +43,7 @@ goog.require('Blockly.JavaScript.texts');
 goog.require('Blockly.JavaScript.variables');
 goog.require('BlocklyGames');
 
+Heroes.HERO_NAMES = [["char"], ["char"]];
 
 /**
  * Common HSV hue for all blocks in this category.
@@ -75,6 +76,7 @@ Blockly.Blocks['heroes_move'] = {
     this.setColour(Heroes.Blocks.HUE);
     this.appendValueInput('VALUE')
         .setCheck('Number')
+        .appendField(new Blockly.FieldDropdown(Heroes.HERO_NAMES), 'HERO')
         .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR');
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -87,7 +89,7 @@ Blockly.JavaScript['heroes_move'] = function(block) {
   var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
       Blockly.JavaScript.ORDER_NONE) || '0';
   return block.getFieldValue('DIR') +
-      '(' + value + ', \'block_id_' + block.id + '\');';
+      '(\'' + block.getFieldValue('HERO') + '\','+ value + ', \'block_id_' + block.id + '\');';
 };
 
 Blockly.Blocks['heroes_add_points'] = {
@@ -216,6 +218,43 @@ Blockly.JavaScript['heroes_print'] = function(block) {
       block.id + '\');\n';
 };
 
+Blockly.Blocks['heroes_speak'] = {
+  /**
+   * Block for printing text.
+   * @this Blockly.Block
+   */
+  init: function() {
+
+    var names = [];
+    for (var i=0; i<Heroes.HERO_NAMES.length; i++)
+    {
+      names[i] = [Heroes.HERO_NAMES[i][0] + " say", Heroes.HERO_NAMES[i][1]];
+    }
+
+    this.setColour(Heroes.Blocks.HUE);
+
+    this.appendValueInput('TEXT')
+        .appendField(new Blockly.FieldDropdown(names), 'WHO')
+    this.appendValueInput('SECONDS')
+        .setCheck('Number')
+        .appendField('for seconds');
+
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+  }
+};
+
+Blockly.JavaScript['heroes_speak'] = function(block) {
+  // Generate JavaScript for printing text.
+  var what = String(Blockly.JavaScript.valueToCode(block, 'TEXT',
+      Blockly.JavaScript.ORDER_NONE) || '\'\'');
+  var who = block.getFieldValue('WHO');
+  var seconds = String(Blockly.JavaScript.valueToCode(block, 'SECONDS',
+      Blockly.JavaScript.ORDER_NONE) || '\'\'');
+  return 'speak(\'' + who + '\',' + what + ',' + seconds + ',\'block_id_' +
+      block.id + '\');';
+};
+
 Blockly.Blocks['heroes_add_item'] = {
   /**
    * Block for adding an item.
@@ -257,6 +296,51 @@ Blockly.JavaScript['heroes_add_item'] = function(block) {
       Blockly.JavaScript.ORDER_COMMA) || 0;
   return 'addItem(' + x + ',' + y + ',' + vx + ',' + vy + ', \'block_id_' +
       block.id + '\');\n';
+};
+
+
+Blockly.Blocks['heroes_add_hero'] = {
+  /**
+   * Block for adding an hero.
+   * @this Blockly.Block
+   */
+   init: function() {
+    var HEROES =
+        [["Add lion", 'lion'],
+         ["Add eagle", 'eagle']];
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldDropdown(HEROES), 'TYPE');
+
+     this.appendValueInput('NAME')
+       .appendField('named');
+
+     this.appendValueInput('X')
+         .setCheck('Number')
+         .appendField('X');
+
+     this.appendValueInput('Y')
+         .setCheck('Number')
+         .appendField('Y');
+
+      this.setColour(Heroes.Blocks.HUE);
+      this.setPreviousStatement(true);
+      this.setNextStatement(true);
+
+   }
+};
+
+Blockly.JavaScript['heroes_add_hero'] = function(block) {
+  // Generate JavaScript for addItem.
+
+  var type = block.getFieldValue('TYPE')
+  var name = Blockly.JavaScript.valueToCode(block, 'NAME',
+      Blockly.JavaScript.ORDER_COMMA) || "";
+  var x = Blockly.JavaScript.valueToCode(block, 'X',
+      Blockly.JavaScript.ORDER_COMMA) || 0;
+  var y = Blockly.JavaScript.valueToCode(block, 'Y',
+      Blockly.JavaScript.ORDER_COMMA) || 0;
+  return 'addHero(' + name + ', "' + type + '",' + x + ',' + y + ', \'block_id_' +
+      block.id + '\');';
 };
 
 
@@ -313,7 +397,18 @@ Blockly.Blocks['heroes_on_collision'] = {
      this.setPreviousStatement(false);
      this.setNextStatement(false);
      this.appendDummyInput()
-         .appendField("On Collision");
+         .appendField('On Collision');
+     this.appendDummyInput()
+         .appendField(new Blockly.FieldDropdown(Heroes.HERO_NAMES), 'A');
+
+     var OBJECTS = Heroes.HERO_NAMES.slice();
+     OBJECTS.push(["item", "item"]);
+
+     this.appendDummyInput()
+         .appendField('with');
+     this.appendDummyInput()
+         .appendField(new Blockly.FieldDropdown(OBJECTS), 'B');
+
      this.appendStatementInput('DO0')
          .appendField(Blockly.Msg.CONTROLS_IF_MSG_THEN);
    }
@@ -332,7 +427,8 @@ Blockly.JavaScript['heroes_on_collision'] = function(block) {
   // Trim the spaces and newlines (for the stupid interpreter), and pass it thru as a string.
   //
 
-  var code = 'setCollisionCallback(\"' + branch.trim().replace("\n", "") + '\", \'block_id_' + block.id +'\')';
+  var code = 'setCollisionCallback("'+ block.getFieldValue('A') + '",  "' +
+      block.getFieldValue('B') + '", \"' + branch.trim().replace("\n", "") + '\", \'block_id_' + block.id +'\')';
   return code + '\n';
 };
 

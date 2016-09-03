@@ -19,10 +19,10 @@
     // Block text and their associated tooltips and URLs (interleaved to
     // assist with translation).
     <span id="Heroes_moveTooltip">{msg meaning="Heroes.moveTooltip" desc="tooltip - In this and subsequent messages, 'heroes' refers to a stylized heroes on the screen to represent a position and direction.  This imaginary heroes is carrying a pen in its tail, so moving the heroes draws a line (or curve, etc.).  You are encouraged to play with the [https://blockly-demo.appspot.com/static/apps/heroes/index.html Heroes application] before doing this translation."}Moves the heroes forward or backward by the specified amount.{/msg}</span>
-    <span id="Heroes_moveUp">{msg meaning="Heroes.moveUp" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of a verb telling a heroes to move (walk) in the direction he/she is facing.  This is followed by a number indicating how far (how many pixels) to go.  Prefer a translation that has text in common with the translation of 'move backward'.  See [[Translating:Blockly#Drop-Down_Menus]]."}move up by{/msg}</span>
-    <span id="Heroes_moveDown">{msg meaning="Heroes.moveDown" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of a verb telling a heroes to move (walk) in the direction opposite to where he/she is facing.  This is followed by a number indicating how far (how many pixels) to go.  Prefer a translation that has text in common with the translation of 'move forward'."}move down by{/msg}</span>
-    <span id="Heroes_moveLeft">{msg meaning="Heroes.moveLeft" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of a verb telling a heroes to move (walk) in the direction he/she is facing.  This is followed by a number indicating how far (how many pixels) to go.  Prefer a translation that has text in common with the translation of 'move backward'.  See [[Translating:Blockly#Drop-Down_Menus]]."}move left by{/msg}</span>
-    <span id="Heroes_moveRight">{msg meaning="Heroes.moveRight" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of a verb telling a heroes to move (walk) in the direction opposite to where he/she is facing.  This is followed by a number indicating how far (how many pixels) to go.  Prefer a translation that has text in common with the translation of 'move forward'."}move right by{/msg}</span>
+    <span id="Heroes_moveUp">{msg meaning="Heroes.moveUp" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] .  See [[Translating:Blockly#Drop-Down_Menus]]."}move up by{/msg}</span>
+    <span id="Heroes_moveDown">{msg meaning="Heroes.moveDown" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] ."}move down by{/msg}</span>
+    <span id="Heroes_moveLeft">{msg meaning="Heroes.moveLeft" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] .  See [[Translating:Blockly#Drop-Down_Menus]]."}move left by{/msg}</span>
+    <span id="Heroes_moveRight">{msg meaning="Heroes.moveRight" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] ."}move right by{/msg}</span>
 
     // Arrow events
     <span id="Heroes_upArrow">{msg meaning="Heroes.upArrow" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of a verb telling a heroes to move (walk) in the direction he/she is facing.  This is followed by a number indicating how far (how many pixels) to go.  Prefer a translation that has text in common with the translation of 'move backward'.  See [[Translating:Blockly#Drop-Down_Menus]]."}when up arrow pressed{/msg}</span>
@@ -40,6 +40,9 @@
 
     <span id="Heroes_heroLion">{msg meaning="Heroes.spaceBar" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] -  change hero image'."}set hero to Lion{/msg}</span>
     <span id="Heroes_heroEagle">{msg meaning="Heroes.spaceBar" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] -  change hero image'."}set hero to Eagle{/msg}</span>
+
+    <span id="Heroes_speak">{msg meaning="Heroes.speak" desc=""}say {/msg}</span>
+
 
   </div>
 {/template}
@@ -249,6 +252,11 @@
   <xml id="toolbox" style="display: none">
 
     <category name="{msg meaning="Games.heroes" desc="IBID"}Heroes{/msg}">
+//      <block type="heroes_add_hero">
+//        <value name="NAME">
+//          <shadow type="text"></shadow>
+//        </value>
+//      </block>
 
       <block type="heroes_move">
         <value name="VALUE">
@@ -258,16 +266,22 @@
         </value>
       </block>
 
-      <block type="heroes_on_arrow"></block>
-      <block type="heroes_on_collision"></block>
+
+      <block type="heroes_add_item"></block>
+
+      <block type="heroes_speak">
+        <value name="TEXT">
+          <shadow type="text"></shadow>
+        </value>
+      </block>
 
       <block type="heroes_set_hero"></block>
-      <block type="heroes_add_points"></block>
     </category>
 
 
-  <category name="{msg meaning="Heroes.catItems" desc="IBID"}Items{/msg}">
-      <block type="heroes_add_item"></block>
+  <category name="{msg meaning="Heroes.catItems" desc="IBID"}Events{/msg}">
+    <block type="heroes_on_arrow"></block>
+    <block type="heroes_on_collision"></block>
   </category>
 
   <category name="{msg meaning="Heroes.catNumbers" desc="IBID"}Number{/msg}">
@@ -288,6 +302,7 @@
   </category>
 
   <category name="{msg meaning="Heroes.game" desc="IBID"}Game{/msg}">
+    <block type="heroes_add_points"></block>
     <block type="heroes_set_background"></block>
   </category>
 
