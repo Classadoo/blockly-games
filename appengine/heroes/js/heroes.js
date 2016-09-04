@@ -724,7 +724,7 @@ Heroes.checkCollisions = function()
           item = Heroes.items[i];
           if (compute_distance(item.x, item.y, hero_a.x, hero_a.y) < (hero_a.radius + Heroes.item_radius))
           {
-            Heroes.interpreter.appendCode(Heroes.collision_events[a][b]);
+            Heroes.interpreter['appendCode'](Heroes.collision_events[a][b]);
             while (Heroes.interpreter.step()){};
             Heroes.items.splice(i, 1);
           }
@@ -737,7 +737,7 @@ Heroes.checkCollisions = function()
         {
           if (Heroes.collisions_in_progress[a + b] == false)
           {
-            Heroes.interpreter.appendCode(Heroes.collision_events[a][b]);
+            Heroes.interpreter['appendCode'](Heroes.collision_events[a][b]);
             while (Heroes.interpreter.step()){};
             Heroes.items.splice(i, 1);
           }
