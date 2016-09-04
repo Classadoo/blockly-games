@@ -308,6 +308,9 @@
         <value name="TEXT">
           <shadow type="text"></shadow>
         </value>
+        <value name="SECONDS">
+          <shadow type="math_number"><field name="NUM">3</field></shadow>
+        </value>
       </block>
 
 //      <block type="heroes_set_hero"></block>
@@ -339,6 +342,11 @@
   <category name="{msg meaning="Heroes.game" desc="IBID"}Game{/msg}">
     <block type="heroes_add_points"></block>
     <block type="heroes_set_background"></block>
+    <block type="heroes_set_title">
+      <value name="TITLE">
+        <shadow type="text"></shadow>
+      </value>
+    </block>
   </category>
 
   </xml>

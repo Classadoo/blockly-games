@@ -255,6 +255,30 @@ Blockly.JavaScript['heroes_speak'] = function(block) {
       block.id + '\');';
 };
 
+Blockly.Blocks['heroes_set_title'] = {
+  /**
+   * Block for printing text.
+   * @this Blockly.Block
+   */
+  init: function() {
+
+    this.setColour(Heroes.Blocks.HUE);
+    this.appendValueInput('TITLE')
+        .appendField("Set Title: ");
+
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+  }
+};
+
+Blockly.JavaScript['heroes_set_title'] = function(block) {
+  // Generate JavaScript for printing text.
+  var title = String(Blockly.JavaScript.valueToCode(block, 'TITLE',
+      Blockly.JavaScript.ORDER_NONE) || '\'\'');
+  return 'setTitle(' + title + ',\'block_id_' +
+      block.id + '\');';
+};
+
 Blockly.Blocks['heroes_add_item'] = {
   /**
    * Block for adding an item.

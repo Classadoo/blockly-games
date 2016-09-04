@@ -384,6 +384,13 @@ Heroes.display = function() {
     Heroes.heroes[hero].draw(Heroes.ctxScratch);
     Heroes.heroes[hero].speak(Heroes.ctxScratch, Heroes.words[hero]);
   }
+  // Draw title.
+  if (Heroes.title)
+  {
+    Heroes.ctxScratch.fillStyle = "#000000";
+    var pos = Heroes.WIDTH/2 - Heroes.ctxScratch.measureText(Heroes.title).width/2;
+    Heroes.ctxScratch.fillText(Heroes.title, pos, 40);
+  }
 
   Heroes.ctxDisplay.globalCompositeOperation = 'source-over';
   Heroes.ctxDisplay.drawImage(Heroes.ctxScratch.canvas, 0, 0);
@@ -537,6 +544,12 @@ Heroes.initInterpreter = function(interpreter, scope) {
   };
   interpreter.setProperty(scope, 'speak',
       interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(title, id) {
+    Heroes.setTitle(title.toString(), id.toString());
+  };
+  interpreter.setProperty(scope, 'setTitle',
+      interpreter.createNativeFunction(wrapper));
 };
 
 /**
@@ -644,6 +657,12 @@ Heroes.speak = function(who, what, seconds, id)
     Heroes.words[who] = "";
   }, seconds*1000);
   Heroes.animate(id);
+}
+
+Heroes.title = "";
+Heroes.setTitle = function(title, id)
+{
+  Heroes.title = title;
 }
 
 Heroes.Heroes = [];
