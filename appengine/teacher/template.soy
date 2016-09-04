@@ -321,6 +321,89 @@
 {template .toolbox}
   <xml id="toolbox" style="display: none">
 
+  <category name="{msg meaning="Games.heroes" desc="IBID"}Heroes{/msg}">
+//      <block type="heroes_add_hero">
+//        <value name="NAME">
+//          <shadow type="text"></shadow>
+//        </value>
+//      </block>
+
+    <block type="heroes_move">
+      <value name="VALUE">
+        <shadow type="math_number">
+          <field name="NUM">10</field>
+        </shadow>
+      </value>
+    </block>
+
+
+    <block type="heroes_add_item">
+      <value name="X">
+        <shadow type="math_random_int">
+        <value name="FROM">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+        <value name="TO">
+          <shadow type="math_number">
+            <field name="NUM">600</field>
+          </shadow>
+        </value>
+        </shadow>
+      </value>
+      <value name="VY">
+        <shadow type="math_random_int">
+        <value name="FROM">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="TO">
+          <shadow type="math_number">
+            <field name="NUM">5</field>
+          </shadow>
+        </value>
+        </shadow>
+      </value>
+    </block>
+
+    <block type="heroes_speak">
+      <value name="TEXT">
+        <shadow type="text"></shadow>
+      </value>
+    </block>
+
+//      <block type="heroes_set_hero"></block>
+  </category>
+
+
+<category name="{msg meaning="Heroes.catItems" desc="IBID"}Events{/msg}">
+  <block type="heroes_on_arrow"></block>
+  <block type="heroes_on_collision"></block>
+</category>
+
+<category name="{msg meaning="Heroes.catNumbers" desc="IBID"}Number{/msg}">
+<block type="math_number"></block>
+
+  <block type="math_random_int">
+    <value name="FROM">
+      <shadow type="math_number">
+        <field name="NUM">1</field>
+      </shadow>
+    </value>
+    <value name="TO">
+      <shadow type="math_number">
+        <field name="NUM">5</field>
+      </shadow>
+    </value>
+  </block>
+</category>
+
+<category name="{msg meaning="Heroes.game" desc="IBID"}Game{/msg}">
+  <block type="heroes_add_points"></block>
+  <block type="heroes_set_background"></block>
+</category>
 
   <category name="{msg meaning="Games.maze" desc="Maze"}Maze{/msg}">
     <block type="maze_moveForward"></block>
