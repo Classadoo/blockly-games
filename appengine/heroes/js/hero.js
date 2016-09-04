@@ -121,3 +121,9 @@ Hero.prototype.speak = function(ctx, words)
     ctx.fillText(words, x + radius, y + radius * 3);
   }
 }
+
+Hero.prototype.set_pos = function(x, y)
+{
+  this.x = x;
+  this.y = y;
+}
