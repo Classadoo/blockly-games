@@ -336,9 +336,13 @@ if (window.location.pathname.match(/readonly.html$/)) {
  */
 Heroes.reset = function() {
   // Starting location of the heroes.
+
+  var widths = [Heroes.WIDTH/2, Heroes.WIDTH/3, Heroes.WIDTH/3*2];
+  var i = 0;
   for (var hero in Heroes.heroes)
   {
-    // TODO(aheine).
+    Heroes.heroes[hero].set_pos(widths[i], Heroes.HEIGHT/2);
+    i++;
   }
 
 
