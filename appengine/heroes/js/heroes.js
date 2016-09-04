@@ -246,7 +246,7 @@ Heroes.reset = function() {
   Heroes.interpreter = null;
 
   // Kill the game event loop.
-  clearInterval(this.eventLoop);
+  clearInterval(Heroes.eventLoop);
 };
 
 /**
@@ -491,7 +491,7 @@ Heroes.animate = function(id) {
 Heroes.items = [];
 Heroes.item_radius = 5;
 Heroes.addItem = function(x, y, vx, vy, id) {
-  this.items.push(new Item(x, y, vx, vy, Heroes.item_rad*2));
+  Heroes.items.push(new Item(x, y, vx, vy, Heroes.item_rad*2));
   Heroes.animate(id);
 };
 
@@ -502,7 +502,7 @@ Heroes.addItem = function(x, y, vx, vy, id) {
 Heroes.radius = 32;
 Heroes.heroes = {};
 Heroes.addHero = function(name, type, x, y, id) {
-  this.heroes[name] = new Hero(type, Heroes.radius, x, y);
+  Heroes.heroes[name] = new Hero(type, Heroes.radius, x, y);
   Heroes.HERO_NAMES.push([name, name]);
   Heroes.animate(id);
 };
@@ -535,8 +535,8 @@ Heroes.Heroes = [];
 Heroes.key_events = {};
 Heroes.setButtonCallback = function(which, fn, id)
 {
-  this.key_events[which] = fn;
-  this.animate(id);
+  Heroes.key_events[which] = fn;
+  Heroes.animate(id);
 }
 Heroes.collision_events = {};
 Heroes.collisions_in_progress = {};
@@ -544,7 +544,7 @@ Heroes.setCollisionCallback = function(a, b, fn, id)
 {
   Heroes.collision_events[a] = Heroes.collision_events[a] || {};
   Heroes.collision_events[a][b] = fn;
-  this.animate(id);
+  Heroes.animate(id);
 }
 
 /**
@@ -566,17 +566,17 @@ Heroes.startGame = function() {
     keys[event.which] = false;
   });
 
-  this.eventLoop = setInterval(function()
+  Heroes.eventLoop = setInterval(function()
     {
       //
       // Check for key presses.
       //
 
-      for (event in self.key_events)
+      for (event in Heroes.key_events)
       {
         if (keys[event])
         {
-          Heroes.interpreter.appendCode(self.key_events[event]);
+          Heroes.interpreter.appendCode(Heroes.key_events[event]);
           while (Heroes.interpreter.step()){};
         }
       }
