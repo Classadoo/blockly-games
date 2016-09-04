@@ -31,6 +31,7 @@ goog.require('BlocklyInterface');
 goog.require('Slider');
 goog.require('Turtle.Answers');
 goog.require('Turtle.Blocks');
+goog.require('Heroes.Blocks');
 goog.require('Maze.Blocks');
 goog.require('Teacher.soy');
 
@@ -39,6 +40,7 @@ goog.require('Teacher.soy');
 var initWildDog = function(workspace, students_div){
     var user_id = guid();
     var user_name = "classadoo_instructor";
+    clear_one_user(user_name);
     push_to_user(null, null, user_name);
 
     workspace.addChangeListener(function(masterEvent) {

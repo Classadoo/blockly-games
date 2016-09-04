@@ -43,7 +43,7 @@ goog.require('Blockly.JavaScript.texts');
 goog.require('Blockly.JavaScript.variables');
 goog.require('BlocklyGames');
 
-Heroes.HERO_NAMES = [["char"], ["char"]];
+Heroes.HERO_NAMES = [["Leo"], ["Leo"],["William"], ["William"],["Andrew"], ["Andrew"]];
 
 /**
  * Common HSV hue for all blocks in this category.
