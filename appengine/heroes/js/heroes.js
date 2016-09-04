@@ -676,10 +676,10 @@ Heroes.startGame = function() {
   //
 
   var keys = {};
-  $(document).keydown(function( event ) {
+  $(document)['keydown'](function( event ) {
     keys[event.which] = true;
   });
-  $(document).keyup(function( event ) {
+  $(document)['keyup'](function( event ) {
     keys[event.which] = false;
   });
 
