@@ -43,7 +43,7 @@ goog.require('Blockly.JavaScript.texts');
 goog.require('Blockly.JavaScript.variables');
 goog.require('BlocklyGames');
 
-Heroes.HERO_NAMES = [["Leo"], ["Leo"],["William"], ["William"],["Andrew"], ["Andrew"]];
+Heroes.HERO_NAMES = [["Leo", "Leo"],["William", "William"],["Andrew", "Andrew"]];
 
 /**
  * Common HSV hue for all blocks in this category.
@@ -90,7 +90,7 @@ Blockly.JavaScript['heroes_move'] = function(block) {
   var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
       Blockly.JavaScript.ORDER_NONE) || '0';
   return block.getFieldValue('DIR') +
-      '(\'' + block.getFieldValue('HERO') + '\','+ value + ', \'block_id_' + block.id + '\');';
+      '(\'' + block.getFieldValue('HERO') + '\','+ value + ', \'block_id_' + block.id + '\');\n';
 };
 
 Blockly.Blocks['heroes_add_points'] = {
@@ -112,7 +112,7 @@ Blockly.JavaScript['heroes_add_points'] = function(block) {
   // Generate JavaScript for adding or removing points.
   var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
       Blockly.JavaScript.ORDER_NONE) || '0';
-  return 'addPoints(' + value + ', \'block_id_' + block.id + '\');';
+  return 'addPoints(' + value + ', \'block_id_' + block.id + '\');\n';
 };
 
 Blockly.Blocks['heroes_set_background'] = {
@@ -138,7 +138,7 @@ Blockly.Blocks['heroes_set_background'] = {
 Blockly.JavaScript['heroes_set_background'] = function(block) {
   // Generate JavaScript for changing the background.
   var value = block.getFieldValue('COLOR');
-  return 'setBackground(\'' + value + '\', \'block_id_' + block.id + '\');';
+  return 'setBackground(\'' + value + '\', \'block_id_' + block.id + '\');\n';
 };
 
 Blockly.Blocks['heroes_set_hero'] = {
@@ -161,7 +161,7 @@ Blockly.Blocks['heroes_set_hero'] = {
 Blockly.JavaScript['heroes_set_hero'] = function(block) {
   // Generate JavaScript for changing the hero icon.
   var value = block.getFieldValue('HERO');
-  return 'setHero(\'' + value + '\', \'block_id_' + block.id + '\');';
+  return 'setHero(\'' + value + '\', \'block_id_' + block.id + '\');\n';
 };
 
 
@@ -215,8 +215,7 @@ Blockly.JavaScript['heroes_print'] = function(block) {
   // Generate JavaScript for printing text.
   var argument0 = String(Blockly.JavaScript.valueToCode(block, 'TEXT',
       Blockly.JavaScript.ORDER_NONE) || '\'\'');
-  return 'print(' + argument0 + ', \'block_id_' +
-      block.id + '\');\n';
+  return 'print(' + argument0 + ', \'block_id_' + block.id + '\');\n';
 };
 
 Blockly.Blocks['heroes_speak'] = {
@@ -252,8 +251,7 @@ Blockly.JavaScript['heroes_speak'] = function(block) {
   var who = block.getFieldValue('WHO');
   var seconds = String(Blockly.JavaScript.valueToCode(block, 'SECONDS',
       Blockly.JavaScript.ORDER_NONE) || '\'\'');
-  return 'speak(\'' + who + '\',' + what + ',' + seconds + ',\'block_id_' +
-      block.id + '\');';
+  return 'speak(\'' + who + '\',' + what + ',' + seconds + ',\'block_id_' + block.id + '\');\n';
 };
 
 Blockly.Blocks['heroes_set_title'] = {
@@ -276,8 +274,7 @@ Blockly.JavaScript['heroes_set_title'] = function(block) {
   // Generate JavaScript for printing text.
   var title = String(Blockly.JavaScript.valueToCode(block, 'TITLE',
       Blockly.JavaScript.ORDER_NONE) || '\'\'');
-  return 'setTitle(' + title + ',\'block_id_' +
-      block.id + '\');';
+  return 'setTitle(' + title + ',\'block_id_' + block.id + '\');\n';
 };
 
 Blockly.Blocks['heroes_add_item'] = {
@@ -365,7 +362,7 @@ Blockly.JavaScript['heroes_add_hero'] = function(block) {
   var y = Blockly.JavaScript.valueToCode(block, 'Y',
       Blockly.JavaScript.ORDER_COMMA) || 0;
   return 'addHero(' + name + ', "' + type + '",' + x + ',' + y + ', \'block_id_' +
-      block.id + '\');';
+      block.id + '\');\n';
 };
 
 
@@ -411,7 +408,7 @@ Blockly.JavaScript['heroes_on_arrow'] = function(block) {
   // Trim the spaces and newlines (for the stupid interpreter), and pass it thru as a string.
   //
 
-  var code = 'setButtonCallback(' + direction_number + ', \"' + branch.trim().replace("\n", "") + '\", \'block_id_' + block.id +'\')';
+  var code = 'setButtonCallback(' + direction_number + ', \"' + branch.trim().replace(/\n/g, "") + '\", \'block_id_' + block.id +'\')';
   return code + '\n';
 };
 
