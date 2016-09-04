@@ -693,7 +693,7 @@ Heroes.startGame = function() {
       {
         if (keys[event])
         {
-          Heroes.interpreter.appendCode(Heroes.key_events[event]);
+          Heroes.interpreter['appendCode'](Heroes.key_events[event]);
           while (Heroes.interpreter.step()){};
         }
       }
