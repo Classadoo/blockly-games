@@ -267,7 +267,36 @@
       </block>
 
 
-      <block type="heroes_add_item"></block>
+      <block type="heroes_add_item">
+        <value name="X">
+          <shadow type="math_random_int">
+          <value name="FROM">
+            <shadow type="math_number">
+              <field name="NUM">0</field>
+            </shadow>
+          </value>
+          <value name="TO">
+            <shadow type="math_number">
+              <field name="NUM">600</field>
+            </shadow>
+          </value>
+          </shadow>
+        </value>
+        <value name="VY">
+          <shadow type="math_random_int">
+          <value name="FROM">
+            <shadow type="math_number">
+              <field name="NUM">1</field>
+            </shadow>
+          </value>
+          <value name="TO">
+            <shadow type="math_number">
+              <field name="NUM">5</field>
+            </shadow>
+          </value>
+          </shadow>
+        </value>
+      </block>
 
       <block type="heroes_speak">
         <value name="TEXT">
@@ -275,7 +304,7 @@
         </value>
       </block>
 
-      <block type="heroes_set_hero"></block>
+//      <block type="heroes_set_hero"></block>
     </category>
 
 
