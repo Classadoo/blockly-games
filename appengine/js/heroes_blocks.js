@@ -49,6 +49,7 @@ Heroes.HERO_NAMES = [["char"], ["char"]];
  * Common HSV hue for all blocks in this category.
  */
 Heroes.Blocks.HUE = 160;
+Heroes.Blocks.EVENT_HUE = 320;
 
 /**
  * Left turn arrow to be appended to messages.
@@ -386,7 +387,7 @@ Blockly.Blocks['heroes_on_arrow'] = {
            [BlocklyGames.getMsg('Heroes_dKey'), '68'],
            [BlocklyGames.getMsg('Heroes_shiftKey'), '16'],
              [BlocklyGames.getMsg('Heroes_spaceBar'), '32']];
-     this.setColour(Heroes.Blocks.HUE);
+     this.setColour(Heroes.Blocks.EVENT_HUE);
      this.appendDummyInput('VALUE')
          .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR');
      this.setPreviousStatement(false);
@@ -422,7 +423,7 @@ Blockly.Blocks['heroes_on_collision'] = {
    */
 
    init: function() {
-     this.setColour(Heroes.Blocks.HUE);
+     this.setColour(Heroes.Blocks.EVENT_HUE);
      this.setPreviousStatement(false);
      this.setNextStatement(false);
      this.appendDummyInput()
