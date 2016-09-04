@@ -37,9 +37,9 @@ function getUsername() {
     var url = window.location.href;
     var regex = new RegExp("[?&]username(=([^&#]*)|&|#|$)"),
         results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
+    if (!results) return "unknown";
+    if (!results[2]) return 'unknown2';
+    return decodeURIComponent(results[2].replace(/\+/g, " ")) + "_heroes";
 }
 
 var initStudentWilddog = function(game, level, workspace, teacher_workspace){
@@ -222,7 +222,8 @@ Heroes.init = function() {
       {lang: BlocklyGames.LANG,
        level: BlocklyGames.LEVEL,
        maxLevel: BlocklyGames.MAX_LEVEL,
-       html: BlocklyGames.IS_HTML});
+       html: BlocklyGames.IS_HTML,
+       suffix: "&username="+getUsername() });
 
   BlocklyInterface.init();
 
