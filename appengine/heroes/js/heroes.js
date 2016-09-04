@@ -387,7 +387,7 @@ Heroes.display = function() {
   // Draw title.
   if (Heroes.title)
   {
-    Heroes.ctxScratch.fillStyle = "#000000";
+    Heroes.ctxScratch.fillStyle = "#1199CC";
     var pos = Heroes.WIDTH/2 - Heroes.ctxScratch.measureText(Heroes.title).width/2;
     Heroes.ctxScratch.fillText(Heroes.title, pos, 40);
   }
