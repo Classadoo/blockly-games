@@ -355,7 +355,12 @@ Blockly.Blocks['heroes_on_arrow'] = {
          [[BlocklyGames.getMsg('Heroes_upArrow'), '38'],
           [BlocklyGames.getMsg('Heroes_downArrow'), '40'],
            [BlocklyGames.getMsg('Heroes_leftArrow'), '37'],
-            [BlocklyGames.getMsg('Heroes_rightArrow'), '39'],
+           [BlocklyGames.getMsg('Heroes_rightArrow'), '39'],
+           [BlocklyGames.getMsg('Heroes_wKey'), '87'],
+           [BlocklyGames.getMsg('Heroes_aKey'), '65'],
+           [BlocklyGames.getMsg('Heroes_sKey'), '83'],
+           [BlocklyGames.getMsg('Heroes_dKey'), '68'],
+           [BlocklyGames.getMsg('Heroes_shiftKey'), '16'],
              [BlocklyGames.getMsg('Heroes_spaceBar'), '32']];
      this.setColour(Heroes.Blocks.HUE);
      this.appendDummyInput('VALUE')
