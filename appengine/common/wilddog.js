@@ -30,7 +30,7 @@ var add_error_callback = function(username, callback)
 var clear_error = function(username)
 {
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username);
-  ref.set({error: ""});
+  ref.update({error: ""});
 }
 
 ///
