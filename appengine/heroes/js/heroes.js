@@ -393,6 +393,8 @@ Heroes.display = function() {
   if (Heroes.title)
   {
     Heroes.ctxScratch.fillStyle = "#1199CC";
+    Heroes.ctxScratch.font="28px Arial";
+
     var pos = Heroes.WIDTH/2 - Heroes.ctxScratch.measureText(Heroes.title).width/2;
     Heroes.ctxScratch.fillText(Heroes.title, pos, 40);
   }
