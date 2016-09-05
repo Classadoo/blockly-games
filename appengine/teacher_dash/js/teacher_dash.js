@@ -44,6 +44,7 @@ var newStudentBlockly = function(username)
     '<span class="username">' + username + '</span>' +
     '<span class="user_level" id="' + username + '_level">Level ?</span>' +
     '<button type="button" class="user_clear" id="' + username + '_clear">Clear</button>' +
+    '<span class="user_error" id="' + username + '_error"></span>' +
     '<div class="blockly" id="' + username + '_blockly"></div>';
   document.getElementById('students').appendChild(new_student);
 
@@ -97,6 +98,15 @@ var initStudent = function(username)
     if (level_div)
     {
       level_div.innerHTML = "Level " + level;
+    }
+  });
+
+  add_error_callback(username, function(err_string)
+  {
+    var error_div = document.getElementById(username + "_error");
+    if (error_div)
+    {
+      error_div.innerHTML = err_string ? "ERROR: " + err_string : "";
     }
   });
 }
