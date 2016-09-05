@@ -10,6 +10,30 @@
 //
 
 ///
+/// If we're using wilddog, we should send our errors to the teacher.
+///
+window.onerror = function(errorMsg, url, lineNumber)
+{
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername());
+  ref.update({"error" : errorMsg + " - " + url + " - " + lineNumber});
+}
+
+var add_error_callback = function(username, callback)
+{
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/error");
+  ref.on("value", function(err)
+  {
+    callback(err.val());
+  });
+}
+
+var clear_error = function(username)
+{
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username);
+  ref.set({error: ""});
+}
+
+///
 /// PUSH DATA
 ///
 

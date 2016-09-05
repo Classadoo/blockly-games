@@ -4,12 +4,12 @@ goog.require('BlocklyGames');
 
 /// HACK (aheine): get the user name in a better way
 function getUsername() {
-    var url = window.location.href;
-    var regex = new RegExp("[?&]username(=([^&#]*)|&|#|$)"),
-        results = regex.exec(url);
-    if (!results) return "unknown";
-    if (!results[2]) return 'unknown2';
-    return decodeURIComponent(results[2].replace(/\+/g, " ")) + "_heroes";
+  var url = window.location.href;
+  var regex = new RegExp("[?&]username(=([^&#]*)|&|#|$)"),
+      results = regex.exec(url);
+  if (!results) return "unknown";
+  if (!results[2]) return 'unknown2';
+  return decodeURIComponent(results[2].replace(/\+/g, " ")) + "_heroes";
 }
 
 var received_snapshots = {};
@@ -68,19 +68,24 @@ var connectPublisher = function(username, workspace)
 }
 
 var initStudentWilddog = function(game, level, workspace, teacher_workspace){
-    //
-    // Send current level.
-    //
-    update_level(getUsername(), game + "-" + level);
+  //
+  // Give us a fresh start.
+  //
+  clear_error(getUsername());
 
-    //
-    // Send all our blockly changes.
-    //
-    connectPublisher(getUsername(), workspace);
+  //
+  // Send current level.
+  //
+  update_level(getUsername(), game + "-" + level);
 
-    //
-    // Subscribe to all our/teacher blockly changes.
-    //
-    connectSubscriber("classadoo_instructor", teacher_workspace);
-    connectSubscriber(getUsername(), workspace);
+  //
+  // Send all our blockly changes.
+  //
+  connectPublisher(getUsername(), workspace);
+
+  //
+  // Subscribe to all our/teacher blockly changes.
+  //
+  connectSubscriber("classadoo_instructor", teacher_workspace);
+  connectSubscriber(getUsername(), workspace);
 }
