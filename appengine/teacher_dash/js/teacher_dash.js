@@ -34,6 +34,7 @@ goog.require('Heroes.Blocks');
 goog.require('Puzzle.Blocks');
 goog.require('Maze.Blocks');
 goog.require('Teacher_Dash.soy');
+goog.require('WilddogUtils');
 
 var newStudentBlockly = function(username)
 {
@@ -62,8 +63,9 @@ var newStudentBlockly = function(username)
      });
 }
 
+var received_snapshots = {};
 /// Initialize a two-way collaborative canvas with a new student.
-var initStudent = function(username, user_id)
+var initStudent = function(username)
 {
   //
   // Inject a new blockly canvas into the list of canvases.
@@ -76,76 +78,14 @@ var initStudent = function(username, user_id)
   //
 
   var events_in_progress = {};
-  var local_event_handler = function(masterEvent) {
-    //
-    // Ignore UI events (except selecting blocks)
-    //
-    if (masterEvent.type == Blockly.Events.UI) {
-      if (masterEvent.element != "selected")
-      {
-        return;
-      }
-    }
-
-    //
-    // Check to see if this event was triggered by Wilddog. If so, do not
-    // send it back.
-    //
-
-    if (events_in_progress[masterEvent.blockId + masterEvent.type] === true)
-    {
-      console.log("dropping remote");
-      events_in_progress[masterEvent.blockId + masterEvent.type] = false;
-      return;
-    }
-
-    //
-    // Convert event to JSON for transmitting across the net.
-    //
-
-    var json = masterEvent.toJson();
-    var wdmsg = {"sender":user_id, "blkmsg":json};
-    push_to_user(wdmsg, null, username);
-  };
-  workspace.addChangeListener(local_event_handler);
+  connectPublisher(username, workspace);
 
   //
   // Setup remote reading of canvas.
   //
 
-  var student_event_callback = function(snapshot) {
-    var blkmsg = clean_event(snapshot, user_id);
-    if (!blkmsg)
-    {
-      return;
-    }
-    var slaveEvent = Blockly.Events.fromJson(blkmsg, workspace);
+  connectSubscriber(username, workspace);
 
-    try {
-      var existingGroup = Blockly.Events.getGroup();
-      var groupid = existingGroup;
-      if (!existingGroup) {
-          Blockly.Events.setGroup(true);
-          groupid = Blockly.Events.getGroup();
-      }
-
-      console.log(slaveEvent.blockId + slaveEvent.type);
-      events_in_progress[slaveEvent.blockId + slaveEvent.type] = true;
-      // Create will automatically trigger a move, so don't send our move command back to the student.
-      if (slaveEvent.type == "create")
-      {
-        events_in_progress[slaveEvent.blockId + "move"] = true;
-      }
-      slaveEvent.run(true);
-      if (!existingGroup) {
-          Blockly.Events.setGroup(false);
-      }
-    }
-    catch(err) {
-        console.log("Error running slave event: ", err.message);
-    }
-  };
-  add_user_event_callback(username, student_event_callback);
   add_user_remove_callback(username, function()
   {
       workspace.clear();
@@ -165,12 +105,11 @@ var initStudent = function(username, user_id)
 var initWildDog = function(){
 
   var user_name = "classadoo_instructor";
-  var user_id = guid();
 
   var new_student_callback = function(user) {
     if (user.key() != user_name)
     {
-      initStudent(user.key(), user_id);
+      initStudent(user.key());
     }
   }
 
