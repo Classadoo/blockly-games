@@ -27,3 +27,7 @@ body, html {
     border: 3px solid white;
     border-radius: 3px;
 }
+
+#pleaseAllowCamera{
+    display: none;
+}
