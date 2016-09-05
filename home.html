@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="index.css"></link>
+</head>
+<body>
+	<div class="login-wrapper">
+		<h2>
+			Login
+		</h2>
+
+		<div class="region-input">
+			<h4>
+				Select region:
+			</h4>
+			<input class="region-select selected" type="button" value="china">
+			<input class="region-select" type="button" value="us">
+		</div>
+
+		<div class="name-input-wrapper">
+			<input class="name-input" id="name-input" type="text" placeholder="first name">
+			<input class="join-button" id="join-button" type="button" value="Join Class">
+		</div>
+	</div>
+</body>
+</html>
+
+<script>
+  document.getElementById("join-button").addEventListener("click", function() {
+    var name = document.getElementById("name-input").value;
+
+    if (name) {
+      window.location = "appengine/maze.html?username=" + name;
+    }
+})
+</script>
