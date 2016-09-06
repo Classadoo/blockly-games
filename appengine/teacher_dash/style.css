@@ -10,6 +10,10 @@ html[dir="RTL"] button.primary {
   height: 300px;
   width: 1000px;
 }
+.user_error {
+  color:#ff1111;
+  font-weight:bold;
+}
 #display {
   border: 1px solid #ccc;
 }
