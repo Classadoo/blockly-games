@@ -19,12 +19,12 @@ function GetURLParameter(sParam)
             return sParameterName[1];
         }
     }
-}​
+}
 
 var name = GetURLParameter("name");
-if( !name ){
+if ( name === "undefined" || name == null) {
   var now = new Date(Date.now());
-  name =  = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+  name = "User:" +  now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
 }
 
 $(document).ready(function() {
@@ -94,7 +94,7 @@ function initializeSession() {
         insertMode: 'append',
         width: '100%',
         height: '100%',
-        name: 
+        "name": name
       },
       function(error) {
         if (error) {
@@ -122,7 +122,7 @@ function initializeSession() {
         pleaseAllowCamera.style.display = 'block';
         console.log("The Allow/Deny dialog box is opened.");
       },
-      accessDialogClosed, function (event) {
+      accessDialogClosed: function (event) {
         // The Allow/Deny dialog box is closed.
         pleaseAllowCamera.style.display = 'none';
         console.log("The Allow/Deny dialog box is closed.");
