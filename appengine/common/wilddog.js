@@ -12,10 +12,17 @@
 ///
 /// If we're using wilddog, we should send our errors to the teacher.
 ///
+var last_err_string = 0;
 window.onerror = function(errorMsg, url, lineNumber)
 {
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername());
-  ref.update({"error" : errorMsg + " - " + url + " - " + lineNumber});
+
+  var err_string = errorMsg + " - " + url + " - " + lineNumber;
+  if (err_string != last_err_string)
+  {
+    ref.update({"error" : err_string});
+    last_err_string = err_string;
+  }
 }
 
 var add_error_callback = function(username, callback)

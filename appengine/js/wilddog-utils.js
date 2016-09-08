@@ -67,7 +67,7 @@ var connectPublisher = function(username, workspace)
   });
 }
 
-var initStudentWilddog = function(game, level, workspace, teacher_workspace){
+var initStudentWilddog = function(game, level, workspace){
   //
   // Give us a fresh start.
   //
@@ -86,6 +86,5 @@ var initStudentWilddog = function(game, level, workspace, teacher_workspace){
   //
   // Subscribe to all our/teacher blockly changes.
   //
-  connectSubscriber("classadoo_instructor", teacher_workspace);
   connectSubscriber(getUsername(), workspace);
 }

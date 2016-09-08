@@ -6,14 +6,16 @@ html[dir="RTL"] button.primary {
   text-align: right;
 }
 
-#my_blockly {
-  position: fixed;
-  bottom: 10px;
+.blockly {
+  height: 400px;
 }
-#teacher_canvas {
-  position: fixed;
+.username {
+  padding-left:20px;
+  font-family:Helvetica;
+  font-size:20px;
 }
-#teacher_canvas .blocklySvg {
+
+.read_only_true .blocklySvg {
   background-color: #666 !important;
 }
 #display {

@@ -34,73 +34,539 @@ goog.require('WilddogUtils');
 
 BlocklyGames.NAME = 'heroes';
 
-Heroes.HEIGHT = 400;
-Heroes.WIDTH = 600;
 
-/**
- * PID of animation task currently executing.
- * @type !Array.<number>
- */
-Heroes.pidList = [];
+// TODO(aheine): use jquery instead of a string of HTML. Also move this to a new file.
+Heroes.GAME_HTML =
+  '<div class="username">{user}</div>' +
+  '<div class="col-md-5" id="visualization">' +
+    '<canvas id="{user}_scratch" width="570" height="400" style="display: none"></canvas>' +
+    '<canvas id="{user}_display" width="570" height="400"></canvas>' +
+    '<table style="padding-top: 1em;">' +
+      '<tr>' +
+        '<td style="width: 15px;">' +
+          '<img id="{user}_spinner" style="visibility: hidden;" src="heroes/loading.gif" height=15 width=15>' +
+        '</td>' +
+        '<td style="width: 190px; text-align: center">' +
+          '<button id="{user}_runButton" class="primary" title="Run the program you wrote.">' +
+            '<img src="common/1x1.gif" class="run icon21"> Run Program' +
+          '</button>' +
+          '<button id="{user}_resetButton" class="primary" style="display: none" title="Stop the program and reset the level.">' +
+            '<img src="common/1x1.gif" class="stop icon21"> Reset' +
+          '</button>' +
+        '</td>' +
+      '</tr>' +
+    '</table>' +
+  '</div>' +
+  '<div class="col-md-7 blockly read_only_{read_only}" id="{user}_blockly"></div>';
 
-/**
- * Number of milliseconds that execution should delay.
- * @type number
- */
-Heroes.pause = 0;
 
-/**
- * JavaScript interpreter for executing program.
- * @type Interpreter
- */
-Heroes.interpreter = null;
-
-/**
- * Should the heroes be drawn?
- * @type boolean
- */
-Heroes.visible = true;
-
-Heroes.setBackground = function(style, id)
+//
+// Constructor for a new game object.
+//
+var Game = function(username, blockly_workspace)
 {
-  Heroes.background = Heroes.backgrounds[style];
-  Heroes.animate(id);
+  var self = this;
+  self.workspace = blockly_workspace;
+  self.username = username;
+
+  self.pidList = [];
+
+  /**
+   * Number of milliseconds that execution should delay.
+   * @type number
+   */
+  self.pause = 0;
+
+  /**
+   * JavaScript interpreter for executing program.
+   * @type Interpreter
+   */
+  self.interpreter = null;
+
+  self.setBackground = function(style, id)
+  {
+    self.background = self.backgrounds[style];
+    self.animate(id);
+  }
+
+  self.addPoints = function(delta)
+  {
+    self.points = self.points || 0;
+    self.points += delta;
+  }
+
+  /**
+   * Reset the heroes to the start position, clear the display, and kill any
+   * pending tasks.
+   */
+  self.reset = function() {
+    // Starting location of the heroes.
+
+    var widths = [Heroes.WIDTH/2, Heroes.WIDTH/3, Heroes.WIDTH/3*2];
+    var i = 0;
+    for (var hero in self.heroes)
+    {
+      self.heroes[hero].set_pos(widths[i], Heroes.HEIGHT/2);
+      i++;
+    }
+
+
+
+    self.background = null;
+
+    self.points = undefined;
+
+    // Clear the canvas.
+    self.ctxScratch.canvas.width = self.ctxScratch.canvas.width;
+    self.ctxScratch.strokeStyle = '#ffffff';
+    self.ctxScratch.fillStyle = '#ffffff';
+    self.ctxScratch.lineWidth = 5;
+    self.ctxScratch.lineCap = 'round';
+    self.ctxScratch.font = 'normal 18pt Arial';
+    self.display();
+
+    // Kill all tasks.
+    for (var x = 0; x < self.pidList.length; x++) {
+      window.clearTimeout(self.pidList[x]);
+    }
+    self.pidList.length = 0;
+    self.interpreter = null;
+
+    // Kill the game event loop.
+    clearInterval(self.eventLoop);
+  };
+
+  /**
+   * Copy the scratch canvas to the display canvas. Add a heroes marker.
+   */
+  self.display = function() {
+    self.drawBackground();
+
+    // Draw the items.
+    for (var i=0; i<self.items.length; i++)
+    {
+      self.items[i].draw(self.ctxScratch, self.item_radius);
+      self.items[i].processEvents();
+    }
+    // Draw the heroes.
+    for (var hero in self.heroes)
+    {
+      self.heroes[hero].draw(self.ctxScratch);
+      self.heroes[hero].speak(self.ctxScratch, self.words[hero]);
+    }
+    // Draw title.
+    if (self.title)
+    {
+      self.ctxScratch.fillStyle = "#1199CC";
+      self.ctxScratch.font="28px Arial";
+
+      var pos = Heroes.WIDTH/2 - self.ctxScratch.measureText(self.title).width/2;
+      self.ctxScratch.fillText(self.title, pos, 40);
+    }
+
+    self.ctxDisplay.globalCompositeOperation = 'source-over';
+    self.ctxDisplay.drawImage(self.ctxScratch.canvas, 0, 0);
+
+    self.drawHUD();
+  };
+
+  self.drawBackground = function()
+  {
+    // Clear the display with black.
+    self.ctxScratch.clearRect(0, 0, self.ctxDisplay.canvas.clientWidth, self.ctxDisplay.canvas.clientHeight);
+    self.ctxDisplay.beginPath();
+    self.ctxDisplay.rect(0, 0,
+        self.ctxDisplay.canvas.width, self.ctxDisplay.canvas.height);
+
+    if (self.background)
+    {
+      self.ctxDisplay.drawImage(self.background, 0, 0, self.ctxDisplay.canvas.clientWidth, self.ctxDisplay.canvas.clientHeight);
+    }
+    else
+    {
+      self.ctxDisplay.fillStyle = "#333333";
+      self.ctxDisplay.fill();
+    }
+  }
+
+  self.drawHUD = function()
+  {
+    if (self.points !== undefined)
+    {
+      self.ctxDisplay.fillStyle = "#FFFFFF";
+      self.ctxDisplay.font = "15px Arial";
+      self.ctxDisplay.fillText("Points: " + self.points, 30, 30);
+    }
+  }
+
+
+  /**
+   * Execute the user's code.  Heaven help us...
+   */
+  self.execute = function() {
+    if (!('Interpreter' in window)) {
+      // Interpreter lazy loads and hasn't arrived yet.  Try again later.
+      setTimeout(self.execute, 250);
+      return;
+    }
+
+    self.reset();
+    self.startGame();
+
+    var code = Blockly.JavaScript.workspaceToCode(self.workspace);
+    self.interpreter = new Interpreter(code, self.initInterpreter);
+    self.pidList.push(setTimeout(self.executeChunk_, 100));
+  };
+
+  /**
+   * Click the run button.  Start the program.
+   * @param {!Event} e Mouse or touch event.
+   */
+  self.runButtonClick = function(e) {
+    // Prevent double-clicks or double-taps.
+    if (BlocklyInterface.eventSpam(e)) {
+      return;
+    }
+
+    var runButton = document.getElementById(self.username + '_runButton');
+    var resetButton = document.getElementById(self.username + '_resetButton');
+    // Ensure that Reset button is at least as wide as Run button.
+    if (!resetButton.style.minWidth) {
+      resetButton.style.minWidth = runButton.offsetWidth + 'px';
+    }
+    runButton.style.display = 'none';
+    resetButton.style.display = 'inline';
+    document.getElementById(self.username + '_spinner').style.visibility = 'visible';
+    self.execute();
+  };
+
+  /**
+   * Click the reset button.  Reset the Heroes.
+   * @param {!Event} e Mouse or touch event.
+   */
+  self.resetButtonClick = function(e) {
+    // Prevent double-clicks or double-taps.
+    if (BlocklyInterface.eventSpam(e)) {
+      return;
+    }
+    var runButton = document.getElementById(self.username + '_runButton');
+    runButton.style.display = 'inline';
+    document.getElementById(self.username + '_resetButton').style.display = 'none';
+    document.getElementById(self.username + '_spinner').style.visibility = 'hidden';
+    self.reset();
+  };
+
+  /**
+   * Inject the Heroes API into a JavaScript interpreter.
+   * @param {!Object} scope Global scope.
+   * @param {!Interpreter} interpreter The JS interpreter.
+   */
+  self.initInterpreter = function(interpreter, scope) {
+    // API
+    var wrapper = function(who, distance, id) {
+      self.move(who.toString(), 0, distance.valueOf(), id.toString());
+    };
+    interpreter.setProperty(scope, 'moveUp',
+        interpreter.createNativeFunction(wrapper));
+
+    wrapper = function(who, distance, id) {
+      self.move(who.toString(), 0, -distance.valueOf(), id.toString());
+    };
+    interpreter.setProperty(scope, 'moveDown',
+        interpreter.createNativeFunction(wrapper));
+
+    wrapper = function(who, distance, id) {
+      self.move(who.toString(), -distance.valueOf(), 0, id.toString());
+    };
+    interpreter.setProperty(scope, 'moveLeft',
+        interpreter.createNativeFunction(wrapper));
+
+    wrapper = function(who, distance, id) {
+      self.move(who.toString(), distance.valueOf(), 0, id.toString());
+    };
+    interpreter.setProperty(scope, 'moveRight',
+        interpreter.createNativeFunction(wrapper));
+
+    wrapper = function(x, y, vx, vy, id) {
+      self.addItem(x.data, y.data, vx.data, vy.data, id.toString());
+    };
+    interpreter.setProperty(scope, 'addItem',
+        interpreter.createNativeFunction(wrapper));
+
+    wrapper = function(name, type, x, y, id) {
+      self.addHero(name.toString(), type.toString(), x.data, y.data, id.toString());
+    };
+    interpreter.setProperty(scope, 'addHero',
+        interpreter.createNativeFunction(wrapper));
+
+    wrapper = function(which, fn, id) {
+      self.setButtonCallback(which.data, fn.toString(), id.toString());
+    };
+    interpreter.setProperty(scope, 'setButtonCallback',
+        interpreter.createNativeFunction(wrapper));
+
+    wrapper = function(a, b, fn, id) {
+      self.setCollisionCallback(a.toString(), b.toString(), fn.toString(), id.toString());
+    };
+    interpreter.setProperty(scope, 'setCollisionCallback',
+        interpreter.createNativeFunction(wrapper));
+
+    wrapper = function(image, id) {
+      self.setBackground(image.toString(), id.toString());
+    };
+    interpreter.setProperty(scope, 'setBackground',
+        interpreter.createNativeFunction(wrapper));
+
+    wrapper = function(num, id) {
+      self.addPoints(num.data, id.toString());
+    };
+    interpreter.setProperty(scope, 'addPoints',
+        interpreter.createNativeFunction(wrapper));
+
+    wrapper = function(who, what, seconds, id) {
+      self.speak(who.toString(), what.toString(), seconds.data, id.toString());
+    };
+    interpreter.setProperty(scope, 'speak',
+        interpreter.createNativeFunction(wrapper));
+
+    wrapper = function(title, id) {
+      self.setTitle(title.toString(), id.toString());
+    };
+    interpreter.setProperty(scope, 'setTitle',
+        interpreter.createNativeFunction(wrapper));
+  };
+
+  /**
+   * Execute a bite-sized chunk of the user's code.
+   * @private
+   */
+  self.executeChunk_ = function() {
+    // All tasks should be complete now.  Clean up the PID list.
+    self.pidList.length = 0;
+    self.pause = 0;
+    var go;
+    do {
+      try {
+        go = self.interpreter.step();
+      } catch (e) {
+        // User error, terminate in shame.
+        alert(e);
+        go = false;
+      }
+      if (go && self.pause) {
+        // The last executed command requested a pause.
+        go = false;
+        self.pidList.push(
+            setTimeout(self.executeChunk_, self.pause));
+      }
+    } while (go);
+    // Wrap up if complete.
+    if (!self.pause) {
+      document.getElementById(self.username + '_spinner').style.visibility = 'hidden';
+      self.workspace.highlightBlock(null);
+    }
+  };
+
+  /**
+   * Highlight a block and pause.
+   * @param {?string} id ID of block.
+   */
+  self.animate = function(id) {
+    if (id) {
+      var m = id.match(/^block_id_([^']+)$/);
+      if (m) {
+        id = m[1];
+      }
+      var block = self.workspace.getBlockById(id);
+      if (block)
+      {
+        block.select();
+      }
+      var stepSpeed = 1000 * Math.pow(1 - Heroes.speedSlider.getValue(), 2);
+      self.pause = Math.max(1, stepSpeed);
+    }
+  };
+
+
+  /**
+   * Add an item to the screen.
+   */
+  self.items = [];
+  self.item_radius = 5;
+  self.addItem = function(x, y, vx, vy, id) {
+    self.items.push(new Item(x, y, vx, vy, self.item_radius*2));
+    self.animate(id);
+  };
+
+
+  //
+  // Heroes actions.
+  //
+  self.radius = 32;
+  self.heroes = {};
+  self.addHero = function(name, type, x, y, id) {
+    self.heroes[name] = new Hero(type, self.radius, x, y);
+
+    if (Heroes.HERO_NAMES.indexOf([name, name]) == -1)
+    {
+      Heroes.HERO_NAMES.push([name, name]);
+    }
+    self.animate(id);
+  };
+  self.move = function(who, x, y, id) {
+    self.heroes[who].x += x;
+    self.heroes[who].y -= y;
+    self.animate(id);
+  };
+
+  //
+  // Hero speech.
+  //
+  self.words = {};
+  self.word_timeouts = {};
+  self.speak = function(who, what, seconds, id)
+  {
+    self.words[who] = what;
+    clearTimeout(self.word_timeouts[who]);
+    self.word_timeouts[who] = setTimeout(function()
+    {
+      self.words[who] = "";
+    }, seconds*1000);
+    self.animate(id);
+  }
+
+  self.title = "";
+  self.setTitle = function(title, id)
+  {
+    self.title = title;
+  }
+
+  self.heroes = [];
+
+  // Events for override.
+  self.key_events = {};
+  self.setButtonCallback = function(which, fn, id)
+  {
+    self.key_events[which] = fn;
+    self.animate(id);
+  }
+  self.collision_events = {};
+  self.collisions_in_progress = {};
+  self.setCollisionCallback = function(a, b, fn, id)
+  {
+    self.collision_events[a] = self.collision_events[a] || {};
+    self.collision_events[a][b] = fn;
+    self.animate(id);
+  }
+
+  /**
+   * Start the event polling.
+   */
+  self.startGame = function() {
+    var self = this;
+    self.items = []
+
+    //
+    // Track each key press.
+    //
+
+    var keys = {};
+    $(document)['keydown'](function( event ) {
+      keys[event.which] = true;
+    });
+    $(document)['keyup'](function( event ) {
+      keys[event.which] = false;
+    });
+
+    self.eventLoop = setInterval(function()
+      {
+        //
+        // Check for key presses.
+        //
+
+        for (event in self.key_events)
+        {
+          if (keys[event])
+          {
+            self.interpreter['appendCode'](self.key_events[event]);
+            while (self.interpreter.step()){};
+          }
+        }
+
+        self.checkCollisions();
+
+        self.display();
+      }, 50);
+  };
+
+  //
+  // Check for collision events.
+  //
+  self.checkCollisions = function()
+  {
+    for (var a in self.collision_events)
+    {
+      var hero_a = self.heroes[a];
+      for (var b in self.collision_events[a])
+      {
+        // Assume B is either an item or a hero.
+        if (b == "item")
+        {
+          // Iterate in reverse so the index isn't affected when we remove elements.
+          var i = self.items.length
+          var item;
+          while (i--) {
+            item = self.items[i];
+            if (compute_distance(item.x, item.y, hero_a.x, hero_a.y) < (hero_a.radius + self.item_radius))
+            {
+              self.interpreter['appendCode'](self.collision_events[a][b]);
+              while (self.interpreter.step()){};
+              self.items.splice(i, 1);
+            }
+          }
+        }
+        else
+        {
+          var hero_b = self.heroes[b];
+          if (compute_distance(hero_b.x, hero_b.y, hero_a.x, hero_a.y) < (hero_a.radius + hero_b.radius))
+          {
+            if (self.collisions_in_progress[a + b] == false)
+            {
+              self.interpreter['appendCode'](self.collision_events[a][b]);
+              while (self.interpreter.step()){};
+              self.items.splice(i, 1);
+            }
+            self.collisions_in_progress[a + b] = true;
+          }
+          else
+          {
+            self.collisions_in_progress[a + b] = false;
+          }
+        }
+      }
+    }
+  }
 }
 
-Heroes.setHero = function(hero, id)
-{
-  Heroes.hero = Heroes.heroes[hero];
-  Heroes.animate(id);
-}
-
-Heroes.addPoints = function(delta)
-{
-  Heroes.points = Heroes.points || 0;
-  Heroes.points += delta;
-}
-
 /**
- * Initialize Blockly and the heroes.  Called on page load.
+ * Initialize Blockly and the shared Heroes object. All games will share these values.
  */
 Heroes.init = function() {
 
-    Heroes.backgrounds = {};
-    Heroes.backgrounds["castle"] = new Image();
-    Heroes.backgrounds["castle"].src = "heroes/castle.jpg";
-    Heroes.backgrounds["cats"] = new Image();
-    Heroes.backgrounds["cats"].src = "heroes/cats.png";
-    Heroes.backgrounds["desert"] = new Image();
-    Heroes.backgrounds["desert"].src = "heroes/desert.jpg";
-    Heroes.backgrounds["space"] = new Image();
-    Heroes.backgrounds["space"].src = "heroes/space.jpg";
-    Heroes.backgrounds["village"] = new Image();
-    Heroes.backgrounds["village"].src = "heroes/village.jpg";
+  Heroes.HEIGHT = 400;
+  Heroes.WIDTH = 570;
 
-    Heroes.HERO_NAMES = [];
-    Heroes.addHero("Leo", "lion", Heroes.WIDTH/2, Heroes.HEIGHT/2);
-    Heroes.addHero("William", "eagle", Heroes.WIDTH/3, Heroes.HEIGHT/2);
-    Heroes.addHero("Andrew", "human", Heroes.WIDTH/3 * 2, Heroes.HEIGHT/2);
-
+  Heroes.backgrounds = {};
+  Heroes.backgrounds["castle"] = new Image();
+  Heroes.backgrounds["castle"].src = "heroes/castle.jpg";
+  Heroes.backgrounds["cats"] = new Image();
+  Heroes.backgrounds["cats"].src = "heroes/cats.png";
+  Heroes.backgrounds["desert"] = new Image();
+  Heroes.backgrounds["desert"].src = "heroes/desert.jpg";
+  Heroes.backgrounds["space"] = new Image();
+  Heroes.backgrounds["space"].src = "heroes/space.jpg";
+  Heroes.backgrounds["village"] = new Image();
+  Heroes.backgrounds["village"].src = "heroes/village.jpg";
 
   // Render the Soy template.
   document.body.innerHTML = Heroes.soy.start({}, null,
@@ -112,624 +578,114 @@ Heroes.init = function() {
 
   BlocklyInterface.init();
 
-  var rtl = BlocklyGames.isRtl();
-  var myBlocklyDiv = document.getElementById('my_blockly');
-  var teacherBlocklyDiv = document.getElementById('teacher_blockly');
-  var teacherLabelDiv = document.getElementById('teacher_label');
-  var teacherCanvasDiv = document.getElementById('teacher_canvas');
-  var toggleTeacherBlocks = document.getElementById('toggleTeacherBlocks');
-  var visualization = document.getElementById('visualization');
-
-  var teacherBlocksHidden = false;
-  var onresize = function(e) {
-    var my_height = teacherBlocksHidden ? window.innerHeight - 100 : window.innerHeight/3*2 - 50;
-    var teacher_height = teacherBlocksHidden ? 0 : window.innerHeight/3*1 - 50;
-    var top = Math.max(10, visualization.offsetTop - window.pageYOffset);
-    var width = window.innerWidth - 640;
-
-    myBlocklyDiv.style.top =  top + 'px';
-    myBlocklyDiv.style.left = rtl ? '10px' : '620px';
-    myBlocklyDiv.style.width = width + 'px';
-    myBlocklyDiv.style.height = my_height + 'px';
-
-    teacherCanvasDiv.style.top = my_height + top + 5 + 'px';
-    teacherCanvasDiv.style.left = rtl ? '10px' : '620px';
-    teacherBlocklyDiv.style.width =  width + 'px';
-    teacherBlocklyDiv.style.height = teacher_height + 'px';
-  };
-  window.addEventListener('scroll', function() {
-    onresize();
-    Blockly.svgResize(BlocklyGames.workspace)
-  });
-  window.addEventListener('resize', onresize);
-  onresize();
-
-  toggleTeacherBlocks.addEventListener("click", function()
-    {
-      teacherBlocksHidden = !teacherBlocksHidden;
-      toggleTeacherBlocks.textContent = teacherBlocksHidden ? "Show" : "Hide"
-      onresize();
-      Blockly.svgResize(BlocklyGames.workspace)
-    });
-
-
-  var toolbox = document.getElementById('toolbox');
-  BlocklyGames.workspace = Blockly.inject('my_blockly',
-      {'media': 'third-party/blockly/media/',
-       'rtl': rtl,
-       'toolbox': toolbox,
-       'trashcan': true,
-       'zoom': {'controls': true, 'wheel': false}});
-   BlocklyGames.teacher_workspace = Blockly.inject('teacher_blockly',
-       {'media': 'third-party/blockly/media/',
-        'readOnly' : true,
-        'rtl': rtl});
-
-  initStudentWilddog( "Heroes", "", BlocklyGames.workspace, BlocklyGames.teacher_workspace );
-  BlocklyGames.workspace.traceOn(true);
-  BlocklyGames.teacher_workspace.traceOn(true);
-
   // Prevent collisions with user-defined functions or variables.
   Blockly.JavaScript.addReservedWords('moveForward,moveBackward,' +
       'turnRight,turnLeft,penUp,penDown,penWidth,penColour,' +
       'hideHeroes,showHeroes,print,font');
 
-  if (document.getElementById('submitButton')) {
-    BlocklyGames.bindClick('submitButton', Heroes.submitToReddit);
-  }
-
   // Initialize the slider.
   var sliderSvg = document.getElementById('slider');
   Heroes.speedSlider = new Slider(10, 35, 130, sliderSvg);
 
+  // Clear the hero names.
+  Heroes.HERO_NAMES = [];
 
-  Heroes.ctxDisplay = document.getElementById('display').getContext('2d');
-  Heroes.ctxAnswer = document.getElementById('answer').getContext('2d');
-  Heroes.ctxScratch = document.getElementById('scratch').getContext('2d');
-  Heroes.reset();
-
-  BlocklyGames.bindClick('runButton', Heroes.runButtonClick);
-  BlocklyGames.bindClick('resetButton', Heroes.resetButtonClick);
-
-  // Preload the win sound.
-  BlocklyGames.workspace.loadAudio_(['heroes/win.mp3', 'heroes/win.ogg'],
-      'win');
   // Lazy-load the JavaScript interpreter.
   setTimeout(BlocklyInterface.importInterpreter, 1);
   // Lazy-load the syntax-highlighting.
   setTimeout(BlocklyInterface.importPrettify, 1);
 
-  if (location.hash.length < 2 &&
-      !BlocklyGames.loadFromLocalStorage(BlocklyGames.NAME,
-                                         BlocklyGames.LEVEL)) {
-    setTimeout(Heroes.showHelp, 1000);
-  }
+  // Add a game
+  var student_workspace = Heroes.addGame(false, getUsername().replace("_heroes", ""));
+  initStudentWilddog( "Heroes", "", student_workspace );
+
+  var student_dropdown = $('#student_dropdown');
+  add_new_student_callback(function(username)
+  {
+    if (username.key() == getUsername())
+    {
+      return;
+    }
+    username = username.key().replace("_heroes", "");
+    student_dropdown.append($('<option></option>').val(username).html(username));
+  });
+
+  student_dropdown.change(function()
+  {
+    Heroes.add_remote_user($(this).val());
+  })
+
+  Heroes.add_remote_user("classadoo_instructor");
 };
 
-if (window.location.pathname.match(/readonly.html$/)) {
-  window.addEventListener('load', function() {
-    BlocklyInterface.initReadonly(Heroes.soy.readonly());
-  });
-} else {
-  window.addEventListener('load', Heroes.init);
+Heroes.addGame = function(readOnly, username)
+{
+  //
+  // Set up the HTML.
+  //
+
+  var new_game = document.createElement("div");
+  new_game.id = username + "_container";
+  new_game.className = "row";
+  new_game.innerHTML = Heroes.GAME_HTML.replace(/{user}/g, username).replace(/{read_only}/g, readOnly);
+  document.getElementById('games').appendChild(new_game);
+
+  //
+  // Add the game to the screen.
+  //
+  var toolbox = document.getElementById('toolbox');
+  var workspace = Blockly.inject(username + '_blockly',
+     {'media': 'third-party/blockly/media/',
+      'toolbox': readOnly ? null : toolbox,
+      'readOnly' : readOnly,
+      'zoom': {'controls': !readOnly, 'wheel': false}});
+  workspace.traceOn(true);
+  workspace.loadAudio_(['heroes/win.mp3', 'heroes/win.ogg'], 'win');
+
+  var game = new Game(username, workspace);
+
+  game.addHero("Leo", "lion", Heroes.WIDTH/2, Heroes.HEIGHT/2);
+  game.addHero("William", "eagle", Heroes.WIDTH/3, Heroes.HEIGHT/2);
+  game.addHero("Andrew", "human", Heroes.WIDTH/3 * 2, Heroes.HEIGHT/2);
+
+
+  game.ctxDisplay = document.getElementById(username + '_display').getContext('2d');
+  game.ctxScratch = document.getElementById(username + '_scratch').getContext('2d');
+  game.reset();
+
+  BlocklyGames.bindClick(username + '_runButton', game.runButtonClick);
+  BlocklyGames.bindClick(username + '_resetButton', game.resetButtonClick);
+  return workspace;
 }
 
-
-/**
- * Reset the heroes to the start position, clear the display, and kill any
- * pending tasks.
- */
-Heroes.reset = function() {
-  // Starting location of the heroes.
-
-  var widths = [Heroes.WIDTH/2, Heroes.WIDTH/3, Heroes.WIDTH/3*2];
-  var i = 0;
-  for (var hero in Heroes.heroes)
-  {
-    Heroes.heroes[hero].set_pos(widths[i], Heroes.HEIGHT/2);
-    i++;
-  }
-
-
-
-  Heroes.background = null;
-
-  Heroes.points = undefined;
-
-  // Clear the canvas.
-  Heroes.ctxScratch.canvas.width = Heroes.ctxScratch.canvas.width;
-  Heroes.ctxScratch.strokeStyle = '#ffffff';
-  Heroes.ctxScratch.fillStyle = '#ffffff';
-  Heroes.ctxScratch.lineWidth = 5;
-  Heroes.ctxScratch.lineCap = 'round';
-  Heroes.ctxScratch.font = 'normal 18pt Arial';
-  Heroes.display();
-
-  // Kill all tasks.
-  for (var x = 0; x < Heroes.pidList.length; x++) {
-    window.clearTimeout(Heroes.pidList[x]);
-  }
-  Heroes.pidList.length = 0;
-  Heroes.interpreter = null;
-
-  // Kill the game event loop.
-  clearInterval(Heroes.eventLoop);
-};
-
-/**
- * Copy the scratch canvas to the display canvas. Add a heroes marker.
- */
-Heroes.display = function() {
-  Heroes.drawBackground();
-
-  // Draw the items.
-  for (var i=0; i<Heroes.items.length; i++)
-  {
-    Heroes.items[i].draw(Heroes.ctxScratch, Heroes.item_radius);
-    Heroes.items[i].processEvents();
-  }
-  // Draw the heroes.
-  for (var hero in Heroes.heroes)
-  {
-    Heroes.heroes[hero].draw(Heroes.ctxScratch);
-    Heroes.heroes[hero].speak(Heroes.ctxScratch, Heroes.words[hero]);
-  }
-  // Draw title.
-  if (Heroes.title)
-  {
-    Heroes.ctxScratch.fillStyle = "#1199CC";
-    Heroes.ctxScratch.font="28px Arial";
-
-    var pos = Heroes.WIDTH/2 - Heroes.ctxScratch.measureText(Heroes.title).width/2;
-    Heroes.ctxScratch.fillText(Heroes.title, pos, 40);
-  }
-
-  Heroes.ctxDisplay.globalCompositeOperation = 'source-over';
-  Heroes.ctxDisplay.drawImage(Heroes.ctxScratch.canvas, 0, 0);
-
-  Heroes.drawHUD();
-};
-
-Heroes.drawBackground = function()
+Heroes.add_remote_user = function(username)
 {
-  // Clear the display with black.
-  Heroes.ctxScratch.clearRect(0, 0, Heroes.ctxDisplay.canvas.clientWidth, Heroes.ctxDisplay.canvas.clientHeight);
-  Heroes.ctxDisplay.beginPath();
-  Heroes.ctxDisplay.rect(0, 0,
-      Heroes.ctxDisplay.canvas.width, Heroes.ctxDisplay.canvas.height);
-
-  if (Heroes.background)
+  //
+  // Hide the old remote user.
+  //
+  if (Heroes.remote_user)
   {
-    Heroes.ctxDisplay.drawImage(Heroes.background, 0, 0, Heroes.ctxDisplay.canvas.clientWidth, Heroes.ctxDisplay.canvas.clientHeight);
+    document.getElementById(Heroes.remote_user + "_container").style.display = "none";
+  }
+  Heroes.remote_user = username;
+
+  //
+  // Create or show the new remote user.
+  //
+  var container = document.getElementById(username + "_container");
+  if (container)
+  {
+    container.style.display = "block";
   }
   else
   {
-    Heroes.ctxDisplay.fillStyle = "#333333";
-    Heroes.ctxDisplay.fill();
+    var remote_workspace = Heroes.addGame(true, username);
+    connectSubscriber(username + "_heroes", remote_workspace);
   }
 }
 
-Heroes.drawHUD = function()
-{
-  if (Heroes.points !== undefined)
-  {
-    Heroes.ctxDisplay.fillStyle = "#FFFFFF";
-    Heroes.ctxDisplay.font = "15px Arial";
-    Heroes.ctxDisplay.fillText("Points: " + Heroes.points, 30, 30);
-  }
-}
 
-/**
- * Click the run button.  Start the program.
- * @param {!Event} e Mouse or touch event.
- */
-Heroes.runButtonClick = function(e) {
-  // Prevent double-clicks or double-taps.
-  if (BlocklyInterface.eventSpam(e)) {
-    return;
-  }
-
-  var runButton = document.getElementById('runButton');
-  var resetButton = document.getElementById('resetButton');
-  // Ensure that Reset button is at least as wide as Run button.
-  if (!resetButton.style.minWidth) {
-    resetButton.style.minWidth = runButton.offsetWidth + 'px';
-  }
-  runButton.style.display = 'none';
-  resetButton.style.display = 'inline';
-  document.getElementById('spinner').style.visibility = 'visible';
-  BlocklyGames.workspace.traceOn(true);
-  Heroes.execute();
-};
-
-/**
- * Click the reset button.  Reset the Heroes.
- * @param {!Event} e Mouse or touch event.
- */
-Heroes.resetButtonClick = function(e) {
-  // Prevent double-clicks or double-taps.
-  if (BlocklyInterface.eventSpam(e)) {
-    return;
-  }
-  var runButton = document.getElementById('runButton');
-  runButton.style.display = 'inline';
-  document.getElementById('resetButton').style.display = 'none';
-  document.getElementById('spinner').style.visibility = 'hidden';
-  BlocklyGames.workspace.traceOn(false);
-  Heroes.reset();
-};
-
-/**
- * Inject the Heroes API into a JavaScript interpreter.
- * @param {!Object} scope Global scope.
- * @param {!Interpreter} interpreter The JS interpreter.
- */
-Heroes.initInterpreter = function(interpreter, scope) {
-  // API
-  var wrapper = function(who, distance, id) {
-    Heroes.move(who.toString(), 0, distance.valueOf(), id.toString());
-  };
-  interpreter.setProperty(scope, 'moveUp',
-      interpreter.createNativeFunction(wrapper));
-
-  wrapper = function(who, distance, id) {
-    Heroes.move(who.toString(), 0, -distance.valueOf(), id.toString());
-  };
-  interpreter.setProperty(scope, 'moveDown',
-      interpreter.createNativeFunction(wrapper));
-
-  wrapper = function(who, distance, id) {
-    Heroes.move(who.toString(), -distance.valueOf(), 0, id.toString());
-  };
-  interpreter.setProperty(scope, 'moveLeft',
-      interpreter.createNativeFunction(wrapper));
-
-  wrapper = function(who, distance, id) {
-    Heroes.move(who.toString(), distance.valueOf(), 0, id.toString());
-  };
-  interpreter.setProperty(scope, 'moveRight',
-      interpreter.createNativeFunction(wrapper));
-
-  wrapper = function(x, y, vx, vy, id) {
-    Heroes.addItem(x.data, y.data, vx.data, vy.data, id.toString());
-  };
-  interpreter.setProperty(scope, 'addItem',
-      interpreter.createNativeFunction(wrapper));
-
-  wrapper = function(name, type, x, y, id) {
-    Heroes.addHero(name.toString(), type.toString(), x.data, y.data, id.toString());
-  };
-  interpreter.setProperty(scope, 'addHero',
-      interpreter.createNativeFunction(wrapper));
-
-  wrapper = function(which, fn, id) {
-    Heroes.setButtonCallback(which.data, fn.toString(), id.toString());
-  };
-  interpreter.setProperty(scope, 'setButtonCallback',
-      interpreter.createNativeFunction(wrapper));
-
-  wrapper = function(a, b, fn, id) {
-    Heroes.setCollisionCallback(a.toString(), b.toString(), fn.toString(), id.toString());
-  };
-  interpreter.setProperty(scope, 'setCollisionCallback',
-      interpreter.createNativeFunction(wrapper));
-
-  wrapper = function(image, id) {
-    Heroes.setBackground(image.toString(), id.toString());
-  };
-  interpreter.setProperty(scope, 'setBackground',
-      interpreter.createNativeFunction(wrapper));
-
-  wrapper = function(hero, id) {
-    Heroes.setHero(hero.toString(), id.toString());
-  };
-  interpreter.setProperty(scope, 'setHero',
-      interpreter.createNativeFunction(wrapper));
-
-  wrapper = function(num, id) {
-    Heroes.addPoints(num.data, id.toString());
-  };
-  interpreter.setProperty(scope, 'addPoints',
-      interpreter.createNativeFunction(wrapper));
-
-  wrapper = function(who, what, seconds, id) {
-    Heroes.speak(who.toString(), what.toString(), seconds.data, id.toString());
-  };
-  interpreter.setProperty(scope, 'speak',
-      interpreter.createNativeFunction(wrapper));
-
-  wrapper = function(title, id) {
-    Heroes.setTitle(title.toString(), id.toString());
-  };
-  interpreter.setProperty(scope, 'setTitle',
-      interpreter.createNativeFunction(wrapper));
-};
-
-/**
- * Execute the user's code.  Heaven help us...
- */
-Heroes.execute = function() {
-  if (!('Interpreter' in window)) {
-    // Interpreter lazy loads and hasn't arrived yet.  Try again later.
-    setTimeout(Heroes.execute, 250);
-    return;
-  }
-
-  Heroes.reset();
-  Heroes.startGame();
-  var code = Blockly.JavaScript.workspaceToCode(BlocklyGames.workspace);
-  Heroes.interpreter = new Interpreter(code, Heroes.initInterpreter);
-  Heroes.pidList.push(setTimeout(Heroes.executeChunk_, 100));
-
-};
-
-/**
- * Execute a bite-sized chunk of the user's code.
- * @private
- */
-Heroes.executeChunk_ = function() {
-  // All tasks should be complete now.  Clean up the PID list.
-  Heroes.pidList.length = 0;
-  Heroes.pause = 0;
-  var go;
-  do {
-    try {
-      go = Heroes.interpreter.step();
-    } catch (e) {
-      // User error, terminate in shame.
-      alert(e);
-      go = false;
-    }
-    if (go && Heroes.pause) {
-      // The last executed command requested a pause.
-      go = false;
-      Heroes.pidList.push(
-          setTimeout(Heroes.executeChunk_, Heroes.pause));
-    }
-  } while (go);
-  // Wrap up if complete.
-  if (!Heroes.pause) {
-    document.getElementById('spinner').style.visibility = 'hidden';
-    BlocklyGames.workspace.highlightBlock(null);
-  }
-};
-
-/**
- * Highlight a block and pause.
- * @param {?string} id ID of block.
- */
-Heroes.animate = function(id) {
-  if (id) {
-    BlocklyInterface.highlight(id);
-    // Scale the speed non-linearly, to give better precision at the fast end.
-    var stepSpeed = 1000 * Math.pow(1 - Heroes.speedSlider.getValue(), 2);
-    Heroes.pause = Math.max(1, stepSpeed);
-  }
-};
-
-
-/**
- * Add an item to the screen.
- */
-Heroes.items = [];
-Heroes.item_radius = 5;
-Heroes.addItem = function(x, y, vx, vy, id) {
-  Heroes.items.push(new Item(x, y, vx, vy, Heroes.item_rad*2));
-  Heroes.animate(id);
-};
-
-
-//
-// Heroes actions.
-//
-Heroes.radius = 32;
-Heroes.heroes = {};
-Heroes.addHero = function(name, type, x, y, id) {
-  Heroes.heroes[name] = new Hero(type, Heroes.radius, x, y);
-  Heroes.HERO_NAMES.push([name, name]);
-  Heroes.animate(id);
-};
-Heroes.move = function(who, x, y, id) {
-
-  Heroes.heroes[who].x += x;
-  Heroes.heroes[who].y -= y;
-
-};
-
-//
-// Hero speech.
-//
-Heroes.words = {};
-Heroes.word_timeouts = {};
-Heroes.speak = function(who, what, seconds, id)
-{
-  Heroes.words[who] = what;
-  clearTimeout(Heroes.word_timeouts[who]);
-  Heroes.word_timeouts[who] = setTimeout(function()
-  {
-    Heroes.words[who] = "";
-  }, seconds*1000);
-  Heroes.animate(id);
-}
-
-Heroes.title = "";
-Heroes.setTitle = function(title, id)
-{
-  Heroes.title = title;
-}
-
-Heroes.Heroes = [];
-
-// Events for override.
-Heroes.key_events = {};
-Heroes.setButtonCallback = function(which, fn, id)
-{
-  Heroes.key_events[which] = fn;
-  Heroes.animate(id);
-}
-Heroes.collision_events = {};
-Heroes.collisions_in_progress = {};
-Heroes.setCollisionCallback = function(a, b, fn, id)
-{
-  Heroes.collision_events[a] = Heroes.collision_events[a] || {};
-  Heroes.collision_events[a][b] = fn;
-  Heroes.animate(id);
-}
-
-/**
- * Start the event polling.
- */
-Heroes.startGame = function() {
-  var self = this;
-  Heroes.items = []
-
-  //
-  // Track each key press.
-  //
-
-  var keys = {};
-  $(document)['keydown'](function( event ) {
-    keys[event.which] = true;
-  });
-  $(document)['keyup'](function( event ) {
-    keys[event.which] = false;
-  });
-
-  Heroes.eventLoop = setInterval(function()
-    {
-      //
-      // Check for key presses.
-      //
-
-      for (event in Heroes.key_events)
-      {
-        if (keys[event])
-        {
-          Heroes.interpreter['appendCode'](Heroes.key_events[event]);
-          while (Heroes.interpreter.step()){};
-        }
-      }
-
-      Heroes.checkCollisions();
-
-      Heroes.display();
-    }, 50);
-};
-
-//
-// Check for collision events.
-//
-Heroes.checkCollisions = function()
-{
-  for (var a in Heroes.collision_events)
-  {
-    var hero_a = Heroes.heroes[a];
-    for (var b in Heroes.collision_events[a])
-    {
-      // Assume B is either an item or a hero.
-      if (b == "item")
-      {
-        // Iterate in reverse so the index isn't affected when we remove elements.
-        var i = Heroes.items.length
-        var item;
-        while (i--) {
-          item = Heroes.items[i];
-          if (compute_distance(item.x, item.y, hero_a.x, hero_a.y) < (hero_a.radius + Heroes.item_radius))
-          {
-            Heroes.interpreter['appendCode'](Heroes.collision_events[a][b]);
-            while (Heroes.interpreter.step()){};
-            Heroes.items.splice(i, 1);
-          }
-        }
-      }
-      else
-      {
-        var hero_b = Heroes.heroes[b];
-        if (compute_distance(hero_b.x, hero_b.y, hero_a.x, hero_a.y) < (hero_a.radius + hero_b.radius))
-        {
-          if (Heroes.collisions_in_progress[a + b] == false)
-          {
-            Heroes.interpreter['appendCode'](Heroes.collision_events[a][b]);
-            while (Heroes.interpreter.step()){};
-            Heroes.items.splice(i, 1);
-          }
-          Heroes.collisions_in_progress[a + b] = true;
-        }
-        else
-        {
-          Heroes.collisions_in_progress[a + b] = false;
-        }
-      }
-    }
-  }
-}
-
-/**
- * Lift or lower the pen.
- * @param {boolean} down True if down, false if up.
- * @param {?string} id ID of block.
- */
-Heroes.penDown = function(down, id) {
-  Heroes.penDownValue = down;
-  Heroes.animate(id);
-};
-
-/**
- * Change the thickness of lines.
- * @param {number} width New thickness in pixels.
- * @param {?string} id ID of block.
- */
-Heroes.penWidth = function(width, id) {
-  Heroes.ctxScratch.lineWidth = width;
-  Heroes.animate(id);
-};
-
-/**
- * Change the colour of the pen.
- * @param {string} colour Hexadecimal #rrggbb colour string.
- * @param {?string} id ID of block.
- */
-Heroes.penColour = function(colour, id) {
-  Heroes.ctxScratch.strokeStyle = colour;
-  Heroes.ctxScratch.fillStyle = colour;
-  Heroes.animate(id);
-};
-
-/**
- * Make the heroes visible or invisible.
- * @param {boolean} visible True if visible, false if invisible.
- * @param {?string} id ID of block.
- */
-Heroes.isVisible = function(visible, id) {
-  Heroes.visible = visible;
-  Heroes.animate(id);
-};
-
-/**
- * Print some text.
- * @param {string} text Text to print.
- * @param {?string} id ID of block.
- */
-Heroes.drawPrint = function(text, id) {
-  Heroes.ctxScratch.save();
-  Heroes.ctxScratch.translate(Heroes.x, Heroes.y);
-  Heroes.ctxScratch.rotate(2 * Math.PI * (Heroes.heading - 90) / 360);
-  Heroes.ctxScratch.fillText(text, 0, 0);
-  Heroes.ctxScratch.restore();
-  Heroes.animate(id);
-};
-
-/**
- * Change the typeface of printed text.
- * @param {string} font Font name (e.g. 'Arial').
- * @param {number} size Font size (e.g. 18).
- * @param {string} style Font style (e.g. 'italic').
- * @param {?string} id ID of block.
- */
-Heroes.drawFont = function(font, size, style, id) {
-  Heroes.ctxScratch.font = style + ' ' + size + 'pt ' + font;
-  Heroes.animate(id);
-};
+window.addEventListener('load', Heroes.init);
 
 var compute_distance = function(x1, y1, x2, y2)
 {
