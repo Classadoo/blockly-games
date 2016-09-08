@@ -52,6 +52,11 @@ Heroes.Blocks.HUE = 160;
 Heroes.Blocks.EVENT_HUE = 320;
 
 /**
+ * Don't let people inject malicious code.
+ */
+Heroes.Blocks.MAX_FOR = 1000;
+
+/**
  * Left turn arrow to be appended to messages.
  */
 Heroes.Blocks.LEFT_TURN = ' \u21BA';
@@ -458,37 +463,3 @@ Blockly.JavaScript['heroes_on_collision'] = function(block) {
       block.getFieldValue('B') + '", \"' + branch.trim().replace("\n", "") + '\", \'block_id_' + block.id +'\')';
   return code + '\n';
 };
-
-Blockly.Blocks['heroes_repeat'] = {
-  /**
-   * Block for repeat n times.
-   * @this Blockly.Block
-   */
-  init: function() {
-    this.jsonInit({
-      "message0": Blockly.Msg.CONTROLS_REPEAT_TITLE,
-      "args0": [
-        {
-          "type": "field_dropdown",
-          "name": "TIMES",
-          "options": [
-            ["3", "3"],
-            ["4", "4"],
-            ["5", "5"],
-            ["360", "360"]
-          ]
-        }
-      ],
-      "previousStatement": null,
-      "nextStatement": null,
-      "colour": Blockly.Blocks.loops.HUE,
-      "tooltip": Blockly.Msg.CONTROLS_REPEAT_TOOLTIP,
-      "helpUrl": Blockly.Msg.CONTROLS_REPEAT_HELPURL
-    });
-    this.appendStatementInput('DO')
-        .appendField(Blockly.Msg.CONTROLS_REPEAT_INPUT_DO);
-  }
-};
-
-Blockly.JavaScript['heroes_repeat'] =
-    Blockly.JavaScript['controls_repeat'];
