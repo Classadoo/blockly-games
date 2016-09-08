@@ -90,6 +90,8 @@ var initStudent = function(username)
   add_user_remove_callback(username, function()
   {
       workspace.clear();
+      var new_student = document.getElementById(username + "_container");
+      new_student.style.display = "none";
   });
 
   add_user_level_callback(username, function(level)
