@@ -7,6 +7,10 @@ var SAMPLE_SERVER_BASE_URL = 'https://codizooopentokphp.herokuapp.com';
 var connectionCount  = 0;
 var pleaseAllowCamera = document.getElementById("pleaseAllowCamera");
 
+var connections = {
+
+};
+
 function GetURLParameter(sParam)
 {
     var sPageURL = window.location.search.substring(1);
@@ -34,7 +38,14 @@ $(document).ready(function() {
     sessionId = res.sessionId;
     token = res.token;
     if (OT.checkSystemRequirements() == 1) {
-      initializeSession();
+      initializeSession(function(err){
+        if( err != null ){
+          console.log("initialSession failed " + err);
+        }
+        else{
+          console.log("initialSession succeed ");
+        }
+      });
     } else {
       // The client does not support WebRTC.
       // You can display your own message.
@@ -42,8 +53,43 @@ $(document).ready(function() {
   });
 });
 
-function initializeSession() {
-  var session = OT.initSession(apiKey, sessionId);
+var session = null;
+
+// Listen for exceptions
+OT.on("exception", function(event) {
+    console.log(event.message);
+});
+
+var formatString = function (str, col) {
+    col = typeof col === 'object' ? col : Array.prototype.slice.call(arguments, 1);
+
+    return str.replace(/\{\{|\}\}|\{(\w+)\}/g, function (m, n) {
+        if (m == "{{") { return "{"; }
+        if (m == "}}") { return "}"; }
+        return col[n];
+    });
+};
+
+var connHtml = "<div id={id} ><div id='light'></div><div id='connid'>{id}</div></div>"
+
+function newConnectionCreated(connection){
+  connections[connection.connectionId] = connection;
+  var uiHtml = formatString(connHtml, {id:connection.connectionId});
+  $('#connections').append(uiHtml);
+}
+
+function connectionDestroyed(connection){
+  delete connections[connection.connectionId];
+}
+
+function initializeSession(cb) {
+  if(session != null){
+    //We already have session.
+    cb(null);
+    return;
+  }
+  session = OT.initSession(apiKey, sessionId);
+
 
   // Subscribe to a newly created stream
   session.on('streamCreated', function(event) {
@@ -65,15 +111,29 @@ function initializeSession() {
   session.on('connectionCreated', function (event) {
     connectionCount++;
     if (event.connection.connectionId != session.connection.connectionId) {
-      console.log('Another client connected. ' + connectionCount + ' total.');
+      newConnectionCreated(event.connection);
+
+      console.log('Another client connected. ' + event.connection.connectionId + "   " + connectionCount + ' total.');
+
     }
   });
   
   session.on('connectionDestroyed', function (event) {
     connectionCount--;
-    console.log('A client disconnected. ' + connectionCount + ' total.');
+    connectionDestroyed(event.connection);
+    console.log('A client disconnected. ' + event.connection.connectionId + "   " + connectionCount + ' total.');
   });
   
+  session.on("signal", function(event) {
+      console.log("Signal sent from connection " + event.from.id);
+      if( event.from.id == session.connection.connectionId){
+        console.log("ignore signal from myself");
+        return;
+      }
+      console.log("Signal is " + event.data);
+      uiDisplaySignal( event.data );
+      // Process the event.data property, if there is any data.
+    });
   
   // Connect to the session
   session.connect(token, function(error) {
@@ -85,10 +145,17 @@ function initializeSession() {
       } else {
         console.log('An unknown error occurred connecting. Please try again later.');
       }
-      return;
+      cb(error);
     }
     
-    var publisher = OT.initPublisher(
+    cb(null)
+
+  });
+}
+
+function _publishStream(cb){
+
+      var publisher = OT.initPublisher(
       'publisher', 
       {
         insertMode: 'append',
@@ -129,17 +196,97 @@ function initializeSession() {
       }
     });
 
-    session.publish(publisher, function(error) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Publishing a stream.');
-      }
-    });
         
     publisher.on('streamCreated', function (event) {
         console.log('The publisher started streaming.');
-    });    
-    
-  });
+    });
+
+    session.publish(publisher, function(error) {
+      if (error) {
+        console.log(error);
+        cb(error)
+
+      } else {
+        console.log('Publishing a stream.');
+        cb(null)
+      }
+    });
+}
+
+function _sendSignal(text, cb){
+
+  session.signal(
+  {
+    data:text
+  },
+  function(error) {
+    if (error) {
+      console.log("signal error ("
+                   + error.code
+                   + "): " + error.message);
+      cb(error);
+    } else {
+      console.log("signal sent.");
+      cb(null)
+    }
+  }
+);
+}
+
+
+function publishStream(){
+
+  async.series([
+        initializeSession,
+        _publishStream
+      ],
+      function(err, results) {
+          // results is now equal to ['one', 'two']
+      }
+  );
+}
+
+function sendSignal(text){
+  console.log("sending signal " + text )
+  async.series([
+        initializeSession,
+        function(cb){
+          _sendSignal(text, cb);
+        }
+      ],
+      function(err, results) {
+          // results is now equal to ['one', 'two']
+      }
+  );
+}
+
+function sendCommand(cmd){
+  console.log("sending command " + cmd )
+  async.series([
+        initializeSession,
+        function(cb){
+          _sendSignal(text, cb);
+        }
+      ],
+      function(err, results) {
+          // results is now equal to ['one', 'two']
+      }
+  );
+
+}
+
+$("#mytext").keyup(function(event){
+    if(event.keyCode == 13){
+        $("#btnSend").click();
+    }
+});
+
+function uiSendSignal(){
+   var text = $('#mytext').val();
+   sendSignal(text);
+}
+
+function uiDisplaySignal(text){
+
+ $('#mysignal').text( text );
 }
