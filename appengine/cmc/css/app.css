@@ -4,28 +4,30 @@ body, html {
 }
 #videos {
     position: relative;
-    width: 600px;
-    height: 400px;
+    width: 320px;
+    height: 240px;
     margin-left: auto;
     margin-right: auto;
 }
 #subscriber {
     position: relative;
-    left: 0;
-    top: 0;
-    width: 600px;
-    height: 400px;
+    width: 320px;
+    height: 240px;
     z-index: 10;
 }
 #publisher {
     position: relative;
-    width: 360px;
+    width: 320px;
     height: 240px;
-    bottom: 10px;
-    left: 10px;
+    
     z-index: 100;
     border: 3px solid white;
     border-radius: 3px;
+}
+#mysignal, #mytext{
+    position: relative;
+    width: 120px;
+    height: 15px;
 }
 
 #pleaseAllowCamera{
