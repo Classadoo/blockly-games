@@ -2,7 +2,7 @@ var apiKey,
     sessionId,
     token;
 
-var SAMPLE_SERVER_BASE_URL = 'https://codizooopentokphp.herokuapp.com';
+var MEETING_CENTER_URL = 'https://aqueous-badlands-97819.herokuapp.com';
 
 var connectionCount  = 0;
 var pleaseAllowCamera = document.getElementById("pleaseAllowCamera");
@@ -31,27 +31,56 @@ if ( name === "undefined" || name == null) {
   name = "User:" +  now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
 }
 
+
+var meetingID = GetURLParameter("meetingID");
+if ( meetingID === "undefined" || meetingID == null) {
+  var now = new Date(Date.now());
+  name = "User:" +  now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+}
+
 $(document).ready(function() {
+
+  var meetingID = GetURLParameter("meetingID");
+  if ( meetingID === "undefined" || meetingID == null) {
+    uiDisplayMessage("Missing meetingID, please add meetingID");
+    return;
+  } 
+
+  var name = GetURLParameter("name");
+  if ( name === "undefined" || name == null) {
+    uiDisplayMessage("Missing user name, please add name");
+    return;
+  }
+
   // Make an Ajax request to get the OpenTok API key, session ID, and token from the server
-  $.get(SAMPLE_SERVER_BASE_URL + '/session', function(res) {
-    apiKey = res.apiKey;
-    sessionId = res.sessionId;
-    token = res.token;
-    if (OT.checkSystemRequirements() == 1) {
-      initializeSession(function(err){
-        if( err != null ){
-          console.log("initialSession failed " + err);
-        }
-        else{
-          console.log("initialSession succeed ");
-        }
-      });
-    } else {
-      // The client does not support WebRTC.
-      // You can display your own message.
-    }
-  });
-});
+  $.ajax({
+     url:MEETING_CENTER_URL + '/meeting/' + meetingID + '/' + name,
+     dataType: 'json', // Notice! JSONP <-- P (lowercase)
+     success:function(res){
+         // do stuff with json (in this case an array)
+         apiKey = res.apiKey;
+          sessionId = res.sessionId;
+          token = res.token;
+          if (OT.checkSystemRequirements() == 1) {
+            initializeSession(function(err){
+              if( err != null ){
+                console.log("initialSession failed " + err);
+              }
+              else{
+                console.log("initialSession succeed ");
+              }
+            });
+          } else {
+            // The client does not support WebRTC.
+            // You can display your own message.
+          }
+     },
+     error:function( jqXHR, textStatus, errorThrown){
+         console.log(textStatus + "   " + errorThrown)
+     }      
+  });//ajax
+
+});//document.ready
 
 var session = null;
 
@@ -70,7 +99,8 @@ var formatString = function (str, col) {
     });
 };
 
-var connHtml = "<div id={id} ><div id='light'></div><div id='connid'>{id}</div></div>"
+var connHtml = "<div id={id} ><div id='light'></div><div id='connid'>{id}</div></div>";
+var msgHtml = "<div id='message'>{msg}</div>";
 
 function newConnectionCreated(connection){
   connections[connection.connectionId] = connection;
@@ -289,4 +319,18 @@ function uiSendSignal(){
 function uiDisplaySignal(text){
 
  $('#mysignal').text( text );
+}
+
+function uiDisplayMessage(msg){
+  var uiHtml = formatString(msgHtml, {"msg":msg});
+  $('#messagebox').append(uiHtml);
+  //$('#messagebox').text( msg );
+  incHeight("messagebox", 20)
+}
+
+function incHeight(id, delta) {
+    var el = document.getElementById(id);
+    var height = el.offsetHeight;
+    var newHeight = height + delta;
+    el.style.height = newHeight + 'px';
 }

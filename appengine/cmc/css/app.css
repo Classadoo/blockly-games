@@ -24,7 +24,7 @@ body, html {
     border: 3px solid white;
     border-radius: 3px;
 }
-#mysignal, #mytext{
+#mysignal, #mytext, #messagebox{
     position: relative;
     width: 120px;
     height: 15px;
