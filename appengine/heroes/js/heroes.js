@@ -580,6 +580,11 @@ Heroes.init = function() {
   // First, figure out if they are in viewing or editing mode.
   //
 
+  //
+  // Some global Blockly setup.
+  //
+  Blockly.SOUND_LIMIT = 1;
+
   Heroes.HEIGHT = 400;
   Heroes.WIDTH = 570;
 
