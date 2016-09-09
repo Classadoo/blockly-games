@@ -90,7 +90,7 @@ var Game = function(username, blockly_workspace)
 
   self.setBackground = function(style, id)
   {
-    self.background = self.backgrounds[style];
+    self.background = Heroes.backgrounds[style];
     self.animate(id);
   }
 
@@ -417,10 +417,6 @@ var Game = function(username, blockly_workspace)
   self.addHero = function(name, type, x, y, id) {
     self.heroes[name] = new Hero(type, self.radius, x, y);
 
-    if (Heroes.HERO_NAMES.indexOf([name, name]) == -1)
-    {
-      Heroes.HERO_NAMES.push([name, name]);
-    }
     self.animate(id);
   };
   self.move = function(who, x, y, id) {
@@ -604,9 +600,9 @@ Heroes.init = function() {
   document.body.innerHTML = Heroes.soy.start({}, null,
       {lang: BlocklyGames.LANG,
        level: BlocklyGames.LEVEL,
-       maxLevel: BlocklyGames.MAX_LEVEL,
+       maxLevel: 3,
        html: BlocklyGames.IS_HTML,
-       suffix: "&username="+getUsername() });
+       suffix: "&username="+getUsername()});
 
   BlocklyInterface.init();
 
@@ -618,9 +614,6 @@ Heroes.init = function() {
   // Initialize the slider.
   var sliderSvg = document.getElementById('slider');
   Heroes.speedSlider = new Slider(10, 35, 130, sliderSvg);
-
-  // Clear the hero names.
-  Heroes.HERO_NAMES = [];
 
   // Lazy-load the JavaScript interpreter.
   setTimeout(BlocklyInterface.importInterpreter, 1);
