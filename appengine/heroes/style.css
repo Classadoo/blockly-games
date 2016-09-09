@@ -18,6 +18,11 @@ button.publish {
   font-family:Helvetica;
   font-size:20px;
 }
+#student_dropdown {
+  margin: 30px;
+  margin-bottom: 15px;
+  font-size:48px;
+}
 
 .read_only_true .blocklySvg {
   background-color: #666 !important;

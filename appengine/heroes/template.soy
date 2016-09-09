@@ -61,7 +61,6 @@
 
   // The canvas and blockly div will go here. These are added programmatically.
   <div id="games"></div>
-  <select id="student_dropdown"></select>
 
   {call BlocklyGames.soy.dialog /}
   {call BlocklyGames.soy.doneDialog /}
@@ -175,6 +174,21 @@
         </value>
       </block>
 
+      <block type="heroes_pen"></block>
+      <block type="heroes_width">
+        <value name="WIDTH">
+          <shadow type="math_number">
+            <field name="NUM">3</field>
+          </shadow>
+        </value>
+      </block>
+
+      <block type="heroes_colour">
+        <value name="COLOUR">
+          <shadow type="colour_picker"></shadow>
+        </value>
+      </block>
+
       {if $ij.level >= 2}
       <block type="heroes_add_item">
 
@@ -240,7 +254,7 @@
         <shadow type="heroes_move">
           <value name="VALUE">
             <shadow type="math_number">
-              <field name="NUM">10</field>
+              <field name="NUM">3</field>
             </shadow>
           </value>
         </shadow>
@@ -262,8 +276,10 @@
   </category>
   {/if}
 
-  {if $ij.level >= 2}
   <category name="{msg meaning="Heroes.catNumbers" desc="IBID"}Number{/msg}">
+
+
+  {if $ij.level >= 2}
   <block type="math_number"></block>
 
     <block type="math_random_int">
@@ -278,6 +294,7 @@
         </shadow>
       </value>
     </block>
+    {/if}
 
     <block type="controls_repeat_ext">
       <value name="TIMES">
@@ -287,7 +304,6 @@
       </value>
     </block>
   </category>
-  {/if}
 
   <category name="{msg meaning="Heroes.game" desc="IBID"}Game{/msg}">
     <block type="heroes_add_points">

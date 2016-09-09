@@ -32,117 +32,9 @@ goog.require('BlocklyInterface');
 goog.require('Maze.Blocks');
 goog.require('Turtle.Blocks');
 goog.require('Maze.soy');
+goog.require('WilddogUtils');
 
 BlocklyGames.NAME = 'maze';
-
-
-/// HACK (aheine): get the user name in a better way
-function getUsername() {
-    var url = window.location.href;
-    var regex = new RegExp("[?&]username(=([^&#]*)|&|#|$)"),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
-
-var initWildDog = function(workspace, teacher_workspace){
-    var user_id = guid();
-    push_to_user(null, "Maze - " + BlocklyGames.LEVEL, getUsername());
-
-    var events_in_progress = {};
-    workspace.addChangeListener(function(masterEvent) {
-      if (masterEvent.type == Blockly.Events.UI) {
-        return;  // Don't mirror UI events.
-      }
-
-      if (events_in_progress[masterEvent.blockId + masterEvent.type] === true)
-      {
-        console.log("don't send event triggered by wilddog.", masterEvent);
-        events_in_progress[masterEvent.blockId + masterEvent.type] = false;
-        return;
-      }
-
-
-      // Convert event to JSON for transmitting across the net.
-      var json = masterEvent.toJson();
-      var wdmsg = {"sender":user_id, "blkmsg":json};
-
-      push_to_user(wdmsg, null, getUsername());
-    });
-
-    var teacher_event_callback = function(snapshot) {
-      var blkmsg = clean_event(snapshot, user_id);
-      if (!blkmsg)
-      {
-        return;
-      }
-      var slaveEvent = Blockly.Events.fromJson(blkmsg, teacher_workspace);
-
-      try {
-
-        /// TODO(aheine): don't worry about what's remote here. Figure out this groupid stuff.
-          var existingGroup = Blockly.Events.getGroup();
-          var groupid = existingGroup;
-          if (!existingGroup) {
-              Blockly.Events.setGroup(true);
-              groupid = Blockly.Events.getGroup();
-          }
-          slaveEvent.run(true);
-          if (!existingGroup) {
-              Blockly.Events.setGroup(false);
-          }
-      }
-      catch(err) {
-          console.log("Error running slave event", err.message);
-      }
-    }
-    add_user_event_callback("classadoo_instructor", teacher_event_callback);
-    add_user_remove_callback("classadoo_instructor", function(old_snapshot)
-    {
-      teacher_workspace.clear();
-    });
-
-    var self_event_callback = function(snapshot) {
-      var blkmsg = clean_event(snapshot, user_id);
-      if (!blkmsg)
-      {
-        return;
-      }
-      var slaveEvent = Blockly.Events.fromJson(blkmsg, workspace);
-      console.log("Received", slaveEvent.type);
-
-      try {
-          if (slaveEvent.type == "ui" && slaveEvent.newValue)
-          {
-            BlocklyInterface.highlight(slaveEvent.newValue);
-          }
-          else
-          {
-            var existingGroup = Blockly.Events.getGroup();
-            var groupid = existingGroup;
-            if (!existingGroup) {
-                Blockly.Events.setGroup(true);
-                groupid = Blockly.Events.getGroup();
-            }
-            events_in_progress[slaveEvent.blockId + slaveEvent.type] = true;
-            // Create will automatically trigger a move, so don't send our move command back to the student.
-            if (slaveEvent.type == "create")
-            {
-              events_in_progress[slaveEvent.blockId + "move"] = true;
-            }
-            slaveEvent.run(true);
-            if (!existingGroup) {
-                Blockly.Events.setGroup(false);
-            }
-          }
-      }
-      catch(err) {
-          document.getElementById("errmsg").innerHTML = err.message;
-      }
-    }
-    add_user_event_callback(getUsername(), self_event_callback);
-}
 
 
 /**
@@ -655,7 +547,9 @@ Maze.init = function() {
        'zoom': {'startScale': scale}});
 
 
-  initWildDog( BlocklyGames.workspace, BlocklyGames.teacher_workspace );
+  initStudentWilddog("maze", BlocklyGames.LEVEL, BlocklyGames.workspace, "maze");
+  connectSubscriber("classadoo_instructor", BlocklyGames.teacher_workspace, "maze");
+
   BlocklyGames.workspace.traceOn(true);
 
   Maze.drawMap();
