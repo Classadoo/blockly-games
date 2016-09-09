@@ -53,11 +53,16 @@ Heroes.GAME_HTML =
           '<button id="{user}_resetButton" class="primary" style="display: none" title="Stop the program and reset the level.">' +
             '<img src="common/1x1.gif" class="stop icon21"> Reset' +
           '</button>' +
+          '{publish_button}' +
         '</td>' +
       '</tr>' +
     '</table>' +
   '</div>' +
   '<div class="col-md-7 blockly read_only_{read_only}" id="{user}_blockly"></div>';
+
+Heroes.PUBLISH_HTML =
+'<td><button id="publishButton" class="primary publish" title="Save this program for viewing later.">' +
+  '<img src="common/1x1.gif" class="camera icon21"> Publish Project</button></td>'
 
 
 //
@@ -615,7 +620,18 @@ Heroes.init = function() {
     Heroes.add_remote_user($(this).val());
   })
 
-  Heroes.add_remote_user("classadoo_instructor");
+  if (getUsername() !== "classadoo_instructor")
+  {
+    Heroes.add_remote_user("classadoo_instructor");
+    var publish = function(e) {
+      var project_name = prompt("Choose a project name", getUsername() + "'s game");
+      if (project_name)
+      {
+        update_snapshot(getUsername, student_workspace.getCode(), project_name);
+      }
+    };
+    BlocklyGames.bindClick('publishButton', publish);
+  }
 };
 
 Heroes.addGame = function(readOnly, username)
@@ -627,7 +643,11 @@ Heroes.addGame = function(readOnly, username)
   var new_game = document.createElement("div");
   new_game.id = username + "_container";
   new_game.className = "row";
-  new_game.innerHTML = Heroes.GAME_HTML.replace(/{user}/g, username).replace(/{read_only}/g, readOnly);
+  var publish_button = readOnly ? "" : Heroes.PUBLISH_HTML;
+  new_game.innerHTML = Heroes.GAME_HTML.replace(/{user}/g, username)
+    .replace(/{read_only}/g, readOnly)
+    .replace("{publish_button}", publish_button);
+
   document.getElementById('games').appendChild(new_game);
 
   //
