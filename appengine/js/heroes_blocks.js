@@ -44,6 +44,7 @@ goog.require('Blockly.JavaScript.variables');
 goog.require('BlocklyGames');
 
 Heroes.HERO_NAMES = [["Leo", "Leo"],["William", "William"],["Andrew", "Andrew"]];
+Heroes.NOISES = [["Play bow sound", "bow"], ["Play pop sound", "pop"]];
 
 /**
  * Common HSV hue for all blocks in this category.
@@ -126,7 +127,7 @@ Blockly.Blocks['heroes_set_background'] = {
    * @this Blockly.Block
    */
   init: function() {
-    var COLORS =
+    var BACKGROUNDS =
         [[BlocklyGames.getMsg('Heroes_bgSpace'), 'space'],
          [BlocklyGames.getMsg('Heroes_bgCastle'), 'castle'],
           [BlocklyGames.getMsg('Heroes_bgDesert'), 'desert'],
@@ -134,7 +135,7 @@ Blockly.Blocks['heroes_set_background'] = {
             [BlocklyGames.getMsg('Heroes_bgVillage'), 'village']];
     this.setColour(Heroes.Blocks.HUE);
     this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown(COLORS), 'COLOR');
+        .appendField(new Blockly.FieldDropdown(BACKGROUNDS), 'BACKGROUND');
     this.setPreviousStatement(true);
     this.setNextStatement(true);
   }
@@ -142,8 +143,28 @@ Blockly.Blocks['heroes_set_background'] = {
 
 Blockly.JavaScript['heroes_set_background'] = function(block) {
   // Generate JavaScript for changing the background.
-  var value = block.getFieldValue('COLOR');
+  var value = block.getFieldValue('BACKGROUND');
   return 'setBackground(\'' + value + '\', \'block_id_' + block.id + '\');\n';
+};
+
+Blockly.Blocks['heroes_noise'] = {
+  /**
+   * Block for moving forward or backwards.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(Heroes.Blocks.HUE);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldDropdown(Heroes.NOISES), 'NOISE');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+  }
+};
+
+Blockly.JavaScript['heroes_noise'] = function(block) {
+  // Generate JavaScript for changing the background.
+  var value = block.getFieldValue('NOISE');
+  return 'makeNoise(\'' + value + '\', \'block_id_' + block.id + '\');\n';
 };
 
 Blockly.Blocks['heroes_set_hero'] = {

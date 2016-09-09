@@ -106,7 +106,6 @@ var Game = function(username, blockly_workspace)
    */
   self.reset = function() {
     // Starting location of the heroes.
-
     var widths = [Heroes.WIDTH/2, Heroes.WIDTH/3, Heroes.WIDTH/3*2];
     var i = 0;
     for (var hero in self.heroes)
@@ -322,6 +321,12 @@ var Game = function(username, blockly_workspace)
     interpreter.setProperty(scope, 'setBackground',
         interpreter.createNativeFunction(wrapper));
 
+    wrapper = function(noise, id) {
+      self.makeNoise(noise.toString(), id.toString());
+    };
+    interpreter.setProperty(scope, 'makeNoise',
+        interpreter.createNativeFunction(wrapper));
+
     wrapper = function(num, id) {
       self.addPoints(num.data, id.toString());
     };
@@ -423,6 +428,19 @@ var Game = function(username, blockly_workspace)
     self.heroes[who].y -= y;
     self.animate(id);
   };
+
+  //
+  // Add sounds to our library.
+  //
+  Heroes.NOISES.forEach(function(el)
+  {
+    self.workspace.loadAudio_(['heroes/' + el[1] + '.mp3'], el[1]);
+  });
+  self.makeNoise = function(name, id)
+  {
+    self.workspace.playAudio(name, 0.5);
+    self.animate(id);
+  }
 
   //
   // Hero speech.
