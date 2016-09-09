@@ -44,7 +44,9 @@ goog.require('Blockly.JavaScript.variables');
 goog.require('BlocklyGames');
 
 Heroes.HERO_NAMES = [["Leo", "Leo"],["William", "William"],["Andrew", "Andrew"]];
-Heroes.NOISES = [["Play bow sound", "bow"], ["Play pop sound", "pop"]];
+Heroes.NOISES = [["Play bow sound", "bow"], ["Play pop sound", "pop"],
+  ["Play moo sound", "moo"], ["Play seal sound", "seal"],
+  ["Play sneeze sound", "sneeze"], ["Play balloon sound", "balloon"]];
 
 /**
  * Common HSV hue for all blocks in this category.
@@ -483,4 +485,76 @@ Blockly.JavaScript['heroes_on_collision'] = function(block) {
   var code = 'setCollisionCallback("'+ block.getFieldValue('A') + '",  "' +
       block.getFieldValue('B') + '", \"' + branch.trim().replace("\n", "") + '\", \'block_id_' + block.id +'\')';
   return code + '\n';
+};
+
+
+Blockly.Blocks['heroes_width'] = {
+  /**
+   * Block for setting the width.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(Heroes.Blocks.HUE);
+    this.appendValueInput('WIDTH')
+        .setCheck('Number')
+        .appendField(new Blockly.FieldDropdown(Heroes.HERO_NAMES), 'HERO')
+        .appendField('Set pen width:');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+  }
+};
+
+Blockly.JavaScript['heroes_width'] = function(block) {
+  // Generate JavaScript for setting the width.
+  var width = Blockly.JavaScript.valueToCode(block, 'WIDTH',
+      Blockly.JavaScript.ORDER_NONE) || '1';
+  return 'penWidth(\'' + block.getFieldValue('HERO') + '\',' + width + ', \'block_id_' + block.id + '\');\n';
+};
+
+Blockly.Blocks['heroes_pen'] = {
+  /**
+   * Block for pen up/down.
+   * @this Blockly.Block
+   */
+   init: function() {
+     var PEN =
+         [["Bring pen up", 'penUp'],
+            ["Bring pen down", 'penDown']];
+     this.setColour(Heroes.Blocks.HUE);
+     this.appendDummyInput()
+         .appendField(new Blockly.FieldDropdown(Heroes.HERO_NAMES), 'HERO')
+         .appendField(new Blockly.FieldDropdown(PEN), 'PEN');
+     this.setPreviousStatement(true);
+     this.setNextStatement(true);
+   }
+};
+
+Blockly.JavaScript['heroes_pen'] = function(block) {
+  // Generate JavaScript for pen up/down.
+  return block.getFieldValue('PEN') +
+      '(\'' + block.getFieldValue('HERO') + '\', \'block_id_' + block.id + '\');\n';
+};
+
+Blockly.Blocks['heroes_colour'] = {
+  /**
+   * Block for setting the colour.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(Blockly.Blocks.colour.HUE);
+    this.appendValueInput('COLOUR')
+        .appendField(new Blockly.FieldDropdown(Heroes.HERO_NAMES), 'HERO')
+        .setCheck('Colour')
+        .appendField("Set pen color");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+  }
+};
+
+Blockly.JavaScript['heroes_colour'] = function(block) {
+  // Generate JavaScript for setting the colour.
+  var colour = Blockly.JavaScript.valueToCode(block, 'COLOUR',
+      Blockly.JavaScript.ORDER_NONE) || '\'#000000\'';
+  return 'penColour(\'' + block.getFieldValue('HERO') + '\', ' + colour + ', \'block_id_' +
+      block.id + '\');\n';
 };

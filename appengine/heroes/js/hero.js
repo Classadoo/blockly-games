@@ -32,6 +32,10 @@ function Hero(type, radius, x, y) {
   this.x = x || 0;
   this.y = y || 0;
 
+  this.penDown = false;
+  this.colour = "#ffffff";
+  this.width = 3;
+
   this.image = chars[type];
   this.radius = radius;
 }

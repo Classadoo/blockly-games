@@ -37,10 +37,10 @@ BlocklyGames.NAME = 'heroes';
 
 // TODO(aheine): use jquery instead of a string of HTML. Also move this to a new file.
 Heroes.GAME_HTML =
-  '<div class="username">{user}</div>' +
   '<div class="col-md-5" id="visualization">' +
     '<canvas id="{user}_scratch" width="570" height="400" style="display: none"></canvas>' +
     '<canvas id="{user}_display" width="570" height="400"></canvas>' +
+    '<canvas id="{user}_lines" width="570" height="400" style="display: none"></canvas>' +
     '<table style="padding-top: 1em;">' +
       '<tr>' +
         '<td style="width: 15px;">' +
@@ -64,6 +64,7 @@ Heroes.PUBLISH_HTML =
 '<td><button id="publishButton" class="primary publish" title="Save this program for viewing later.">' +
   '<img src="common/1x1.gif" class="camera icon21"> Publish Project</button></td>'
 
+Heroes.USER_DROPDOWN = '<select id="student_dropdown"></select>';
 
 //
 // Constructor for a new game object.
@@ -71,10 +72,19 @@ Heroes.PUBLISH_HTML =
 var Game = function(username, blockly_workspace)
 {
   var self = this;
+
   self.workspace = blockly_workspace;
   self.username = username;
-
   self.pidList = [];
+
+  self.ctxDisplay = document.getElementById(self.username + '_display').getContext('2d');
+  self.ctxScratch = document.getElementById(self.username + '_scratch').getContext('2d');
+  self.ctxLines = document.getElementById(self.username + '_lines').getContext('2d');
+
+  self.items = [];
+  self.item_radius = 5;
+  self.radius = 32;
+  self.heroes = {};
 
   /**
    * Number of milliseconds that execution should delay.
@@ -105,20 +115,30 @@ var Game = function(username, blockly_workspace)
    * pending tasks.
    */
   self.reset = function() {
-    // Starting location of the heroes.
-    var widths = [Heroes.WIDTH/2, Heroes.WIDTH/3, Heroes.WIDTH/3*2];
-    var i = 0;
-    for (var hero in self.heroes)
-    {
-      self.heroes[hero].set_pos(widths[i], Heroes.HEIGHT/2);
-      i++;
-    }
+    //
+    // Reset state of the heroes.
+    //
+    self.heroes = {};
+    self.addHero("Leo", "lion", Heroes.WIDTH/2, Heroes.HEIGHT/2);
+    self.addHero("William", "eagle", Heroes.WIDTH/3, Heroes.HEIGHT/2);
+    self.addHero("Andrew", "human", Heroes.WIDTH/3 * 2, Heroes.HEIGHT/2);
 
-
-
+    //
+    // Clear drawings.
+    //
+    self.ctxLines.clearRect(0, 0, self.ctxDisplay.canvas.clientWidth, self.ctxDisplay.canvas.clientHeight);
     self.background = null;
 
+    //
+    // Clear game state.
+    //
     self.points = undefined;
+    self.words = {};
+    self.word_timeouts = {};
+    self.title = "";
+    self.key_events = {};
+    self.collision_events = {};
+    self.collisions_in_progress = {};
 
     // Clear the canvas.
     self.ctxScratch.canvas.width = self.ctxScratch.canvas.width;
@@ -169,6 +189,8 @@ var Game = function(username, blockly_workspace)
     }
 
     self.ctxDisplay.globalCompositeOperation = 'source-over';
+    self.ctxDisplay.drawImage(self.ctxLines.canvas, 0, 0);
+    self.ctxDisplay.globalCompositeOperation = 'source-over';
     self.ctxDisplay.drawImage(self.ctxScratch.canvas, 0, 0);
 
     self.drawHUD();
@@ -202,7 +224,6 @@ var Game = function(username, blockly_workspace)
       self.ctxDisplay.fillText("Points: " + self.points, 30, 30);
     }
   }
-
 
   /**
    * Execute the user's code.  Heaven help us...
@@ -344,6 +365,29 @@ var Game = function(username, blockly_workspace)
     };
     interpreter.setProperty(scope, 'setTitle',
         interpreter.createNativeFunction(wrapper));
+
+    wrapper = function(who, id) {
+      self.penDown(who.toString(), false, id.toString());
+    };
+    interpreter.setProperty(scope, 'penUp',
+        interpreter.createNativeFunction(wrapper));
+    wrapper = function(who, id) {
+      self.penDown(who.toString(), true, id.toString());
+    };
+    interpreter.setProperty(scope, 'penDown',
+        interpreter.createNativeFunction(wrapper));
+
+    wrapper = function(who, width, id) {
+      self.penWidth(who.toString(), width.valueOf(), id.toString());
+    };
+    interpreter.setProperty(scope, 'penWidth',
+        interpreter.createNativeFunction(wrapper));
+
+    wrapper = function(who, colour, id) {
+      self.penColour(who.toString(), colour.toString(), id.toString());
+    };
+    interpreter.setProperty(scope, 'penColour',
+        interpreter.createNativeFunction(wrapper));
   };
 
   /**
@@ -401,8 +445,6 @@ var Game = function(username, blockly_workspace)
   /**
    * Add an item to the screen.
    */
-  self.items = [];
-  self.item_radius = 5;
   self.addItem = function(x, y, vx, vy, id) {
     self.items.push(new Item(x, y, vx, vy, self.item_radius*2));
     self.animate(id);
@@ -412,16 +454,69 @@ var Game = function(username, blockly_workspace)
   //
   // Heroes actions.
   //
-  self.radius = 32;
-  self.heroes = {};
   self.addHero = function(name, type, x, y, id) {
     self.heroes[name] = new Hero(type, self.radius, x, y);
 
     self.animate(id);
   };
+
   self.move = function(who, x, y, id) {
-    self.heroes[who].x += x;
-    self.heroes[who].y -= y;
+    var hero = self.heroes[who];
+    if (hero.penDown) {
+      self.ctxLines.strokeStyle = hero.colour;
+      self.ctxLines.fillStyle = hero.colour;
+      self.ctxLines.lineWidth = hero.width;
+      self.ctxLines.beginPath();
+      self.ctxLines.moveTo(hero.x, hero.y);
+    }
+
+    hero.x += x;
+    hero.y -= y;
+
+    if (hero.penDown) {
+      self.ctxLines.lineTo(self.heroes[who].x, self.heroes[who].y);
+      self.ctxLines.stroke();
+    }
+
+    self.animate(id);
+  };
+
+  /**
+   * Lift or lower the pen.
+   * @param {boolean} down True if down, false if up.
+   * @param {?string} id ID of block.
+   */
+  self.penDown = function(who, down, id) {
+    if (self.heroes[who])
+    {
+      self.heroes[who].penDown = down;
+    }
+    self.animate(id);
+  };
+
+  /**
+   * Change the thickness of lines.
+   * @param {number} width New thickness in pixels.
+   * @param {?string} id ID of block.
+   */
+  self.penWidth = function(who, width, id) {
+    if (self.heroes[who])
+    {
+      self.heroes[who].width = width;
+    }
+    self.animate(id);
+  };
+
+  /**
+   * Change the colour of the pen.
+   * @param {string} colour Hexadecimal #rrggbb colour string.
+   * @param {?string} id ID of block.
+   */
+  self.penColour = function(who, colour, id) {
+    if (self.heroes[who])
+    {
+      self.heroes[who].colour = colour;
+    }
     self.animate(id);
   };
 
@@ -441,8 +536,6 @@ var Game = function(username, blockly_workspace)
   //
   // Hero speech.
   //
-  self.words = {};
-  self.word_timeouts = {};
   self.speak = function(who, what, seconds, id)
   {
     self.words[who] = what;
@@ -454,23 +547,18 @@ var Game = function(username, blockly_workspace)
     self.animate(id);
   }
 
-  self.title = "";
   self.setTitle = function(title, id)
   {
     self.title = title;
   }
 
-  self.heroes = [];
-
   // Events for override.
-  self.key_events = {};
   self.setButtonCallback = function(which, fn, id)
   {
     self.key_events[which] = fn;
     self.animate(id);
   }
-  self.collision_events = {};
-  self.collisions_in_progress = {};
+
   self.setCollisionCallback = function(a, b, fn, id)
   {
     self.collision_events[a] = self.collision_events[a] || {};
@@ -491,6 +579,10 @@ var Game = function(username, blockly_workspace)
 
     var keys = {};
     $(document)['keydown'](function( event ) {
+      if (self.key_events[event.which])
+      {
+        event.preventDefault();
+      }
       keys[event.which] = true;
     });
     $(document)['keyup'](function( event ) {
@@ -515,7 +607,7 @@ var Game = function(username, blockly_workspace)
         self.checkCollisions();
 
         self.display();
-      }, 50);
+      }, 20);
   };
 
   //
@@ -579,7 +671,7 @@ Heroes.init = function() {
   //
   // Some global Blockly setup.
   //
-  Blockly.SOUND_LIMIT = 1;
+  Blockly.SOUND_LIMIT = 50;
 
   Heroes.HEIGHT = 400;
   Heroes.WIDTH = 570;
@@ -624,22 +716,6 @@ Heroes.init = function() {
   var student_workspace = Heroes.addGame(false, getUsername());
   initStudentWilddog( "Heroes", "", student_workspace, getSavedGame());
 
-  var student_dropdown = $('#student_dropdown');
-  add_new_student_callback(function(username)
-  {
-    if (username.key() == getUsername())
-    {
-      return;
-    }
-    username = username.key();
-    student_dropdown.append($('<option></option>').val(username).html(username));
-  });
-
-  student_dropdown.change(function()
-  {
-    Heroes.add_remote_user($(this).val());
-  })
-
   if (getUsername() !== "classadoo_instructor")
   {
     Heroes.add_remote_user("classadoo_instructor");
@@ -653,6 +729,28 @@ Heroes.init = function() {
     };
     BlocklyGames.bindClick('publishButton', publish);
   }
+
+  var student_dropdown = $('#student_dropdown');
+  add_new_student_callback(function(username)
+  {
+    if (username.key() == getUsername())
+    {
+      return;
+    }
+    username = username.key();
+    student_dropdown['append']($('<option></option>')['val'](username)['html'](username));
+    if (username == "classadoo_instructor")
+    {
+      student_dropdown['val'](username);
+    }
+  });
+
+  student_dropdown['change'](function()
+  {
+    Heroes.add_remote_user($(this)['val']());
+  });
+
+
 };
 
 Heroes.addGame = function(readOnly, username)
@@ -669,7 +767,15 @@ Heroes.addGame = function(readOnly, username)
     .replace(/{read_only}/g, readOnly)
     .replace("{publish_button}", publish_button);
 
-  document.getElementById('games').appendChild(new_game);
+  var games_div = document.getElementById('games');
+  games_div.appendChild(new_game);
+
+  if (!readOnly)
+  {
+    var dropdown = document.createElement("div");
+    dropdown.innerHTML = Heroes.USER_DROPDOWN;
+    games_div.appendChild(dropdown);
+  }
 
   //
   // Add the game to the screen.
@@ -684,14 +790,6 @@ Heroes.addGame = function(readOnly, username)
   workspace.loadAudio_(['heroes/win.mp3', 'heroes/win.ogg'], 'win');
 
   var game = new Game(username, workspace);
-
-  game.addHero("Leo", "lion", Heroes.WIDTH/2, Heroes.HEIGHT/2);
-  game.addHero("William", "eagle", Heroes.WIDTH/3, Heroes.HEIGHT/2);
-  game.addHero("Andrew", "human", Heroes.WIDTH/3 * 2, Heroes.HEIGHT/2);
-
-
-  game.ctxDisplay = document.getElementById(username + '_display').getContext('2d');
-  game.ctxScratch = document.getElementById(username + '_scratch').getContext('2d');
   game.reset();
 
   BlocklyGames.bindClick(username + '_runButton', game.runButtonClick);
