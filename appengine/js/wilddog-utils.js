@@ -2,14 +2,18 @@
 goog.provide('WilddogUtils');
 goog.require('BlocklyGames');
 
-/// HACK (aheine): get the user name in a better way
-function getUsername() {
+var getQueryParam = function(param)
+{
   var url = window.location.href;
-  var regex = new RegExp("[?&]username(=([^&#]*)|&|#|$)"),
+  var regex = new RegExp("[?&]" + param + "(=([^&#]*)|&|#|$)"),
       results = regex.exec(url);
   if (!results) return "unknown";
   if (!results[2]) return 'unknown2';
-  return decodeURIComponent(results[2].replace(/\+/g, " ")) + "_heroes";
+  return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+var getUsername = function() {
+  return getQueryParam("username");
 }
 
 var received_snapshots = {};

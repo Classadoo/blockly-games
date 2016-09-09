@@ -558,6 +558,10 @@ var Game = function(username, blockly_workspace)
  */
 Heroes.init = function() {
 
+  //
+  // First, figure out if they are in viewing or editing mode.
+  //
+
   Heroes.HEIGHT = 400;
   Heroes.WIDTH = 570;
 
@@ -601,7 +605,7 @@ Heroes.init = function() {
   setTimeout(BlocklyInterface.importPrettify, 1);
 
   // Add a game
-  var student_workspace = Heroes.addGame(false, getUsername().replace("_heroes", ""));
+  var student_workspace = Heroes.addGame(false, getUsername());
   initStudentWilddog( "Heroes", "", student_workspace );
 
   var student_dropdown = $('#student_dropdown');
@@ -611,7 +615,7 @@ Heroes.init = function() {
     {
       return;
     }
-    username = username.key().replace("_heroes", "");
+    username = username.key();
     student_dropdown.append($('<option></option>').val(username).html(username));
   });
 
@@ -700,7 +704,7 @@ Heroes.add_remote_user = function(username)
   else
   {
     var remote_workspace = Heroes.addGame(true, username);
-    connectSubscriber(username + "_heroes", remote_workspace);
+    connectSubscriber(username, remote_workspace);
   }
 }
 
