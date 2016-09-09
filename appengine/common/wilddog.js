@@ -53,7 +53,7 @@ var update_level = function(username, level)
 
 var update_snapshot = function(username, xml, snapshot_key)
 {
-  snapshot_key = snapshot_key || "current"
+  snapshot_key = snapshot_key || "current";
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/snapshots");
 
   var snapshot_obj = {};
