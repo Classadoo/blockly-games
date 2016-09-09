@@ -7,9 +7,26 @@ var MEETING_CENTER_URL = 'https://aqueous-badlands-97819.herokuapp.com';
 var connectionCount  = 0;
 var pleaseAllowCamera = document.getElementById("pleaseAllowCamera");
 
+//hold the connection with the status
+// connection = {conObj: connection, stmObj: stream};
+
 var connections = {
 
 };
+
+var localCam = {
+  st: st_unconnected
+};
+
+var comStatus = {
+
+};
+
+var st_unconnected = "unconnected";
+var st_connected = "connected";
+var st_inited = "inited";
+var st_published = "published";
+
 
 function GetURLParameter(sParam)
 {
@@ -51,6 +68,8 @@ $(document).ready(function() {
     uiDisplayMessage("Missing user name, please add name");
     return;
   }
+  $("#camlight").html(name);
+  uiChangeStatus("camlight", st_unconnected);
 
   // Make an Ajax request to get the OpenTok API key, session ID, and token from the server
   $.ajax({
@@ -83,6 +102,7 @@ $(document).ready(function() {
 });//document.ready
 
 var session = null;
+var publisher = null;
 
 // Listen for exceptions
 OT.on("exception", function(event) {
@@ -99,12 +119,12 @@ var formatString = function (str, col) {
     });
 };
 
-var connHtml = "<div id={id} ><div id='light'></div><div id='connid'>{id}</div></div>";
+var connHtml = "<div id={id} ><div id='light'></div><div id='connid'>{name}</div></div>";
 var msgHtml = "<div id='message'>{msg}</div>";
 
 function newConnectionCreated(connection){
-  connections[connection.connectionId] = connection;
-  var uiHtml = formatString(connHtml, {id:connection.connectionId});
+  connections[connection.connectionId] = {'conObj':connection};
+  var uiHtml = formatString(connHtml, {id:connection.connectionId, name:JSON.parse(connection.data).username});
   $('#connections').append(uiHtml);
 }
 
@@ -130,6 +150,10 @@ function initializeSession(cb) {
     });
   });
 
+  session.on("streamDestroyed", function(event) {
+      console.log("Stream " + event.stream.name + " ended. " + event.reason);
+  });
+
   session.on('sessionDisconnected', function(event) {
     console.log('You were disconnected from the session.', event.reason);
     if (event.reason === 'networkDisconnected') {
@@ -146,6 +170,10 @@ function initializeSession(cb) {
       console.log('Another client connected. ' + event.connection.connectionId + "   " + connectionCount + ' total.');
 
     }
+    else{
+      localCam.st = st_connected;
+      uiChangeStatus("camlight", st_connected)
+    }
   });
   
   session.on('connectionDestroyed', function (event) {
@@ -160,7 +188,9 @@ function initializeSession(cb) {
         console.log("ignore signal from myself");
         return;
       }
-      console.log("Signal is " + event.data);
+      connection = connections[event.from.id]
+      var from = JSON.parse(connection.data).username;
+      console.log("Signal is " + event.data + "  from " + from);
       uiDisplaySignal( event.data );
       // Process the event.data property, if there is any data.
     });
@@ -183,9 +213,14 @@ function initializeSession(cb) {
   });
 }
 
-function _publishStream(cb){
-
-      var publisher = OT.initPublisher(
+function _initPublisher(cb){
+      if(publisher != null){
+        if(cb != null){
+          cb(null);
+        }
+        return;
+      }
+      publisher = OT.initPublisher(
       'publisher', 
       {
         insertMode: 'append',
@@ -196,8 +231,16 @@ function _publishStream(cb){
       function(error) {
         if (error) {
           console.log('Publisher can not be initialized.',  error.code, error.message);
+          if(cb != null){
+            cb(error);
+          }
         } else {
+          localCam.st = st_inited;
+          uiChangeStatus("camlight", st_inited);
           console.log('Publisher initialized.');
+          if(cb != null){
+            cb(null);
+          }
         }
       }
     );
@@ -228,9 +271,24 @@ function _publishStream(cb){
 
         
     publisher.on('streamCreated', function (event) {
+        localCam['stmObj']=event.stream;
+        localCam.st = st_published;
+        uiChangeStatus("camlight", st_published);
         console.log('The publisher started streaming.');
+
     });
 
+    publisher.on('streamDestroyed', function (event) {
+        delete localCam['stmObj'];
+        localCam.st = st_inited;
+        event.preventDefault();
+        uiChangeStatus("camlight", st_inited);
+        console.log('Publisher stopped streaming.');
+
+    });
+}
+
+function _publish(cb ){
     session.publish(publisher, function(error) {
       if (error) {
         console.log(error);
@@ -242,6 +300,24 @@ function _publishStream(cb){
       }
     });
 }
+
+
+function _unPublish(cb){
+    session.unpublish(publisher, function(error) {
+      if (error) {
+        console.log(error);
+        if(cb != null){
+          cb(error)
+        }
+      } else {
+        console.log('unpublishing a stream.');
+        if(cb != null){
+          cb(null);
+        }
+      }
+    });
+}
+
 
 function _sendSignal(text, cb){
 
@@ -268,7 +344,8 @@ function publishStream(){
 
   async.series([
         initializeSession,
-        _publishStream
+        _initPublisher,
+        _publish
       ],
       function(err, results) {
           // results is now equal to ['one', 'two']
@@ -327,6 +404,56 @@ function uiDisplayMessage(msg){
   //$('#messagebox').text( msg );
   incHeight("messagebox", 20)
 }
+var st_unconnected = "unconnected";
+var st_connected = "connected";
+var st_pub_local = "pub_local";
+var st_pub_remote = "pub_remote";
+
+function uiChangeStatus(id, status){
+  var uiid = "#" + id;
+
+  //console.log($(uiid).style)
+
+  switch(status){
+    case st_unconnected:
+      $(uiid).css('color', '#B6B6B4');
+      
+    break;
+    case st_connected:
+      $(uiid).css('color', '#736F6E');
+    break;
+    case st_inited:
+      $(uiid).css('color', '#008015');
+    break;
+    case st_published:
+      $(uiid).css('color', '#FF4500');
+    break;
+  }
+  
+}
+
+function getConnectionStatus(connection){
+
+}
+
+function uiFlipStatus(){
+  switch(localCam.st){
+    case st_unconnected:
+      console.log("uiFlipStatus " + st_unconnected)
+    break;
+    case st_connected:
+      console.log("uiFlipStatus " + st_connected)
+      _initPublisher(null);
+    break;
+    case st_inited:
+      publishStream();
+    break;
+    case st_published:
+      _unPublish(null);
+    break;
+  }
+};
+  
 
 function incHeight(id, delta) {
     var el = document.getElementById(id);
