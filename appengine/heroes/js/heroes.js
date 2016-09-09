@@ -606,7 +606,7 @@ Heroes.init = function() {
 
   // Add a game
   var student_workspace = Heroes.addGame(false, getUsername());
-  initStudentWilddog( "Heroes", "", student_workspace );
+  initStudentWilddog( "Heroes", "", student_workspace, getSavedGame());
 
   var student_dropdown = $('#student_dropdown');
   add_new_student_callback(function(username)
@@ -631,7 +631,8 @@ Heroes.init = function() {
       var project_name = prompt("Choose a project name", getUsername() + "'s game");
       if (project_name)
       {
-        update_snapshot(getUsername, student_workspace.getCode(), project_name);
+        update_snapshot(getUsername(), Blockly.Xml.domToText(
+          Blockly.Xml.workspaceToDom(student_workspace)), project_name);
       }
     };
     BlocklyGames.bindClick('publishButton', publish);
