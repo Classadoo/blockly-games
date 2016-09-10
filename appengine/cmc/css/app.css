@@ -1,0 +1,78 @@
+body, html {
+    background-color: gray;
+    height: 100%;
+}
+#videos {
+    position: relative;
+    width: 320px;
+    height: 240px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.camvideo {
+    position: relative;
+    width: 320px;
+    height: 240px;
+    z-index: 10;
+}
+#publisher {
+    position: relative;
+    width: 320px;
+    height: 240px;
+    
+    z-index: 100;
+    border: 3px solid white;
+    border-radius: 3px;
+}
+#mysignal, #mytext, #messagebox{
+    position: relative;
+    width: 120px;
+    height: 15px;
+}
+
+#pleaseAllowCamera{
+    display: none;
+}
+
+.camButton {
+    -moz-box-shadow:inset 0px 0px 14px -3px #f2fadc;
+    -webkit-box-shadow:inset 0px 0px 14px -3px #f2fadc;
+    box-shadow:inset 0px 0px 14px -3px #f2fadc;
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #e6e6e6), color-stop(1, #9ba892));
+    background:-moz-linear-gradient(top, #e6e6e6 5%, #9ba892 100%);
+    background:-webkit-linear-gradient(top, #e6e6e6 5%, #9ba892 100%);
+    background:-o-linear-gradient(top, #e6e6e6 5%, #9ba892 100%);
+    background:-ms-linear-gradient(top, #e6e6e6 5%, #9ba892 100%);
+    background:linear-gradient(to bottom, #e6e6e6 5%, #9ba892 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#e6e6e6', endColorstr='#9ba892',GradientType=0);
+    background-color:#e6e6e6;
+    -moz-border-radius:6px;
+    -webkit-border-radius:6px;
+    border-radius:6px;
+    border:1px solid #b2b8ad;
+    display:inline-block;
+    cursor:pointer;
+    color:#757d6f;
+    font-family:Arial;
+    font-size:15px;
+    font-weight:bold;
+    padding:6px 24px;
+    text-decoration:none;
+    text-shadow:0px 1px 0px #ced9bf;
+    
+}
+.camButton:hover {
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #9ba892), color-stop(1, #e6e6e6));
+    background:-moz-linear-gradient(top, #9ba892 5%, #e6e6e6 100%);
+    background:-webkit-linear-gradient(top, #9ba892 5%, #e6e6e6 100%);
+    background:-o-linear-gradient(top, #9ba892 5%, #e6e6e6 100%);
+    background:-ms-linear-gradient(top, #9ba892 5%, #e6e6e6 100%);
+    background:linear-gradient(to bottom, #9ba892 5%, #e6e6e6 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#9ba892', endColorstr='#e6e6e6',GradientType=0);
+    background-color:#9ba892;
+}
+.camButton:active {
+    position:relative;
+    top:1px;
+}
+
