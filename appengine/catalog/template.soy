@@ -15,6 +15,38 @@
  */
 {template .start}
 
-  <ul id="project_list"></ul>
+<div class="dashboard">
+  <h1 class="title">
+    Classadoo Projects
+  </h1>
+  <div class="row">
+    <div class="col-md-3 col-md-offset-3">
+      <h2>
+        {$ij.username}'s Projects
+      </h2>
+    </div>
+    <div class="col-md-3">
+      <h2>
+        Start a New Project
+      </h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3 col-md-offset-3">
+      <ul id="project_list"></ul>
+    </div>
+    <div class="col-md-3">
+      <ul id="projects">
+        <li><a href="maze.html?level=1&lang=en&username={$ij.username}">Maze</a></li>
+      </ul>
+      <ul id="projects">
+        <li><a href="turtle_collab.html?level=1&lang=en&username={$ij.username}">Turtle</a></li>
+      </ul>
+      <ul id="projects">
+        <li><a href="heroes.html?level=1&lang=en&username={$ij.username}">Heroes</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
 
 {/template}

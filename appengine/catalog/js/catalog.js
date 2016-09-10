@@ -28,7 +28,7 @@ Catalog.init = function()
 {
   // Render the Soy template.
   document.body.innerHTML = Catalog.soy.start({}, null,
-      {});
+      {username: getUsername()});
 
   var project_list = document.getElementById("project_list");
   add_new_project_callback(getUsername(), function(project)
@@ -36,7 +36,7 @@ Catalog.init = function()
     var li = document.createElement("li");
     var new_project = document.createElement("a");
     new_project.innerHTML = project.key();
-    new_project.href = "/appengine/heroes.html?level=3&username=" + getUsername() + "&saved=" + project.key();
+    new_project.href = "/appengine/heroes.html?level=3&username=" + getUsername() + "&saved=" + encodeURIComponent(project.key());
     li.appendChild(new_project);
     project_list.appendChild(li);
   })

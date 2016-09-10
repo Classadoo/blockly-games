@@ -35,16 +35,6 @@ goog.require('Turtle_Collab.Blocks');
 goog.require('Maze.Blocks');
 goog.require('Turtle_Collab.soy');
 
-/// HACK (aheine): get the user name in a better way
-function getUsername() {
-    var url = window.location.href;
-    var regex = new RegExp("[?&]username(=([^&#]*)|&|#|$)"),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
-
 var initWildDog = function(workspace, teacher_workspace){
     var user_id = guid();
     push_to_user(null, "Turtle-" + BlocklyGames.LEVEL, getUsername());
