@@ -26,11 +26,21 @@
 </html>
 
 <script>
-  document.getElementById("join-button").addEventListener("click", function() {
+  var button = document.getElementById("join-button");
+	var name_input = document.getElementById("name-input");
+
+  button.addEventListener("click", function() {
     var name = document.getElementById("name-input").value;
 
     if (name) {
       window.location = "appengine/catalog.html?username=" + name;
     }
-})
+  });
+
+	name_input.addEventListener("keyup", function(event) {
+		event.preventDefault();
+		if (event.keyCode == 13) {
+				button.click();
+		}
+	});
 </script>

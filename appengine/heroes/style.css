@@ -23,6 +23,11 @@ button.publish {
   margin-bottom: 15px;
   font-size:48px;
 }
+.speed_label {
+  position:relative;
+  display:inline;
+  bottom: 11px;
+}
 
 .read_only_true .blocklySvg {
   background-color: #666 !important;

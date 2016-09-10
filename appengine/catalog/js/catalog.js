@@ -36,7 +36,18 @@ Catalog.init = function()
     var li = document.createElement("li");
     var new_project = document.createElement("a");
     new_project.innerHTML = project.key();
-    new_project.href = "/appengine/heroes.html?level=3&username=" + getUsername() + "&saved=" + encodeURIComponent(project.key());
+
+    if (project.key() == "turtle")
+    {
+      new_project.href = "/appengine/turtle_collab.html?level=10&username=" + getUsername() + "&saved=" + encodeURIComponent(project.key());
+    }
+    else if (project.key() == "maze") {
+      return;
+    }
+    else
+    {
+      new_project.href = "/appengine/heroes.html?level=4&username=" + getUsername() + "&saved=" + encodeURIComponent(project.key());
+    }
     li.appendChild(new_project);
     project_list.appendChild(li);
   })

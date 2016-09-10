@@ -612,7 +612,7 @@ var Game = function(username, blockly_workspace)
         self.checkCollisions();
 
         self.display();
-      }, 20);
+      }, 60 - Heroes.speedSlider.getValue() * 50);
   };
 
   //
