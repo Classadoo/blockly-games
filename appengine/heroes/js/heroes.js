@@ -719,7 +719,7 @@ Heroes.init = function() {
 
   // Add a game
   var student_workspace = Heroes.addGame(false, getUsername());
-  initStudentWilddog( "Heroes", "", student_workspace, getSavedGame());
+  initStudentWilddog( "Heroes", BlocklyGames.LEVEL, student_workspace, getSavedGame());
 
   if (getUsername() !== "Classadoo_instructor")
   {
