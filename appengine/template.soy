@@ -180,12 +180,8 @@
  */
 {template .titleSpan private="true"}
   <span id="title">
-    {if $ij.html}
-      <a href="index.html?lang={$ij.lang}">
-    {else}
-      <a href="./?lang={$ij.lang}">
-    {/if}
-      {msg meaning="Games.name" desc="IBID"}Blockly Games{/msg}
+    <a href="../index.html?lang={$ij.lang}">
+    {msg meaning="Games.name" desc="IBID"}Classadoo{/msg}
     </a>
     {sp}:{sp}
     {$appName}

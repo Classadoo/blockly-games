@@ -80,13 +80,13 @@ var initStudent = function(username)
   //
 
   var events_in_progress = {};
-  connectPublisher(username, workspace);
+  connectPublisher(username, workspace, getSavedGame());
 
   //
   // Setup remote reading of canvas.
   //
 
-  connectSubscriber(username, workspace);
+  connectSubscriber(username, workspace, getSavedGame());
 
   add_user_remove_callback(username, function()
   {

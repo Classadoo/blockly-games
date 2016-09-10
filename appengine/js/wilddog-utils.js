@@ -14,7 +14,7 @@ var getQueryParam = function(param)
 
 var getUsername = function()
 {
-  return getQueryParam("username") || "unknown";
+  return (getQueryParam("username") || "unknown").toLowerCase();
 }
 
 var getSavedGame = function()

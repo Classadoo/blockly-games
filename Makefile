@@ -29,6 +29,10 @@ maze-en: common-en
 	$(SOY_COMPILER) --outputPathFormat appengine/maze/generated/en/soy.js --srcs appengine/maze/template.soy
 	python build-app.py maze en
 
+catalog-en: common-en
+	$(SOY_COMPILER) --outputPathFormat appengine/catalog/generated/en/soy.js --srcs appengine/catalog/template.soy
+	python build-app.py catalog en
+
 heroes-en: common-en
 	$(SOY_COMPILER) --outputPathFormat appengine/heroes/generated/en/soy.js --srcs appengine/heroes/template.soy
 	python build-app.py heroes en
