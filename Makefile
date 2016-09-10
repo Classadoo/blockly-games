@@ -2,9 +2,9 @@
 # Definitions
 ##############################
 
-USER_APPS = {index,puzzle,maze,bird,heroes,teacher-dash,turtle-collab,turtle,movie,pond/docs,pond/tutor,pond/duck}
-ALL_JSON = {./,index,puzzle,maze,bird,heroes,teacher-dash,turtle-collab,turtle,movie,pond/docs,pond,pond/tutor,pond/duck}
-ALL_TEMPLATES = appengine/template.soy,appengine/index/template.soy,appengine/puzzle/template.soy,appengine/maze/template.soy,appengine/bird/template.soy,appengine/heroes/template.soy,appengine/teacher_dash/template.soy,appengine/turtle_collab/template.soy,appengine/turtle/template.soy,appengine/movie/template.soy,appengine/pond/docs/template.soy,appengine/pond/template.soy,appengine/pond/tutor/template.soy,appengine/pond/duck/template.soy
+USER_APPS = {index,puzzle,maze,bird,catalog,heroes,teacher-dash,turtle-collab,turtle,movie,pond/docs,pond/tutor,pond/duck}
+ALL_JSON = {./,index,puzzle,maze,bird,catalog,heroes,teacher-dash,turtle-collab,turtle,movie,pond/docs,pond,pond/tutor,pond/duck}
+ALL_TEMPLATES = appengine/template.soy,appengine/index/template.soy,appengine/puzzle/template.soy,appengine/maze/template.soy,appengine/catalog/template.soy,appengine/bird/template.soy,appengine/heroes/template.soy,appengine/teacher_dash/template.soy,appengine/turtle_collab/template.soy,appengine/turtle/template.soy,appengine/movie/template.soy,appengine/pond/docs/template.soy,appengine/pond/template.soy,appengine/pond/tutor/template.soy,appengine/pond/duck/template.soy
 
 APP_ENGINE_THIRD_PARTY = appengine/third-party
 SOY_COMPILER = java -jar third-party/SoyToJsSrcCompiler.jar --shouldProvideRequireSoyNamespaces --isUsingIjData

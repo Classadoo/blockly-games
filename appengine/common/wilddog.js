@@ -150,10 +150,16 @@ var clear_users = function()
   ref.set({"classadoo_instructor" : {}});
 }
 
-
 var clear_one_user = function(username)
 {
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username);
   console.log("Clearing user", username);
+  ref.remove();
+}
+
+var clear_one_snapshot = function(username, snapshot)
+{
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/snapshots/" + snapshot);
+  console.log("Clearing snapshot", username, snapshot);
   ref.remove();
 }
