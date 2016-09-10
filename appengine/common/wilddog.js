@@ -103,13 +103,22 @@ var add_user_remove_callback = function(username, callback)
   });
 }
 
-
 var add_new_student_callback = function(callback)
 {
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/");
   ref.on("child_added", function(snapshot)
   {
     console.log("New student ", snapshot.key());
+    callback(snapshot);
+  });
+}
+
+var add_new_project_callback = function(username, callback)
+{
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/snapshots");
+  ref.on("child_added", function(snapshot)
+  {
+    console.log("New project ", snapshot.key());
     callback(snapshot);
   });
 }

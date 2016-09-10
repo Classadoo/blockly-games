@@ -18,7 +18,7 @@
   <table width="100%">
     <tr>
       <td>
-        <h1>
+        <h3>
           {call BlocklyGames.soy.titleSpan}
             {param appName}
               {msg meaning="Games.heroes" desc="IBID"}Heroes{/msg}
@@ -30,32 +30,37 @@
             {param lang: $ij.lang /}
             {param suffix: $ij.suffix /}
           {/call}
-        </h1>
+        </h3>
       </td>
     </tr>
   </table>
 
-<svg
-    id="slider"
-    xmlns="http://www.w3.org/2000/svg"
-    xmlns:svg="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-    version="1.1"
-    width="150"
-    height="50">
-  <!-- Slow icon. -->
-  <clipPath id="slowClipPath">
-    <rect width=26 height=12 x=5 y=14 />
-  </clipPath>
-  <image xlink:href="heroes/icons.png" height=42 width=84 x=-21 y=-10
-      clip-path="url(#slowClipPath)" />
-  <!-- Fast icon. -->
-  <clipPath id="fastClipPath">
-    <rect width=26 height=16 x=120 y=10 />
-  </clipPath>
-  <image xlink:href="heroes/icons.png" height=42 width=84 x=120 y=-11
-      clip-path="url(#fastClipPath)" />
-</svg>
+<span>
+Game speed
+</span>
+<span>
+  <svg
+      id="slider"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:svg="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      version="1.1"
+      width="150"
+      height="50">
+    <!-- Slow icon. -->
+    <clipPath id="slowClipPath">
+      <rect width=26 height=12 x=5 y=14 />
+    </clipPath>
+    <image xlink:href="heroes/icons.png" height=42 width=84 x=-21 y=-10
+        clip-path="url(#slowClipPath)" />
+    <!-- Fast icon. -->
+    <clipPath id="fastClipPath">
+      <rect width=26 height=16 x=120 y=10 />
+    </clipPath>
+    <image xlink:href="heroes/icons.png" height=42 width=84 x=120 y=-11
+        clip-path="url(#fastClipPath)" />
+  </svg>
+</span>
 
   {call .toolbox /}
 
