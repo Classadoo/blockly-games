@@ -30,7 +30,8 @@ goog.require('BlocklyDialogs');
 goog.require('BlocklyGames');
 goog.require('BlocklyInterface');
 goog.require('Maze.Blocks');
-goog.require('Turtle.Blocks');
+goog.require('Turtle_Collab.Blocks');
+goog.require('Heroes.Blocks');
 goog.require('Maze.soy');
 goog.require('WilddogUtils');
 

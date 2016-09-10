@@ -33,6 +33,8 @@ goog.require('Slider');
 goog.require('Turtle.Answers');
 goog.require('Turtle_Collab.Blocks');
 goog.require('Maze.Blocks');
+goog.require('Heroes.Blocks');
+goog.require('Maze.Blocks');
 goog.require('Turtle_Collab.soy');
 
 BlocklyGames.NAME = 'turtle';
