@@ -548,7 +548,7 @@ Maze.init = function() {
 
   clear_one_snapshot(getUsername(), "maze");
   initStudentWilddog("maze", BlocklyGames.LEVEL, BlocklyGames.workspace, "maze");
-  connectSubscriber("classadoo_instructor", BlocklyGames.teacher_workspace, "maze");
+  connectSubscriber("Classadoo_instructor", BlocklyGames.teacher_workspace, "maze");
 
   BlocklyGames.workspace.traceOn(true);
 

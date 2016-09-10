@@ -286,3 +286,429 @@
     </button>
   </div>
 {/template}
+
+
+/**
+ *  Tools needed to build a maze game.
+ */
+{template .maze_tools}
+  <block type="maze_moveForward"></block>
+  <block type="maze_turn"><field name="DIR">turnLeft</field></block>
+  <block type="maze_turn"><field name="DIR">turnRight</field></block>
+  {if $ij.level > 2}
+    <block type="maze_forever"></block>
+    {if $ij.level == 6}
+      <block type="maze_if"><field name="DIR">isPathLeft</field></block>
+    {elseif $ij.level > 6}
+      <block type="maze_if"></block>
+      {if $ij.level > 8}
+        <block type="maze_ifElse"></block>
+      {/if}
+    {/if}
+  {/if}
+{/template}
+
+
+
+/**
+ *  Tools needed to build a turtle game.
+ */
+{template .turtle_tools}
+  {if $ij.level == 10}
+    <category name="{msg meaning="Games.turtle" desc="IBID"}Turtle{/msg}">
+      <block type="turtle_move">
+        <value name="VALUE">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="turtle_turn">
+        <value name="VALUE">
+          <shadow type="math_number">
+            <field name="NUM">90</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="turtle_width">
+        <value name="WIDTH">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="turtle_pen"></block>
+      <block type="turtle_visibility"></block>
+      <block type="turtle_print">
+        <value name="TEXT">
+          <shadow type="text"></shadow>
+        </value>
+      </block>
+      <block type="turtle_font"></block>
+    </category>
+    <category name="{msg meaning="Games.catColour" desc="IBID"}Colour{/msg}">
+      <block type="turtle_colour">
+        <value name="COLOUR">
+          <shadow type="colour_picker"></shadow>
+        </value>
+      </block>
+      <block type="colour_picker"></block>
+      <block type="colour_random"></block>
+      <block type="colour_rgb">
+        <value name="RED">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+        <value name="GREEN">
+          <shadow type="math_number">
+            <field name="NUM">50</field>
+          </shadow>
+        </value>
+        <value name="BLUE">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="colour_blend">
+        <value name="COLOUR1">
+          <shadow type="colour_picker">
+            <field name="COLOUR">#ff0000</field>
+          </shadow>
+        </value>
+        <value name="COLOUR2">
+          <shadow type="colour_picker">
+            <field name="COLOUR">#3333ff</field>
+          </shadow>
+        </value>
+        <value name="RATIO">
+          <shadow type="math_number">
+            <field name="NUM">0.5</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <category name="{msg meaning="Games.catLogic" desc="IBID"}Logic{/msg}">
+      <block type="controls_if"></block>
+      <block type="logic_compare"></block>
+      <block type="logic_operation"></block>
+      <block type="logic_negate"></block>
+      <block type="logic_boolean"></block>
+      <block type="logic_ternary"></block>
+    </category>
+    <category name="{msg meaning="Games.catLoops" desc="IBID"}Loops{/msg}">
+      <block type="controls_repeat_ext">
+        <value name="TIMES">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="controls_whileUntil"></block>
+      <block type="controls_for">
+        <value name="FROM">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="TO">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+        <value name="BY">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="controls_flow_statements"></block>
+    </category>
+    <category name="{msg meaning="Games.catMath" desc="IBID"}Math{/msg}">
+      <block type="math_number"></block>
+      <block type="math_arithmetic">
+        <value name="A">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="B">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_single">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">9</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_trig">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">45</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_constant"></block>
+      <block type="math_number_property">
+        <value name="NUMBER_TO_CHECK">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_change">
+        <value name="DELTA">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_round">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">3.1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_modulo">
+        <value name="DIVIDEND">
+          <shadow type="math_number">
+            <field name="NUM">64</field>
+          </shadow>
+        </value>
+        <value name="DIVISOR">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_constrain">
+        <value name="VALUE">
+          <shadow type="math_number">
+            <field name="NUM">50</field>
+          </shadow>
+        </value>
+        <value name="LOW">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="HIGH">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_random_int">
+        <value name="FROM">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="TO">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_random_float"></block>
+    </category>
+    <sep></sep>
+    <category name="{msg meaning="Games.catVariables" desc="IBID"}Variables{/msg}" custom="VARIABLE"></category>
+    <category name="{msg meaning="Games.catProcedures" desc="IBID"}Functions{/msg}" custom="PROCEDURE"></category>
+  {else}
+    <category name="{msg meaning="Turtle.catTurtle" desc="category - Blocks related to Turtle commands."}Turtle{/msg}">
+      <block type="turtle_move_internal">
+        <field name="VALUE">100</field>
+      </block>
+      <block type="turtle_turn_internal">
+        <field name="VALUE">90</field>
+      </block>
+        <block type="turtle_pen"></block>
+    </category>
+      <category name="{msg meaning="Games.catColour" desc="IBID"}Colour{/msg}">
+        <block type="turtle_colour_internal"></block>
+      </category>
+    <category name="{msg meaning="Games.catLoops" desc="IBID"}Loops{/msg}">
+      <block type="turtle_repeat_internal">
+        <field name="TIMES">4</field>
+      </block>
+    </category>
+  {/if}
+{/template}
+
+/**
+ *  Tools needed to build a heroes game.
+ */
+{template .heroes_tools}
+
+    <category name="{msg meaning="Games.heroes" desc="IBID"}Heroes{/msg}">
+      <block type="heroes_move">
+        <value name="VALUE">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+      </block>
+
+      <block type="heroes_pen"></block>
+
+      {if $ij.level >= 2}
+      <block type="heroes_width">
+        <value name="WIDTH">
+          <block type="math_number">
+            <field name="NUM">3</field>
+          </block>
+        </value>
+      </block>
+
+      <block type="heroes_colour">
+        <value name="COLOUR">
+          <block type="colour_picker"></block>
+        </value>
+      </block>
+      {/if}
+
+      {if $ij.level >= 3}
+      <block type="heroes_add_item">
+
+        {if $ij.level < 4}
+          <value name="X">
+            <block type="math_random_int">
+            <value name="FROM">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <value name="TO">
+              <block type="math_number">
+                <field name="NUM">600</field>
+              </block>
+            </value>
+            </block>
+          </value>
+          <value name="VY">
+            <block type="math_random_int">
+            <value name="FROM">
+              <block type="math_number">
+                <field name="NUM">1</field>
+              </block>
+            </value>
+            <value name="TO">
+              <block type="math_number">
+                <field name="NUM">5</field>
+              </block>
+            </value>
+            </block>
+          </value>
+
+          <value name="X">
+            <block type="math_number"><field name="NUM">0</field></block>
+          </value>
+          <value name="Y">
+            <block type="math_number"><field name="NUM">0</field></block>
+          </value>
+
+        {/if}
+      </block>
+      {/if}
+
+      {if $ij.level >= 2}
+      <block type="heroes_speak">
+        <value name="TEXT">
+          <block type="text"></block>
+        </value>
+        <value name="SECONDS">
+          <block type="math_number"><field name="NUM">3</field></block>
+        </value>
+      </block>
+
+      <block type="heroes_noise"></block>
+      {/if}
+
+    </category>
+
+
+  {if $ij.level == 3}
+  <category name="{msg meaning="Heroes.catItems" desc="IBID"}Events{/msg}">
+    <block type="heroes_on_arrow">
+      <value name="DO0">
+        <block type="heroes_move">
+          <value name="VALUE">
+            <block type="math_number">
+              <field name="NUM">3</field>
+            </block>
+          </value>
+        </block>
+      </value>
+    </block>
+    <block type="heroes_on_arrow">
+
+    </block>
+
+  </category>
+  {/if}
+
+  {if $ij.level >= 4}
+  <category name="{msg meaning="Heroes.catItems" desc="IBID"}Events{/msg}">
+    <block type="heroes_on_arrow"></block>
+
+    <block type="heroes_on_collision"></block>
+
+  </category>
+  {/if}
+
+  <category name="{msg meaning="Heroes.catNumbers" desc="IBID"}Number{/msg}">
+
+
+  {if $ij.level >= 3}
+  <block type="math_number"></block>
+
+    <block type="math_random_int">
+      <value name="FROM">
+        <block type="math_number">
+          <field name="NUM">1</field>
+        </block>
+      </value>
+      <value name="TO">
+        <block type="math_number">
+          <field name="NUM">5</field>
+        </block>
+      </value>
+    </block>
+    {/if}
+
+    <block type="controls_repeat_ext">
+      <value name="TIMES">
+        <block type="math_number">
+          <field name="NUM">10</field>
+        </block>
+      </value>
+    </block>
+  </category>
+
+  <category name="{msg meaning="Heroes.game" desc="IBID"}Game{/msg}">
+    <block type="heroes_add_points">
+      {if $ij.level == 1}
+        <value name="VALUE">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+      {/if}
+    </block>
+
+    <block type="heroes_set_background"></block>
+    <block type="heroes_set_title">
+      <value name="TITLE">
+        <block type="text"></block>
+      </value>
+    </block>
+  </category>
+
+{/template}
