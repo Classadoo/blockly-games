@@ -695,7 +695,7 @@ Heroes.init = function() {
   document.body.innerHTML = Heroes.soy.start({}, null,
       {lang: BlocklyGames.LANG,
        level: BlocklyGames.LEVEL,
-       maxLevel: 3,
+       maxLevel: 4,
        html: BlocklyGames.IS_HTML,
        suffix: "&username="+getUsername()});
 
@@ -719,9 +719,9 @@ Heroes.init = function() {
   var student_workspace = Heroes.addGame(false, getUsername());
   initStudentWilddog( "Heroes", "", student_workspace, getSavedGame());
 
-  if (getUsername() !== "classadoo_instructor")
+  if (getUsername() !== "Classadoo_instructor")
   {
-    Heroes.add_remote_user("classadoo_instructor");
+    Heroes.add_remote_user("Classadoo_instructor");
     var publish = function(e) {
       var project_name = prompt("Choose a project name", getUsername() + "'s game");
       if (project_name)
@@ -742,9 +742,16 @@ Heroes.init = function() {
     }
     username = username.key();
     student_dropdown['append']($('<option></option>')['val'](username)['html'](username));
-    if (username == "classadoo_instructor")
+    if (username == "Classadoo_instructor")
     {
       student_dropdown['val'](username);
+    }
+    //
+    // If this is the first user to show up, trigger the change event manually.
+    //
+    if (!Heroes.remote_user)
+    {
+      Heroes.add_remote_user(username);
     }
   });
 
@@ -810,7 +817,6 @@ Heroes.add_remote_user = function(username)
     document.getElementById(Heroes.remote_user + "_container").style.display = "none";
   }
   Heroes.remote_user = username;
-
   //
   // Create or show the new remote user.
   //
