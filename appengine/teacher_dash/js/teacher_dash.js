@@ -28,10 +28,9 @@ goog.provide('Teacher_Dash');
 goog.require('BlocklyDialogs');
 goog.require('BlocklyGames');
 goog.require('BlocklyInterface');
-goog.require('Turtle.Blocks');
+goog.require('Turtle_Collab.Blocks');
 
 goog.require('Heroes.Blocks');
-goog.require('Puzzle.Blocks');
 goog.require('Maze.Blocks');
 goog.require('Teacher_Dash.soy');
 goog.require('WilddogUtils');
@@ -150,7 +149,7 @@ BlocklyGames.NAME = 'TeacherDash';
 /**
  * Initialize Blockly and the turtle.  Called on page load.
  */
-Turtle.init = function() {
+Turtle_Collab.init = function() {
   // Render the Soy template.
   document.body.innerHTML = Teacher_Dash.soy.start({}, null,
       {lang: BlocklyGames.LANG,
@@ -169,4 +168,4 @@ Turtle.init = function() {
   initWildDog();
 };
 
-window.addEventListener('load', Turtle.init);
+window.addEventListener('load', Turtle_Collab.init);

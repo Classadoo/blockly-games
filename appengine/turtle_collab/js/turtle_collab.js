@@ -35,109 +35,6 @@ goog.require('Turtle_Collab.Blocks');
 goog.require('Maze.Blocks');
 goog.require('Turtle_Collab.soy');
 
-var initWildDog = function(workspace, teacher_workspace){
-    var user_id = guid();
-    push_to_user(null, "Turtle-" + BlocklyGames.LEVEL, getUsername());
-
-    var events_in_progress = {};
-    workspace.addChangeListener(function(masterEvent) {
-      if (masterEvent.type == Blockly.Events.UI) {
-        return;  // Don't mirror UI events.
-      }
-
-      if (events_in_progress[masterEvent.blockId + masterEvent.type] === true)
-      {
-        console.log("don't send event triggered by wilddog.", masterEvent);
-        events_in_progress[masterEvent.blockId + masterEvent.type] = false;
-        return;
-      }
-
-
-      // Convert event to JSON for transmitting across the net.
-      var json = masterEvent.toJson();
-      var wdmsg = {"sender":user_id, "blkmsg":json};
-
-      console.log("Sending student event", masterEvent);
-      push_to_user(wdmsg, null, getUsername());
-    });
-
-    var teacher_event_callback = function(snapshot) {
-      var blkmsg = clean_event(snapshot, user_id);
-      if (!blkmsg)
-      {
-        return;
-      }
-      var slaveEvent = Blockly.Events.fromJson(blkmsg, teacher_workspace);
-
-      try {
-        if (slaveEvent.type == "ui" && slaveEvent.newValue)
-        {
-          teacher_workspace.highlightBlock(slaveEvent.newValue);
-        }
-        else
-        {
-          var existingGroup = Blockly.Events.getGroup();
-          var groupid = existingGroup;
-          if (!existingGroup) {
-              Blockly.Events.setGroup(true);
-              groupid = Blockly.Events.getGroup();
-          }
-          slaveEvent.run(true);
-          if (!existingGroup) {
-              Blockly.Events.setGroup(false);
-          }
-        }
-      }
-      catch(err) {
-        console.log("Error running slave event", err.message);
-      }
-    }
-    add_user_event_callback("classadoo_instructor", teacher_event_callback);
-    add_user_remove_callback("classadoo_instructor", function(old_snapshot)
-    {
-      teacher_workspace.clear();
-    });
-
-    var self_event_callback = function(snapshot) {
-      var blkmsg = clean_event(snapshot, user_id);
-      if (!blkmsg)
-      {
-        return;
-      }
-      var slaveEvent = Blockly.Events.fromJson(blkmsg, workspace);
-
-      try {
-        if (slaveEvent.type == "ui" && slaveEvent.newValue)
-        {
-          BlocklyInterface.highlight(slaveEvent.newValue);
-        }
-        else
-        {
-          var existingGroup = Blockly.Events.getGroup();
-          var groupid = existingGroup;
-          if (!existingGroup) {
-              Blockly.Events.setGroup(true);
-              groupid = Blockly.Events.getGroup();
-          }
-          events_in_progress[slaveEvent.blockId + slaveEvent.type] = true;
-          // Create will automatically trigger a move, so don't send our move command back to the student.
-          if (slaveEvent.type == "create")
-          {
-            events_in_progress[slaveEvent.blockId + "move"] = true;
-          }
-          slaveEvent.run(true);
-          if (!existingGroup) {
-              Blockly.Events.setGroup(false);
-          }
-        }
-      }
-      catch(err) {
-          document.getElementById("errmsg").innerHTML = err.message;
-      }
-    }
-    add_user_event_callback(getUsername(), self_event_callback);
-}
-
 BlocklyGames.NAME = 'turtle';
 
 /**
@@ -263,7 +160,9 @@ Turtle.init = function() {
         'zoom': BlocklyGames.LEVEL == BlocklyGames.MAX_LEVEL ?
             {'controls': true, 'wheel': true} : null});
 
-  initWildDog( BlocklyGames.workspace, BlocklyGames.teacher_workspace );
+  initStudentWilddog("turtle", BlocklyGames.LEVEL, BlocklyGames.workspace, "turtle");
+  connectSubscriber("Classadoo_instructor", BlocklyGames.teacher_workspace, "turtle");
+
   BlocklyGames.workspace.traceOn(true);
   BlocklyGames.teacher_workspace.traceOn(true);
 
