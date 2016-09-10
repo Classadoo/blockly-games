@@ -6,7 +6,7 @@
 
 //
 // Interface to wilddog events. The basic structure in wilddog is:
-//   {username : {snapshots : {"current" : "", "foo-etc" : ""}, level : 9}}
+//   {username : {snapshots : {"Untitled Heroes" : "", "foo-etc" : ""}, level : 9}}
 //
 
 ///
@@ -53,7 +53,7 @@ var update_level = function(username, level)
 
 var update_snapshot = function(username, xml, snapshot_key)
 {
-  snapshot_key = snapshot_key || "current";
+  snapshot_key = snapshot_key || "Untitled Heroes";
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/snapshots");
 
   var snapshot_obj = {};
@@ -75,7 +75,7 @@ var set_code_running = function(username, code, running)
 
 var add_snapshot_callback = function(username, callback, snapshot_key)
 {
-  snapshot_key = snapshot_key || "current"
+  snapshot_key = snapshot_key || "Untitled Heroes"
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/snapshots");
 
   ref.child(snapshot_key).on("value", function(snapshot)

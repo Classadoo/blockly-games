@@ -1,71 +1,7 @@
-button.primary {
-  /* Can't use "text-align: start" due to IE. */
-  text-align: left;
-}
-html[dir="RTL"] button.primary {
-  text-align: right;
-}
-button.publish {
-  background-color: #2bad19 !important;
-  border-color: #0b9d09 !important;
+.dashboard {
+  margin-top: 50px;
 }
 
-.blockly {
-  height: 400px;
-}
-.username {
-  padding-left:20px;
-  font-family:Helvetica;
-  font-size:20px;
-}
-#student_dropdown {
-  margin: 30px;
-  margin-bottom: 15px;
-  font-size:48px;
-}
-
-.read_only_true .blocklySvg {
-  background-color: #666 !important;
-}
-#display {
-  border: 1px solid #ccc;
-}
-#downloadImageLink {
-  display: none;
-}
-#sampleHelp3, #sampleHelp4 {
-  height: 50px;
-  width: 250px;
-}
-
-/* Slider. */
-.sliderTrack {
-  stroke: #aaa;
-  stroke-width: 6px;
-  stroke-linecap: round;
-}
-.sliderKnob {
-  fill: #ddd;
-  stroke: #bbc;
-  stroke-width: 1px;
-  stroke-linejoin: round;
-}
-.sliderKnob:hover {
-  fill: #eee;
-}
-
-/* Sprited icons. */
-.icon21 {
-  height: 21px;
-  width: 21px;
-  background-image: url(icons.png);
-}
-.camera {
-  background-position: -21px 0px;
-}
-.stop {
-  background-position: -42px 0px;
-}
-.run {
-  background-position: -63px 0px;
+.title {
+  text-align: center;
 }
