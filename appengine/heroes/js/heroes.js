@@ -828,7 +828,7 @@ Heroes.add_remote_user = function(username)
   else
   {
     var remote_workspace = Heroes.addGame(true, username);
-    connectSubscriber(username, remote_workspace);
+    connectSubscriber(username, remote_workspace, getSavedGame());
   }
 }
 
