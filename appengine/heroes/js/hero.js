@@ -25,6 +25,8 @@ chars["eagle"] = new Image();
 chars["eagle"].src = "heroes/eagle.png";
 chars["lion"] = new Image();
 chars["lion"].src = "heroes/lion.png";
+chars["human"] = new Image();
+chars["human"].src = "heroes/andrew.png";
 
 var chars_per_line = 40;
 
@@ -36,57 +38,14 @@ function Hero(type, radius, x, y) {
   this.colour = "#ffffff";
   this.width = 3;
 
-  this.image = chars[type];
+  this.image = chars[type] || chars["andrew"];
   this.radius = radius;
 }
 
 // Draws this item to a given context.
 Hero.prototype.draw = function(ctx) {
-  if (this.image)
-  {
-    ctx.drawImage(this.image, this.x - this.radius,
-      this.y - this.radius, this.radius * 2, this.radius * 2);
-  }
-  else
-  {
-    // Make the heroes the colour of the pen.
-    ctx.strokeStyle = '#ffffff';
-    ctx.fillStyle = '#ffffff';
-
-    // Draw the heroes body.
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    // Draw the heroes head.
-    var WIDTH = 0.3;
-    var HEAD_TIP = 10;
-    var ARROW_TIP = 4;
-    var BEND = 6;
-    var radians = 2 * Math.PI * this.heading / 360;
-    var tipX = this.x + (this.radius + HEAD_TIP) * Math.sin(radians);
-    var tipY = this.y - (this.radius + HEAD_TIP) * Math.cos(radians);
-    radians -= WIDTH;
-    var leftX = this.x + (this.radius + ARROW_TIP) * Math.sin(radians);
-    var leftY = this.y - (this.radius + ARROW_TIP) * Math.cos(radians);
-    radians += WIDTH / 2;
-    var leftControlX = this.x + (this.radius + BEND) * Math.sin(radians);
-    var leftControlY = this.y - (this.radius + BEND) * Math.cos(radians);
-    radians += WIDTH;
-    var rightControlX = this.x + (this.radius + BEND) * Math.sin(radians);
-    var rightControlY = this.y - (this.radius + BEND) * Math.cos(radians);
-    radians += WIDTH / 2;
-    var rightX = this.x + (this.radius + ARROW_TIP) * Math.sin(radians);
-    var rightY = this.y - (this.radius + ARROW_TIP) * Math.cos(radians);
-    ctx.beginPath();
-    ctx.moveTo(tipX, tipY);
-    ctx.lineTo(leftX, leftY);
-    ctx.bezierCurveTo(leftControlX, leftControlY,
-        rightControlX, rightControlY, rightX, rightY);
-    ctx.closePath();
-    ctx.fill();
-  }
+  ctx.drawImage(this.image, this.x - this.radius,
+    this.y - this.radius, this.radius * 2, this.radius * 2);
 }
 
 Hero.prototype.speak = function(ctx, words)
