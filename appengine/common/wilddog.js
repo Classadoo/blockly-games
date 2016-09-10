@@ -61,6 +61,14 @@ var update_snapshot = function(username, xml, snapshot_key)
   ref.update(snapshot_obj);
 }
 
+var set_code_running = function(username, code, running)
+{
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/code_running");
+  var code_obj = {};
+  code_obj[code] = running;
+  ref.update(code_obj);
+}
+
 ///
 /// ADD CALLBACKS.
 ///
@@ -110,6 +118,14 @@ var add_new_student_callback = function(callback)
 var add_user_level_callback = function(username, callback)
 {
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/level");
+  ref.on("value", function(snapshot){
+    callback(snapshot.val());
+  });
+}
+
+var add_code_running_callback = function(username, callback)
+{
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/code_running");
   ref.on("value", function(snapshot){
     callback(snapshot.val());
   });

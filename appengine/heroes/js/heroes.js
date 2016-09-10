@@ -158,6 +158,8 @@ var Game = function(username, blockly_workspace)
 
     // Kill the game event loop.
     clearInterval(self.eventLoop);
+
+    set_code_running(getUsername(), self.username, false);
   };
 
   /**
@@ -263,6 +265,7 @@ var Game = function(username, blockly_workspace)
     resetButton.style.display = 'inline';
     document.getElementById(self.username + '_spinner').style.visibility = 'visible';
     self.execute();
+    set_code_running(getUsername(), self.username, true);
   };
 
   /**
