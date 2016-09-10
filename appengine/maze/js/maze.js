@@ -546,7 +546,7 @@ Maze.init = function() {
        'rtl': rtl,
        'zoom': {'startScale': scale}});
 
-
+  clear_one_snapshot(getUsername(), "maze");
   initStudentWilddog("maze", BlocklyGames.LEVEL, BlocklyGames.workspace, "maze");
   connectSubscriber("classadoo_instructor", BlocklyGames.teacher_workspace, "maze");
 
