@@ -27,11 +27,14 @@ var st_connected = "connected";
 var st_inited = "inited";
 var st_published = "published";
 
+var st_calling = "calling";
+var st_notcalling = "notcalling"
+
 var cmd_inited = "cmd_inited"; //this is really a status update, telling everyone that my camera is ready.
 var cmd_publish = "cmd_pub";
 var cmd_unpublish = "cmd_unpub"
-
-
+var cmd_callhelp = "cmd_callhelp"
+var cmd_callcancel = "cmd_callcancel";
 function GetURLParameter(sParam)
 {
     var sPageURL = window.location.search.substring(1);
@@ -92,6 +95,18 @@ $(document).ready(function() {
   if(isTeacherPage){
     meetingurl += "?role=teacher";
   }
+
+//Make button flash
+  setInterval(function() {
+    var box = $('.flashbtn');
+    if (box.css('color') == 'rgb(0, 128, 21)') {
+        box.css({'color':'rgb(255,69,00)'});
+    }
+    else {
+        box.css({'color':'rgb(0, 128, 21)'});
+    }
+  }, 500);
+
 
   // Make an Ajax request to get the OpenTok API key, session ID, and token from the server
   $.ajax({
@@ -159,6 +174,9 @@ function newConnectionCreated(connection){
   $('#connections').append(uiHtml);
   if(connData.role != 'teacher'){
     $('#' + connection.connectionId +'-camlight').click(evtSendCmdRemote)
+  }
+  else{
+    $('#' + connection.connectionId +'-camlight').click(evtCallForHelp)
   }
   
   updateUIStatus(connection.connectionId);
@@ -482,10 +500,10 @@ var st_pub_local = "pub_local";
 var st_pub_remote = "pub_remote";
 
 function updateUIStatus(id){
-  uiChangeStatus(id + "-camlight", connections[id].status)
+  uiChangeStatus(id + "-camlight", connections[id].status, connections[id].callstatus)
 }
 
-function uiChangeStatus(id, status){
+function uiChangeStatus(id, status, callstatus){
   var uiid = "#" + id;
 
   //console.log($(uiid).style)
@@ -500,12 +518,20 @@ function uiChangeStatus(id, status){
     break;
     case st_inited:
       $(uiid).css('color', '#008015');
+      //$(uiid).fadeIn(1000).fadeOut(1000).fadeIn(1000).fadeOut(1000).fadeIn(1000);
     break;
     case st_published:
       $(uiid).css('color', '#FF4500');
+      //$(uiid).addClass('flashbtn')
+    break;
     break;
   }
-  
+  if(callstatus == st_calling){
+    $(uiid).addClass('flashbtn');
+  }
+  else{
+    $(uiid).removeClass('flashbtn');
+  }
 }
 
 function getConnectionStatus(connection){
@@ -513,6 +539,7 @@ function getConnectionStatus(connection){
 }
 
 function executeCmd(cmd, fromConn){
+  var id = fromConn.connectionId;
   switch(cmd){
     case cmd_publish:
       publishStream();
@@ -521,8 +548,16 @@ function executeCmd(cmd, fromConn){
       _unPublish(null);
     break;
     case cmd_inited:
-      var id = fromConn.connectionId;
+      
       connections[id].status = st_inited;
+      updateUIStatus(id);
+    break;
+    case cmd_callhelp:
+      connections[id].callstatus = st_calling;
+      updateUIStatus(id);
+    break;
+    case cmd_callcancel:
+      connections[id].callstatus = st_notcalling;
       updateUIStatus(id);
     break;
   }
@@ -530,6 +565,7 @@ function executeCmd(cmd, fromConn){
 }
 
 function uiFlipStatus(){
+
   switch(localCam.st){
     case st_unconnected:
       console.log("uiFlipStatus " + st_unconnected)
@@ -547,24 +583,53 @@ function uiFlipStatus(){
   }
 };
   
+function evtCallForHelp(event){
+  var uiid = event.target.id;
+  //we are from id-camlight, get the id from it.
+  var id = uiid.replace('-camlight', '');
+  conn = connections[id];
+  if(conn.callstatus == st_calling){
+    _sendCmd(conn, cmd_callcancel);
+    conn['callstatus'] = st_notcalling;
+  }
+  else{
+    conn['callstatus'] = st_calling;
+    _sendCmd(conn, cmd_callhelp);
+  }
+  updateUIStatus(id);
+}
+
 function evtSendCmdRemote(event){
   var uiid = event.target.id;
   //we are from id-camlight, get the id from it.
   var id = uiid.replace('-camlight', '');
   conn = connections[id];
-  switch (conn.status ){
-    case st_unconnected:
-      console.log("evtSendCmdRemote " + st_unconnected)
-    break;
-    case st_connected:
-      _sendCmd(conn, cmd_publish)
-    break;
-    case st_inited:
-      _sendCmd(conn, cmd_publish)
-    break;
-    case st_published:
-      _sendCmd(conn, cmd_unpublish)
-    break;
+  if(conn.callstatus== st_calling){
+    if( conn.status != st_published){
+      _sendCmd(conn, cmd_publish);
+
+    }
+    _sendCmd(conn, cmd_callcancel);
+    conn.callstatus = st_notcalling;
+    updateUIStatus(id);
+
+  }
+  else{
+    switch (conn.status ){
+      case st_unconnected:
+        console.log("evtSendCmdRemote " + st_unconnected)
+      break;
+      case st_connected:
+        _sendCmd(conn, cmd_publish)
+      break;
+      case st_inited:
+        _sendCmd(conn, cmd_publish)
+      break;
+      case st_published:
+        _sendCmd(conn, cmd_unpublish)
+      break;
+    }
+
   }
 }
 
