@@ -173,24 +173,24 @@ Game speed
     <category name="{msg meaning="Games.heroes" desc="IBID"}Heroes{/msg}">
       <block type="heroes_move">
         <value name="VALUE">
-          <shadow type="math_number">
+          <block type="math_number">
             <field name="NUM">10</field>
-          </shadow>
+          </block>
         </value>
       </block>
 
       <block type="heroes_pen"></block>
       <block type="heroes_width">
         <value name="WIDTH">
-          <shadow type="math_number">
+          <block type="math_number">
             <field name="NUM">3</field>
-          </shadow>
+          </block>
         </value>
       </block>
 
       <block type="heroes_colour">
         <value name="COLOUR">
-          <shadow type="colour_picker"></shadow>
+          <block type="colour_picker"></block>
         </value>
       </block>
 
@@ -199,39 +199,39 @@ Game speed
 
         {if $ij.level < 3}
           <value name="X">
-            <shadow type="math_random_int">
+            <block type="math_random_int">
             <value name="FROM">
-              <shadow type="math_number">
+              <block type="math_number">
                 <field name="NUM">0</field>
-              </shadow>
+              </block>
             </value>
             <value name="TO">
-              <shadow type="math_number">
+              <block type="math_number">
                 <field name="NUM">600</field>
-              </shadow>
+              </block>
             </value>
-            </shadow>
+            </block>
           </value>
           <value name="VY">
-            <shadow type="math_random_int">
+            <block type="math_random_int">
             <value name="FROM">
-              <shadow type="math_number">
+              <block type="math_number">
                 <field name="NUM">1</field>
-              </shadow>
+              </block>
             </value>
             <value name="TO">
-              <shadow type="math_number">
+              <block type="math_number">
                 <field name="NUM">5</field>
-              </shadow>
+              </block>
             </value>
-            </shadow>
+            </block>
           </value>
 
           <value name="X">
-            <shadow type="math_number"><field name="NUM">0</field></shadow>
+            <block type="math_number"><field name="NUM">0</field></block>
           </value>
           <value name="Y">
-            <shadow type="math_number"><field name="NUM">0</field></shadow>
+            <block type="math_number"><field name="NUM">0</field></block>
           </value>
 
         {/if}
@@ -240,10 +240,10 @@ Game speed
 
       <block type="heroes_speak">
         <value name="TEXT">
-          <shadow type="text"></shadow>
+          <block type="text"></block>
         </value>
         <value name="SECONDS">
-          <shadow type="math_number"><field name="NUM">3</field></shadow>
+          <block type="math_number"><field name="NUM">3</field></block>
         </value>
       </block>
 
@@ -256,13 +256,13 @@ Game speed
   <category name="{msg meaning="Heroes.catItems" desc="IBID"}Events{/msg}">
     <block type="heroes_on_arrow">
       <value name="DO0">
-        <shadow type="heroes_move">
+        <block type="heroes_move">
           <value name="VALUE">
-            <shadow type="math_number">
+            <block type="math_number">
               <field name="NUM">3</field>
-            </shadow>
+            </block>
           </value>
-        </shadow>
+        </block>
       </value>
     </block>
     <block type="heroes_on_arrow">
@@ -289,23 +289,23 @@ Game speed
 
     <block type="math_random_int">
       <value name="FROM">
-        <shadow type="math_number">
+        <block type="math_number">
           <field name="NUM">1</field>
-        </shadow>
+        </block>
       </value>
       <value name="TO">
-        <shadow type="math_number">
+        <block type="math_number">
           <field name="NUM">5</field>
-        </shadow>
+        </block>
       </value>
     </block>
     {/if}
 
     <block type="controls_repeat_ext">
       <value name="TIMES">
-        <shadow type="math_number">
+        <block type="math_number">
           <field name="NUM">10</field>
-        </shadow>
+        </block>
       </value>
     </block>
   </category>
@@ -314,9 +314,9 @@ Game speed
     <block type="heroes_add_points">
       {if $ij.level == 1}
         <value name="VALUE">
-          <shadow type="math_number">
+          <block type="math_number">
             <field name="NUM">10</field>
-          </shadow>
+          </block>
         </value>
       {/if}
     </block>
@@ -324,7 +324,7 @@ Game speed
     <block type="heroes_set_background"></block>
     <block type="heroes_set_title">
       <value name="TITLE">
-        <shadow type="text"></shadow>
+        <block type="text"></block>
       </value>
     </block>
   </category>
