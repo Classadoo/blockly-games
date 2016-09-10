@@ -8,7 +8,7 @@ var connectionCount  = 0;
 var pleaseAllowCamera = document.getElementById("pleaseAllowCamera");
 
 //hold the connection with the status
-// connection = {conObj: connection, stmObj: stream};
+// connection = {conObj: connection, stmObj: stream, status: st};
 
 var connections = {
 
@@ -27,6 +27,10 @@ var st_connected = "connected";
 var st_inited = "inited";
 var st_published = "published";
 
+var cmd_inited = "cmd_inited"; //this is really a status update, telling everyone that my camera is ready.
+var cmd_publish = "cmd_pub";
+var cmd_unpublish = "cmd_unpub"
+
 
 function GetURLParameter(sParam)
 {
@@ -42,6 +46,12 @@ function GetURLParameter(sParam)
     }
 }
 
+var pageName = document.location.pathname.match(/[^\/]+$/)[0];
+
+console.log(pageName);
+
+var isTeacherPage = (pageName.toLowerCase().indexOf('teacher') != -1 );
+
 var name = GetURLParameter("name");
 if ( name === "undefined" || name == null) {
   var now = new Date(Date.now());
@@ -54,6 +64,11 @@ if ( meetingID === "undefined" || meetingID == null) {
   var now = new Date(Date.now());
   name = "User:" +  now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
 }
+
+var connHtml = "<div id={id} class='subscriber'><div id='{id}-ctrl' class='camctrl'>" +
+                "<a href='#' id='{id}-camlight' class='camButton'>{name}</a>" +
+               "</div><div id='{id}-video' ></div></div>";
+var msgHtml = "<div id='message'>{msg}</div>";
 
 $(document).ready(function() {
 
@@ -71,9 +86,16 @@ $(document).ready(function() {
   $("#camlight").html(name);
   uiChangeStatus("camlight", st_unconnected);
 
+  $("#videos").draggable();
+
+  var meetingurl = MEETING_CENTER_URL + '/meeting/' + meetingID + '/' + name;
+  if(isTeacherPage){
+    meetingurl += "?role=teacher";
+  }
+
   // Make an Ajax request to get the OpenTok API key, session ID, and token from the server
   $.ajax({
-     url:MEETING_CENTER_URL + '/meeting/' + meetingID + '/' + name,
+     url:meetingurl,
      dataType: 'json', // Notice! JSONP <-- P (lowercase)
      success:function(res){
          // do stuff with json (in this case an array)
@@ -87,6 +109,7 @@ $(document).ready(function() {
               }
               else{
                 console.log("initialSession succeed ");
+                publishStream();
               }
             });
           } else {
@@ -119,17 +142,31 @@ var formatString = function (str, col) {
     });
 };
 
-var connHtml = "<div id={id} ><div id='light'></div><div id='connid'>{name}</div></div>";
-var msgHtml = "<div id='message'>{msg}</div>";
+
 
 function newConnectionCreated(connection){
-  connections[connection.connectionId] = {'conObj':connection};
-  var uiHtml = formatString(connHtml, {id:connection.connectionId, name:JSON.parse(connection.data).username});
+  console.log("new connection created")
+  connections[connection.connectionId] = {'conObj':connection, 'status': st_connected};
+  var connData = JSON.parse(connection.data);
+  if(!isTeacherPage && connData.role != 'teacher'){
+    return;
+  }
+  var dispName = connData.username;
+  if(connData.role == 'teacher'){
+    dispName = dispName +"(T)";
+  }
+  var uiHtml = formatString(connHtml, {id:connection.connectionId, name:dispName});
   $('#connections').append(uiHtml);
+  if(connData.role != 'teacher'){
+    $('#' + connection.connectionId +'-camlight').click(evtSendCmdRemote)
+  }
+  
+  updateUIStatus(connection.connectionId);
 }
 
 function connectionDestroyed(connection){
   delete connections[connection.connectionId];
+  $( "#"+connection.connectionId ).remove();
 }
 
 function initializeSession(cb) {
@@ -143,15 +180,35 @@ function initializeSession(cb) {
 
   // Subscribe to a newly created stream
   session.on('streamCreated', function(event) {
-    session.subscribe(event.stream, 'subscriber', {
+    console.log("one stream is created")
+    var connId = event.stream.connection.connectionId;
+    var conn = connections[connId]['conObj'];
+    var connData = JSON.parse(conn.data);
+    connections[connId]['status'] = st_published;
+    if(!isTeacherPage && connData.role != 'teacher'){
+      return;
+    }
+    session.subscribe(event.stream, connId + '-video', {
       insertMode: 'append',
       width: '100%',
       height: '100%'
     });
+    
+    updateUIStatus(connId);
+    $("#" + connId + '-video').addClass('camvideo');
   });
 
   session.on("streamDestroyed", function(event) {
       console.log("Stream " + event.stream.name + " ended. " + event.reason);
+      var connId = event.stream.connection.connectionId;
+      connections[connId]['status'] = st_inited;
+      var conn = connections[connId]['conObj'];
+      var connData = JSON.parse(conn.data);
+      if(!isTeacherPage && connData.role != 'teacher'){
+            return;
+          }      
+      updateUIStatus(connId);
+      $("#" + connId + '-video').removeClass('camvideo');
   });
 
   session.on('sessionDisconnected', function(event) {
@@ -182,16 +239,16 @@ function initializeSession(cb) {
     console.log('A client disconnected. ' + event.connection.connectionId + "   " + connectionCount + ' total.');
   });
   
-  session.on("signal", function(event) {
+  session.on("signal:cmd", function(event) {
       console.log("Signal sent from connection " + event.from.id);
       if( event.from.id == session.connection.connectionId){
         console.log("ignore signal from myself");
         return;
       }
-      connection = connections[event.from.id]
+      connection = connections[event.from.id]['conObj'];
       var from = JSON.parse(connection.data).username;
       console.log("Signal is " + event.data + "  from " + from);
-      uiDisplaySignal( event.data );
+      executeCmd(event.data, connection);
       // Process the event.data property, if there is any data.
     });
   
@@ -213,6 +270,8 @@ function initializeSession(cb) {
   });
 }
 
+
+
 function _initPublisher(cb){
       if(publisher != null){
         if(cb != null){
@@ -220,13 +279,18 @@ function _initPublisher(cb){
         }
         return;
       }
+      var nameOnCam = name;
+      if(isTeacherPage){
+        nameOnCam = name+"("+"teacher" + ")";
+      }
       publisher = OT.initPublisher(
       'publisher', 
       {
         insertMode: 'append',
         width: '100%',
         height: '100%',
-        "name": name
+        "name": name,
+        style: { nameDisplayMode: "on", buttonDisplayMode: 'on' }
       },
       function(error) {
         if (error) {
@@ -237,6 +301,7 @@ function _initPublisher(cb){
         } else {
           localCam.st = st_inited;
           uiChangeStatus("camlight", st_inited);
+          sendCmdToAll(cmd_inited);
           console.log('Publisher initialized.');
           if(cb != null){
             cb(null);
@@ -319,11 +384,38 @@ function _unPublish(cb){
 }
 
 
-function _sendSignal(text, cb){
+function _sendCmd(connection, text, cb){
+  console.log("send command " + connection.connectionId + "  " + text)
+  session.signal(
+  {
+    to: connection['conObj'],
+    data:text,
+    type:"cmd"
+  },
+  function(error) {
+    if (error) {
+      console.log("signal error ("
+                   + error.code
+                   + "): " + error.message);
+      if(cb != null){
+        cb(error);
+      }
+    } else {
+      console.log("signal sent.");
+      if(cb != null){
+        cb(null);
+      }
+    }
+  }
+);
+}
+
+function _sendCmdToAll(text, cb){
 
   session.signal(
   {
-    data:text
+    data:text,
+    type:"cmd"
   },
   function(error) {
     if (error) {
@@ -353,33 +445,18 @@ function publishStream(){
   );
 }
 
-function sendSignal(text){
-  console.log("sending signal " + text )
+function sendCmdToAll(text){
+  console.log("sending command " + text )
   async.series([
         initializeSession,
         function(cb){
-          _sendSignal(text, cb);
+          _sendCmdToAll(text, cb);
         }
       ],
       function(err, results) {
           // results is now equal to ['one', 'two']
       }
   );
-}
-
-function sendCommand(cmd){
-  console.log("sending command " + cmd )
-  async.series([
-        initializeSession,
-        function(cb){
-          _sendSignal(text, cb);
-        }
-      ],
-      function(err, results) {
-          // results is now equal to ['one', 'two']
-      }
-  );
-
 }
 
 $("#mytext").keyup(function(event){
@@ -388,14 +465,9 @@ $("#mytext").keyup(function(event){
     }
 });
 
-function uiSendSignal(){
+function uiSendCmd(){
    var text = $('#mytext').val();
-   sendSignal(text);
-}
-
-function uiDisplaySignal(text){
-
- $('#mysignal').text( text );
+   sendCmdToAll(text);
 }
 
 function uiDisplayMessage(msg){
@@ -408,6 +480,10 @@ var st_unconnected = "unconnected";
 var st_connected = "connected";
 var st_pub_local = "pub_local";
 var st_pub_remote = "pub_remote";
+
+function updateUIStatus(id){
+  uiChangeStatus(id + "-camlight", connections[id].status)
+}
 
 function uiChangeStatus(id, status){
   var uiid = "#" + id;
@@ -436,6 +512,23 @@ function getConnectionStatus(connection){
 
 }
 
+function executeCmd(cmd, fromConn){
+  switch(cmd){
+    case cmd_publish:
+      publishStream();
+    break;
+    case cmd_unpublish:
+      _unPublish(null);
+    break;
+    case cmd_inited:
+      var id = fromConn.connectionId;
+      connections[id].status = st_inited;
+      updateUIStatus(id);
+    break;
+  }
+  
+}
+
 function uiFlipStatus(){
   switch(localCam.st){
     case st_unconnected:
@@ -454,6 +547,26 @@ function uiFlipStatus(){
   }
 };
   
+function evtSendCmdRemote(event){
+  var uiid = event.target.id;
+  //we are from id-camlight, get the id from it.
+  var id = uiid.replace('-camlight', '');
+  conn = connections[id];
+  switch (conn.status ){
+    case st_unconnected:
+      console.log("evtSendCmdRemote " + st_unconnected)
+    break;
+    case st_connected:
+      _sendCmd(conn, cmd_publish)
+    break;
+    case st_inited:
+      _sendCmd(conn, cmd_publish)
+    break;
+    case st_published:
+      _sendCmd(conn, cmd_unpublish)
+    break;
+  }
+}
 
 function incHeight(id, delta) {
     var el = document.getElementById(id);
