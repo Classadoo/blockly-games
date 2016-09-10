@@ -180,6 +180,8 @@ Game speed
       </block>
 
       <block type="heroes_pen"></block>
+
+      {if $ij.level >= 2}
       <block type="heroes_width">
         <value name="WIDTH">
           <block type="math_number">
@@ -193,11 +195,12 @@ Game speed
           <block type="colour_picker"></block>
         </value>
       </block>
+      {/if}
 
-      {if $ij.level >= 2}
+      {if $ij.level >= 3}
       <block type="heroes_add_item">
 
-        {if $ij.level < 3}
+        {if $ij.level < 4}
           <value name="X">
             <block type="math_random_int">
             <value name="FROM">
@@ -238,6 +241,7 @@ Game speed
       </block>
       {/if}
 
+      {if $ij.level >= 2}
       <block type="heroes_speak">
         <value name="TEXT">
           <block type="text"></block>
@@ -248,11 +252,12 @@ Game speed
       </block>
 
       <block type="heroes_noise"></block>
+      {/if}
 
     </category>
 
 
-  {if $ij.level == 2}
+  {if $ij.level == 3}
   <category name="{msg meaning="Heroes.catItems" desc="IBID"}Events{/msg}">
     <block type="heroes_on_arrow">
       <value name="DO0">
@@ -272,7 +277,7 @@ Game speed
   </category>
   {/if}
 
-  {if $ij.level >= 3}
+  {if $ij.level >= 4}
   <category name="{msg meaning="Heroes.catItems" desc="IBID"}Events{/msg}">
     <block type="heroes_on_arrow"></block>
 
@@ -284,7 +289,7 @@ Game speed
   <category name="{msg meaning="Heroes.catNumbers" desc="IBID"}Number{/msg}">
 
 
-  {if $ij.level >= 2}
+  {if $ij.level >= 3}
   <block type="math_number"></block>
 
     <block type="math_random_int">
