@@ -25,6 +25,7 @@
 
 goog.provide('Turtle_Collab');
 
+goog.require('WilddogUtils');
 goog.require('BlocklyDialogs');
 goog.require('BlocklyGames');
 goog.require('BlocklyInterface');
