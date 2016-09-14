@@ -163,9 +163,9 @@ function newConnectionCreated(connection){
   console.log("new connection created")
   connections[connection.connectionId] = {'conObj':connection, 'status': st_connected};
   var connData = JSON.parse(connection.data);
-  if(!isTeacherPage && connData.role != 'teacher'){
-    return;
-  }
+  // if(!isTeacherPage && connData.role != 'teacher'){
+  //   return;
+  // }
   var dispName = connData.username;
   if(connData.role == 'teacher'){
     dispName = dispName +"(T)";
@@ -173,7 +173,13 @@ function newConnectionCreated(connection){
   var uiHtml = formatString(connHtml, {id:connection.connectionId, name:dispName});
   $('#connections').append(uiHtml);
   if(connData.role != 'teacher'){
-    $('#' + connection.connectionId +'-camlight').click(evtSendCmdRemote)
+    if(isTeacherPage){ //Only teacher can send remote command
+      $('#' + connection.connectionId +'-camlight').click(evtSendCmdRemote);
+    }
+    else
+    {
+
+    }
   }
   else{
     $('#' + connection.connectionId +'-camlight').click(evtCallForHelp)
@@ -203,9 +209,9 @@ function initializeSession(cb) {
     var conn = connections[connId]['conObj'];
     var connData = JSON.parse(conn.data);
     connections[connId]['status'] = st_published;
-    if(!isTeacherPage && connData.role != 'teacher'){
-      return;
-    }
+    // if(!isTeacherPage && connData.role != 'teacher'){
+    //   return;
+    // }
     session.subscribe(event.stream, connId + '-video', {
       insertMode: 'append',
       width: '100%',
@@ -222,9 +228,9 @@ function initializeSession(cb) {
       connections[connId]['status'] = st_inited;
       var conn = connections[connId]['conObj'];
       var connData = JSON.parse(conn.data);
-      if(!isTeacherPage && connData.role != 'teacher'){
-            return;
-          }      
+      // if(!isTeacherPage && connData.role != 'teacher'){
+      //       return;
+      //     }      
       updateUIStatus(connId);
       $("#" + connId + '-video').removeClass('camvideo');
   });
