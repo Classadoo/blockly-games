@@ -394,6 +394,15 @@ Blockly.JavaScript['heroes_add_hero'] = function(block) {
 };
 
 
+var clean_event_block = function(branch)
+{
+  // The interpreter can't handle nested events due to the nested strings.
+  // They don't make a ton of sense, so let's remove them.
+  // Note: We used to not have previous/next statements, so these had to be standalone statements,
+  // but not having order made it confusing. Often events wouldn't be set up until after a collision had occurred, for example.
+  return branch.replace(/setCollisionCallback.*;/g, "").replace(/setButtonCallback.*;/g, "").trim().replace(/\n/g, "");
+}
+
 Blockly.Blocks['heroes_on_arrow'] = {
   /**
    * Block for if/elseif/else condition.
@@ -415,8 +424,8 @@ Blockly.Blocks['heroes_on_arrow'] = {
      this.setColour(Heroes.Blocks.EVENT_HUE);
      this.appendDummyInput('VALUE')
          .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR');
-     this.setPreviousStatement(false);
-     this.setNextStatement(false);
+     this.setPreviousStatement(true);
+     this.setNextStatement(true);
      this.appendStatementInput('DO0')
          .appendField(Blockly.Msg.CONTROLS_IF_MSG_THEN);
    }
@@ -430,13 +439,14 @@ Blockly.JavaScript['heroes_on_arrow'] = function(block) {
   //
 
   var branch = Blockly.JavaScript.statementToCode(block, 'DO0');
+  branch = clean_event_block(branch);
   var direction_number = parseInt(block.getFieldValue('DIR'));
 
   //
   // Trim the spaces and newlines (for the stupid interpreter), and pass it thru as a string.
   //
 
-  var code = 'setButtonCallback(' + direction_number + ', \"' + branch.trim().replace(/\n/g, "") + '\", \'block_id_' + block.id +'\')';
+  var code = 'setButtonCallback(' + direction_number + ', \"' + branch + '\", \'block_id_' + block.id +'\');';
   return code + '\n';
 };
 
@@ -449,8 +459,8 @@ Blockly.Blocks['heroes_on_collision'] = {
 
    init: function() {
      this.setColour(Heroes.Blocks.EVENT_HUE);
-     this.setPreviousStatement(false);
-     this.setNextStatement(false);
+     this.setPreviousStatement(true);
+     this.setNextStatement(true);
      this.appendDummyInput()
          .appendField('On Collision');
      this.appendDummyInput()
@@ -477,13 +487,14 @@ Blockly.JavaScript['heroes_on_collision'] = function(block) {
   //
 
   var branch = Blockly.JavaScript.statementToCode(block, 'DO0');
+  branch = clean_event_block(branch);
 
   //
   // Trim the spaces and newlines (for the stupid interpreter), and pass it thru as a string.
   //
 
   var code = 'setCollisionCallback("'+ block.getFieldValue('A') + '",  "' +
-      block.getFieldValue('B') + '", \"' + branch.trim().replace("\n", "") + '\", \'block_id_' + block.id +'\')';
+      block.getFieldValue('B') + '", \"' + branch+ '\", \'block_id_' + block.id +'\');';
   return code + '\n';
 };
 
