@@ -556,7 +556,6 @@
 
       <block type="heroes_pen"></block>
 
-      {if $ij.level >= 2}
       <block type="heroes_width">
         <value name="WIDTH">
           <block type="math_number">
@@ -570,9 +569,8 @@
           <block type="colour_picker"></block>
         </value>
       </block>
-      {/if}
 
-      {if $ij.level >= 3}
+      {if $ij.level >= 2}
       <block type="heroes_add_item">
 
         {if $ij.level < 4}
@@ -616,7 +614,7 @@
       </block>
       {/if}
 
-      {if $ij.level >= 2}
+      {if $ij.level >= 5}
       <block type="heroes_speak">
         <value name="TEXT">
           <block type="text"></block>
@@ -632,8 +630,9 @@
     </category>
 
 
-  {if $ij.level == 3}
+  {if $ij.level >= 3}
   <category name="{msg meaning="Heroes.catItems" desc="IBID"}Events{/msg}">
+    {if $ij.level == 3}
     <block type="heroes_on_arrow">
       <value name="DO0">
         <block type="heroes_move">
@@ -645,26 +644,17 @@
         </block>
       </value>
     </block>
+    {else}
     <block type="heroes_on_arrow">
-
-    </block>
-
-  </category>
-  {/if}
-
-  {if $ij.level >= 4}
-  <category name="{msg meaning="Heroes.catItems" desc="IBID"}Events{/msg}">
-    <block type="heroes_on_arrow"></block>
-
     <block type="heroes_on_collision"></block>
-
+    </block>
+    {/if}
   </category>
   {/if}
 
   <category name="{msg meaning="Heroes.catNumbers" desc="IBID"}Number{/msg}">
 
-
-  {if $ij.level >= 3}
+  {if $ij.level >= 4}
   <block type="math_number"></block>
 
     <block type="math_random_int">
@@ -690,9 +680,11 @@
     </block>
   </category>
 
+
+  {if $ij.level >= 4}
   <category name="{msg meaning="Heroes.game" desc="IBID"}Game{/msg}">
     <block type="heroes_add_points">
-      {if $ij.level == 1}
+      {if $ij.level == 4}
         <value name="VALUE">
           <block type="math_number">
             <field name="NUM">10</field>
@@ -701,12 +693,16 @@
       {/if}
     </block>
 
-    <block type="heroes_set_background"></block>
-    <block type="heroes_set_title">
-      <value name="TITLE">
-        <block type="text"></block>
-      </value>
-    </block>
+
+    {if $ij.level >= 5}
+      <block type="heroes_set_background"></block>
+      <block type="heroes_set_title">
+        <value name="TITLE">
+          <block type="text"></block>
+        </value>
+      </block>
+    {/if}
   </category>
+  {/if}
 
 {/template}

@@ -20,6 +20,15 @@
 
 goog.provide('HeroObject');
 
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++ ) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
 var chars = {};
 chars["eagle"] = new Image();
 chars["eagle"].src = "heroes/eagle.png";
@@ -30,15 +39,16 @@ chars["human"].src = "heroes/andrew.png";
 
 var chars_per_line = 40;
 
-function Hero(type, radius, x, y) {
+function Hero(char, radius, x, y) {
   this.x = x || 0;
   this.y = y || 0;
 
-  this.penDown = false;
-  this.colour = "#ffffff";
-  this.width = 3;
+  this.penDown = true;
+  this.colour = null;
+  this.width = 5;
 
-  this.image = chars[type] || chars["andrew"];
+  this.char = char;
+  this.image = chars[char] || chars["andrew"];
   this.radius = radius;
 }
 
@@ -52,7 +62,7 @@ Hero.prototype.speak = function(ctx, words)
 {
   if (words)
   {
-    ctx.font="12px Arial";
+    ctx.font = "12px Arial";
     var height = 24;
     var radius = height/4;
     var width = ctx.measureText(words).width + radius * 2;
