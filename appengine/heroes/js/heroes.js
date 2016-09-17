@@ -40,7 +40,7 @@ BlocklyGames.NAME = 'heroes';
 
 // TODO(aheine): use jquery instead of a string of HTML. Also move this to a new file.
 Heroes.GAME_HTML =
-  '<div class="col-md-5" id="visualization">' +
+  '<div class="visualization">' +
     '<canvas id="{user}_scratch" width="570" height="400" style="display: none"></canvas>' +
     '<canvas id="{user}_display" width="570" height="400"></canvas>' +
     '<canvas id="{user}_lines" width="570" height="400" style="display: none"></canvas>' +
@@ -61,7 +61,7 @@ Heroes.GAME_HTML =
       '</tr>' +
     '</table>' +
   '</div>' +
-  '<div class="col-md-7 blockly read_only_{read_only}" id="{user}_blockly"></div>';
+  '<div class="blockly read_only_{read_only}" id="{user}_blockly"></div>';
 
 Heroes.PUBLISH_HTML =
 '<td><button id="publishButton" class="primary publish" title="Save this program for viewing later.">' +
@@ -855,6 +855,14 @@ Heroes.addGame = function(readOnly, username)
 
   var games_div = document.getElementById('games');
   games_div.appendChild(new_game);
+
+  var blocklyDiv = document.getElementById(username + "_blockly");
+  var onresize = function(e) {
+    var width = window.innerWidth - 630;
+    blocklyDiv.style.width = width + 'px';
+  };
+  window.addEventListener('resize', onresize);
+  onresize();
 
   if (!readOnly)
   {
