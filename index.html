@@ -2,37 +2,63 @@
 <html>
 <head>
 	<link rel="stylesheet" href="index.css"></link>
+	<link rel="stylesheet" href="appengine/common/bootstrap.min.css"></link>
+	<script src="appengine/js/wilddog.js"></script>
 </head>
 <body>
+
+	<div class="topbar clearfix">
+		<div class="logo-container example-element" example-id="logo" example-name="cabinet">
+			<div class="logo-wrapper">
+				<h3 class="logo-text">Classadoo</h3>
+			</div>
+		</div>
+	</div>
+
+
 	<div class="login-wrapper">
 		<h2>
 			Login
 		</h2>
 
-		<div class="region-input">
-			<h4>
-				Select region:
-			</h4>
-			<input class="region-select selected" type="button" value="china">
-			<input class="region-select" type="button" value="us">
+		<div class="row name-input-wrapper">
+			<span class="col-md-2 col-md-offset-4 input-label">Classroom: </span>
+			<select class="col-md-2 classroom-input" id="classroom-input" type="text" placeholder="Select class..."></select>
 		</div>
-
-		<div class="name-input-wrapper">
-			<input class="name-input" id="name-input" type="text" placeholder="first name">
-			<input class="join-button" id="join-button" type="button" value="Join Class">
+		<div class="row name-input-wrapper">
+			<span class="col-md-2 col-md-offset-4 input-label">Name: </span>
+			<input class="col-md-2 name-input" id="name-input" type="text" placeholder="first name">
 		</div>
+		<input class="join-button" id="join-button" type="button" value="Join Class">
 	</div>
 </body>
 </html>
 
 <script>
+window.onload = function()
+{
   var button = document.getElementById("join-button");
-	var name_input = document.getElementById("name-input");
+  var name_input = document.getElementById("name-input");
+	var student_class_input = document.getElementById("classroom-input");
+
+	var ref = new Wilddog("https://blocklypipe.wilddogio.com/classes");
+	ref.on("child_added", function(child)
+	{
+		child = child['key']();
+		if (child)
+		{
+	    var opt = document.createElement('option');
+	    opt.value = child;
+	    opt.innerHTML = child;
+			student_class_input.appendChild(opt);
+		}
+	});
 
   button.addEventListener("click", function() {
-    var name = document.getElementById("name-input").value;
+		var name = name_input.value;
+		var student_class = student_class_input.value;
 
-    if (name) {
+    if (name && student_class) {
       window.location = "appengine/catalog.html?username=" + name;
     }
   });
@@ -43,4 +69,5 @@
 				button.click();
 		}
 	});
+}
 </script>

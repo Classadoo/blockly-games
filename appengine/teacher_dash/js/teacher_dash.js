@@ -171,14 +171,21 @@ Turtle_Collab.init = function() {
 
   BlocklyInterface.init();
 
+
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com");
+
   var clearStudents = document.getElementById('clearStudents');
   clearStudents.addEventListener("click", function()
   {
-    var ref = new Wilddog("https://blocklypipe.wilddogio.com/users");
-    ref['set']({"classadoo_instructor" : {}});
+    ref['child']('users')['set']({"classadoo_instructor" : {}});
   });
 
   initWildDog();
+
+  //
+  // Create a class if it doesn't already exist.
+  //
+  ref['child']['classes']['child'][getClass()]['update']({});
 };
 
 window.addEventListener('load', Turtle_Collab.init);
