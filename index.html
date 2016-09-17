@@ -42,7 +42,7 @@ window.onload = function()
   var student_class_input = document.getElementById("classroom-input");
 
   var ref = new Wilddog("https://blocklypipe.wilddogio.com");
-  ref.child('classes').on("child_added", function(child)
+  ref.child('classrooms').on("child_added", function(child)
   {
     child = child['key']();
     if (child)

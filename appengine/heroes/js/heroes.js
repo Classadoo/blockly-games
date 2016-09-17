@@ -750,55 +750,85 @@ Heroes.init = function() {
   }
 
   var student_dropdown = $('#student_dropdown');
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/");
-  ref['on']("child_added", function(user)
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/");
+  var users = ref['child']("users");
+  var classrooms = ref['child']("classrooms");
+
+  users['child'](getUsername())['on']("value", function(snapshot)
+  {
+    Heroes.classroom = snapshot['val']()['classroom'];
+    classrooms["child"](Heroes.classroom)["on"]("value", function(snapshot)
+    {
+      var room = snapshot['val']();
+      if (room)
+      {
+        var level_allowed = room['level'] || 999;
+
+        //
+        // Now do something crazy - go through all the levels and hide the ones that aren't allowed.
+        //
+
+        var levels = document.getElementsByClassName("level_number");
+        for (var i=0; i < levels.length; i++)
+        {
+          var num = levels[i].id.replace("level", "");
+          num = parseInt(num);
+          if (num > level_allowed)
+          {
+            levels[i].style.display = "none";
+          }
+          else
+          {
+            levels[i].style.display = "inline";
+          }
+        }
+      }
+    })
+  });
+
+  users['on']("child_added", function(user)
   {
     var username = user['key']();
     if (username == getUsername())
     {
-      Heroes.classroom = user['val']()['classroom'];
       return;
     }
 
-    setTimeout(function()
+    var new_classmate = function()
     {
-      var new_classmate = function()
+      student_dropdown.append($('<option></option>')['val'](username)['html'](username));
+      if (username == "Classadoo_instructor")
       {
-        student_dropdown.append($('<option></option>')['val'](username)['html'](username));
-        if (username == "Classadoo_instructor")
-        {
-          student_dropdown['val'](username);
-        }
-
-        //
-        // If this is the first user to show up, trigger the change event manually.
-        //
-        if (!Heroes.remote_user)
-        {
-          Heroes.add_remote_user(username);
-        }
+        student_dropdown['val'](username);
       }
 
-      var correct_class = !Heroes.classroom || user['val']()['classroom'] == Heroes.classroom;
-      if (correct_class)
+      //
+      // If this is the first user to show up, trigger the change event manually.
+      //
+      if (!Heroes.remote_user)
       {
-        new_classmate();
+        Heroes.add_remote_user(username);
       }
-      else
+    }
+
+    var correct_class = !Heroes.classroom || user['val']()['classroom'] == Heroes.classroom;
+    if (correct_class)
+    {
+      new_classmate();
+    }
+    else
+    {
+      ref['child'](username)['on']("value", function(snapshot)
       {
-        ref['child'](username)['on']("value", function(snapshot)
+        if (snapshot['val']())
         {
-          if (snapshot['val']())
+          if (snapshot['val']()['classroom'] == Heroes.classroom)
           {
-            if (snapshot['val']()['classroom'] == Heroes.classroom)
-            {
-              new_classmate();
-            }
+            new_classmate();
           }
-        });
-      }
-    }, 500);
-
+        }
+      });
+    }
   });
 
   student_dropdown['change'](function()
