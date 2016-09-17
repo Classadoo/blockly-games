@@ -62,7 +62,7 @@ var newStudentBlockly = function(username)
        'scrollbars':true,
        'toolbox': toolbox,
        'trashcan': true,
-       'zoom': {'controls': true, 'wheel': true}
+       'zoom': {'controls': true, 'wheel': true, 'maxScale' : 1.3, 'minScale' : 0.7}
      });
 }
 
