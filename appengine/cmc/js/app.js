@@ -49,6 +49,24 @@ function GetURLParameter(sParam)
     }
 }
 
+function get_browser(){
+    var ua=navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || []; 
+    if(/trident/i.test(M[1])){
+        tem=/\brv[ :]+(\d+)/g.exec(ua) || []; 
+        return {name:'IE',version:(tem[1]||'')};
+        }   
+    if(M[1]==='Chrome'){
+        tem=ua.match(/\bOPR\/(\d+)/)
+        if(tem!=null)   {return {name:'Opera', version:tem[1]};}
+        }   
+    M=M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
+    if((tem=ua.match(/version\/(\d+)/i))!=null) {M.splice(1,1,tem[1]);}
+    return {
+      name: M[0],
+      version: M[1]
+    };
+ }
+
 var pageName = document.location.pathname.match(/[^\/]+$/)[0];
 
 console.log(pageName);
@@ -72,6 +90,14 @@ var connHtml = "<div id={id} class='subscriber'><div id='{id}-ctrl' class='camct
                 "<a href='#' id='{id}-camlight' class='camButton'>{name}</a>" +
                "</div><div id='{id}-video' ></div></div>";
 var msgHtml = "<div id='message'>{msg}</div>";
+
+var compmsg_en = "You browser {name}, version {version} does not support our video conference system. In order to use our video conference system, "
+                + "please click following icon to install the latest version Chrome or Firefox. </p> "
+                + "您的浏览器（{name} 版本{version}）不支持我们的视频会议系统。请点击下载安装谷歌浏览器或者火狐浏览器。"
+
+var compmsg_en_too_old = "You browser {name}, version {version} does not support our video conference system. In order to use our video conference system, "
+                + "please click following icon to install the latest version Chrome or Firefox. </p> "
+                + "您的浏览器（{name} 版本{version}）版本太旧，不支持我们的视频会议系统。请点击下载安装最新版的谷歌浏览器或者火狐浏览器。"
 
 $(document).ready(function() {
 
@@ -118,18 +144,34 @@ $(document).ready(function() {
           sessionId = res.sessionId;
           token = res.token;
           if (OT.checkSystemRequirements() == 1) {
+            $('#videos').show();
             initializeSession(function(err){
               if( err != null ){
                 console.log("initialSession failed " + err);
               }
               else{
                 console.log("initialSession succeed ");
+
                 publishStream();
               }
             });
           } else {
             // The client does not support WebRTC.
             // You can display your own message.
+            //OT.upgradeSystemRequirements();
+            var browser=get_browser();
+
+            var uiMsgHtml = "";
+            if(browser.name == "Chrome" || browser.name == "Firefox"){
+              uiMsgHtml = formatString(compmsg_en_too_old, {name:browser.name, version:browser.version});
+            }
+            else{
+              uiMsgHtml = formatString(compmsg_en, {name:browser.name, version:browser.version});
+            }
+
+            $('#compmsg').append(uiMsgHtml);
+            $('#compability').show();
+            $('#videos').hide();
           }
      },
      error:function( jqXHR, textStatus, errorThrown){
@@ -212,6 +254,7 @@ function initializeSession(cb) {
     // if(!isTeacherPage && connData.role != 'teacher'){
     //   return;
     // }
+
     session.subscribe(event.stream, connId + '-video', {
       insertMode: 'append',
       width: '100%',

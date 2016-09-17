@@ -2,7 +2,34 @@ body, html {
     background-color: gray;
     height: 100%;
 }
+#compability{
+    display :none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+margin-top: -9em; /*set to a negative number 1/2 of your height*/
+    margin-left: -15em; /*set to a negative number 1/2 of your width*/
+    border: 1px solid #ccc;
+    background-color: #f3f3f3;
+    width: 480px;
+    height: 320px;
+
+padding: 10px;
+align: center;
+}
+#compmsg{
+    
+    font-family:Arial, Helvetica, sans-serif; 
+font-size:16px;
+margin-bottom: 40px;
+
+}
+#complogo{
+
+}
+
 #videos {
+    display :none;
     position: relative;
     width: 320px;
     height: 240px;
