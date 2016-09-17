@@ -27,7 +27,7 @@ var getSavedGame = function()
 
 var getClass = function()
 {
-  return getQueryParam("class");
+  return getQueryParam("class") || "unknown_class";
 }
 
 ///

@@ -1,10 +1,11 @@
 body {
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', 'Droid Sans Mono', monospace;
+    font-family: 'Varela Round', 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', 'Droid Sans Mono', monospace;
     height: 100%;
+    position: 'relative';
 }
 
 .login-wrapper {
-	margin-top: 15%;
+	margin-top: 10%;
 	text-align: center;
 }
 
@@ -15,8 +16,13 @@ body {
 	font-size: 22px;
 }
 
-.name-input {
+.name-input, .input-label, .classroom-input {
 	font-size: 22px;
+  margin: 5px;
+}
+
+.input-label {
+  text-align: right;
 }
 
 .region-select.selected {
@@ -31,4 +37,16 @@ body {
 
 .region-input {
 	margin-bottom: 15px;
+}
+
+.logo-container {
+	margin-left: 60px;
+	float: left;
+	border: 1px solid white;
+}
+
+.logo {
+	position: relative;
+	bottom: 10px;
+	height: 60px;
 }
