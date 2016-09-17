@@ -69,6 +69,13 @@ var connectSubscriber = function(username, workspace, saved_game)
     var xml = Blockly.Xml.textToDom(code);
     Blockly.Xml.domToWorkspace(xml, workspace);
     workspace.clearUndo();
+
+    //
+    // Someone changed some blocks. Make sure they're visible.
+    //
+
+    workspace.zoomToFit();
+    workspace.zoomCenter(-1);
   });
 
 }
