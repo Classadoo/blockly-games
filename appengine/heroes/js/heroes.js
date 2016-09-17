@@ -31,7 +31,10 @@ goog.require('Heroes.Blocks');
 goog.require('Maze.Blocks');
 goog.require('Turtle_Collab.Blocks');
 goog.require('Heroes.soy');
+
 goog.require('WilddogUtils');
+goog.require('Wilddog');
+goog.require('JQuery');
 
 
 BlocklyGames.NAME = 'heroes';
@@ -583,14 +586,14 @@ var Game = function(username, blockly_workspace)
     //
 
     var keys = {};
-    $(document)['keydown'](function( event ) {
+    $(document).keydown(function( event ) {
       if (self.key_events[event.which])
       {
         event.preventDefault();
       }
       keys[event.which] = true;
     });
-    $(document)['keyup'](function( event ) {
+    $(document).keyup(function( event ) {
       keys[event.which] = false;
     });
 
@@ -743,10 +746,10 @@ Heroes.init = function() {
       return;
     }
     username = username.key();
-    student_dropdown['append']($('<option></option>')['val'](username)['html'](username));
+    student_dropdown.append($('<option></option>').val(username).html(username));
     if (username == "Classadoo_instructor")
     {
-      student_dropdown['val'](username);
+      student_dropdown.val(username);
     }
     //
     // If this is the first user to show up, trigger the change event manually.
@@ -757,9 +760,9 @@ Heroes.init = function() {
     }
   });
 
-  student_dropdown['change'](function()
+  student_dropdown.change(function()
   {
-    Heroes.add_remote_user($(this)['val']());
+    Heroes.add_remote_user($(this).val());
   });
 
 
