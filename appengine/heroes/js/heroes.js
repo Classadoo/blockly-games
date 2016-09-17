@@ -476,7 +476,7 @@ var Game = function(username, blockly_workspace)
   self.move = function(who, x, y, id) {
     var hero = self.heroes[who];
     if (hero.penDown) {
-      self.ctxLines.strokeStyle = hero.colour;
+      self.ctxLines.strokeStyle = hero.colour || getRandomColor();
       self.ctxLines.fillStyle = hero.colour;
       self.ctxLines.lineWidth = hero.width;
       self.ctxLines.beginPath();
@@ -705,7 +705,7 @@ Heroes.init = function() {
   document.body.innerHTML = Heroes.soy.start({}, null,
       {lang: BlocklyGames.LANG,
        level: BlocklyGames.LEVEL,
-       maxLevel: 4,
+       maxLevel: 5,
        html: BlocklyGames.IS_HTML,
        suffix: "&username="+getUsername()});
 
