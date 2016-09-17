@@ -870,8 +870,8 @@ Heroes.addGame = function(readOnly, username)
   var workspace = Blockly.inject(username + '_blockly',
      {'media': 'third-party/blockly/media/',
       'toolbox': readOnly ? null : toolbox,
-      'readOnly' : false,
-      'zoom': {'controls': true, 'wheel': false}});
+      'readOnly' : readOnly,
+      'zoom': {'controls': !readOnly, 'wheel': false}});
   workspace.traceOn(true);
   workspace.loadAudio_(['heroes/win.mp3', 'heroes/win.ogg'], 'win');
 
