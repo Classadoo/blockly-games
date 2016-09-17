@@ -32,24 +32,24 @@ Catalog.init = function()
 
   var project_list = document.getElementById("project_list");
 
-
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/");
-  ref.child(username).child('snapshots').on("child_added", function(project)
+  ref['child'](getUsername())['child']('snapshots')['on']("child_added", function(project)
   {
+    project = project['key']();
     var li = document.createElement("li");
     var new_project = document.createElement("a");
-    new_project.innerHTML = project.key();
+    new_project.innerHTML = project;
 
-    if (project.key() == "turtle")
+    if (project == "turtle")
     {
-      new_project.href = "/appengine/turtle_collab.html?level=10&username=" + getUsername() + "&saved=" + encodeURIComponent(project.key());
+      new_project.href = "/appengine/turtle_collab.html?level=10&username=" + getUsername() + "&saved=" + encodeURIComponent(project);
     }
-    else if (project.key() == "maze") {
+    else if (project == "maze") {
       return;
     }
     else
     {
-      new_project.href = "/appengine/heroes.html?level=4&username=" + getUsername() + "&saved=" + encodeURIComponent(project.key());
+      new_project.href = "/appengine/heroes.html?level=4&username=" + getUsername() + "&saved=" + encodeURIComponent(project);
     }
     li.appendChild(new_project);
     project_list.appendChild(li);
