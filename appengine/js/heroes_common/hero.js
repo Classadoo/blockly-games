@@ -80,7 +80,7 @@ chars["turtle"].src = "heroes/turtle.png";
 var chars_per_line = 40;
 
 
-function Hero(name, char, radius, x, y, line_context, display_context, sprite_ide, game) {
+function Hero(name, char, radius, x, y, line_context, display_context, sprite_ide, game, image) {
 
 var self = this;
 self.ctxLines = line_context;
@@ -107,7 +107,17 @@ self.colour = null;
 self.width = 5;
 
 self.char = char;
-self.image = chars[char] || chars["andrew"];
+
+if (image)
+{
+  self.image = new Image();
+  self.image.src = image;
+}
+else
+{
+  self.image = chars[char] || chars["andrew"];
+}
+
 self.radius = radius;
 
 self.collision_events = {};

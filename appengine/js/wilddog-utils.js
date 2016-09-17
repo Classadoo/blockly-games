@@ -63,12 +63,12 @@ self.publishNewGame = function(username)
   return key;
 }
 
-self.publishNewHero = function(game_id, name, type, index, x, y)
+self.publishNewHero = function(game_id, name, type, index, x, y, image)
 {
   var hero_ref = self.ref['child']("heroes").push();
   hero_ref['update']({"x" : x, "y" : y});
 
-  hero_object = {"type": type, "name": name, "index": index};
+  hero_object = {"type": type, "name": name, "index": index, "image" : image};
 
   self.ref['child']("games")['child'](game_id)['child']("heroes")['child'](hero_ref['key']())['update'](hero_object);
 }
@@ -129,6 +129,7 @@ self.connectSubscriberGame = function(game_id, ide)
     var id = child['key']();
     var name = child['val']()['name'];
     var type = child['val']()['type'];
+    var image = child['val']()['image'];
 
     var tab;
     if (name.toLowerCase() == "world")
@@ -137,7 +138,7 @@ self.connectSubscriberGame = function(game_id, ide)
     }
     else
     {
-      tab = ide.new_hero_tab(name, type, id);
+      tab = ide.new_hero_tab(name, type, id, image);
     }
     self.connectSubscriberWorkspace(id, tab.workspace);
 

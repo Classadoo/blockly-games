@@ -40,17 +40,23 @@ self.starting_y = Heroes.HEIGHT/2;
 //
 // Setup the tab for creating a new hero.
 //
-var character_types = ["lion", "eagle", "human", "smiley", "king", "knight", "dancer", "turtle"];
+var character_types = ["lion", "eagle", "human", "smiley", "king", "knight", "dancer", "turtle", "custom"];
 character_types.forEach(function(animal)
 {
   $("#" + username + "-hero-type")['append']($("<option></option>",
       {"value": animal, "text": animal}));
+  $("#" + username + "-hero-type")['on']('change', function() {
+    window.lc.clear();
+    window.lc.saveShape(LC.createShape('Image', {"image": chars[this.value]}))
+  });
+  
 });
 
 $("#" + self.username + "-submit-hero")['click'](function()
 {
   var name = $("#" + username + "-hero-name")['val']();
   var type = $("#" + username + "-hero-type")['val']();
+  var image = window.lc.getImage().toDataURL("image/png");
 
   name = name.replace(/[^a-zA-Z0-9]+/g, "");
 
@@ -65,7 +71,7 @@ $("#" + self.username + "-submit-hero")['click'](function()
     console.log("This hero already exists: ", name);
     return;
   }
-  self.publishHero(name, type);
+  self.publishHero(name, type, image);
 })
 // If the user hits enter, prevent the POST event and just add a hero.
 $('.tab-pane')['keydown'](function(event){
@@ -75,10 +81,10 @@ $('.tab-pane')['keydown'](function(event){
   }
 });
 
-self.publishHero = function(name, type)
+self.publishHero = function(name, type, image)
 {
   wilddog.publishNewHero(game.id, name, type, Object.keys(self.tabs).length,
-    self.starting_x, self.starting_y);
+    self.starting_x, self.starting_y, image);
 }
 
 self.cycle_starting_locations = function()
@@ -93,7 +99,7 @@ self.cycle_starting_locations = function()
 //
 // When a new hero is created.
 //
-self.new_hero_tab = function(new_tab_name, type, hero_id)
+self.new_hero_tab = function(new_tab_name, type, hero_id, image)
 {
   self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name, type, hero_id, self);
 
@@ -122,7 +128,7 @@ self.new_hero_tab = function(new_tab_name, type, hero_id)
 
   if (self.game)
   {
-    self.game.addHero(new_tab_name, type, self.tabs[new_tab_name], self.starting_x, self.starting_y);
+    self.game.addHero(new_tab_name, type, self.tabs[new_tab_name], self.starting_x, self.starting_y, image);
     self.cycle_starting_locations();
 
   }

@@ -208,10 +208,10 @@ self.setup_game_world = function(ide_tab)
   self.reset();
 }
 
-self.addHero = function(name, type, ide_tab, x, y) {
+self.addHero = function(name, type, ide_tab, x, y, image) {
 
   self.heroes[name] = new Hero(name, type, hero_radius, x, y, self.ctxLines,
-    self.ctxDisplay, ide_tab, self);
+    self.ctxDisplay, ide_tab, self, image);
 
   //
   // Draw her.
