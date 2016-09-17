@@ -142,14 +142,34 @@ var initStudent = function(username)
 
 /// Initialize listener for new students and publisher for teacher updates.
 var initWildDog = function(){
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/");
+
+  var classroom = getQueryParam("classroom");
   var new_student_callback = function(user) {
-    if (user['key']() != "classadoo_instructor")
+    var username = user['key']();
+    if (username != "classadoo_instructor")
     {
-      initStudent(user['key']());
+      var correct_class = !classroom || user['val']()['classroom'] == classroom;
+      if (correct_class)
+      {
+        initStudent(username);
+      }
+      else
+      {
+      ref['child'](username)['on']("value", function(snapshot)
+      {
+        if (snapshot['val']())
+        {
+          if (snapshot['val']()['classroom'] == classroom)
+          {
+            initStudent(username);
+          }
+        }
+      })
+      }
     }
   }
 
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/");
   ref['on']("child_added", new_student_callback);
 }
 
@@ -185,7 +205,11 @@ Turtle_Collab.init = function() {
   //
   // Create a class if it doesn't already exist.
   //
-  ref['child']['classes']['child'][getClass()]['update']({});
+  var classroom = getQueryParam("classroom");
+  if (classroom)
+  {
+    ref['child']('classes')['child'](classroom)['update']({});
+  }
 };
 
 window.addEventListener('load', Turtle_Collab.init);

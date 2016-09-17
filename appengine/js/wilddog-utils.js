@@ -25,11 +25,6 @@ var getSavedGame = function()
   return getQueryParam("saved");
 }
 
-var getClass = function()
-{
-  return getQueryParam("class") || "unknown_class";
-}
-
 ///
 /// If we're using wilddog, we should send our errors to the teacher.
 ///

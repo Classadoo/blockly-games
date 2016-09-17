@@ -1,36 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<link rel="stylesheet" href="index.css"></link>
-	<link rel="stylesheet" href="appengine/common/bootstrap.min.css"></link>
-	<script src="appengine/js/wilddog.js"></script>
+  <link rel="stylesheet" href="index.css"></link>
+  <link rel="stylesheet" href="appengine/common/bootstrap.min.css"></link>
+  <script src="appengine/js/wilddog.js"></script>
 </head>
 <body>
 
-	<div class="topbar clearfix">
-		<div class="logo-container example-element" example-id="logo" example-name="cabinet">
-			<div class="logo-wrapper">
-				<h3 class="logo-text">Classadoo</h3>
-			</div>
-		</div>
-	</div>
+  <div class="topbar clearfix">
+    <div class="logo-container example-element" example-id="logo" example-name="cabinet">
+      <div class="logo-wrapper">
+        <h3 class="logo-text">Classadoo</h3>
+      </div>
+    </div>
+  </div>
 
 
-	<div class="login-wrapper">
-		<h2>
-			Login
-		</h2>
+  <div class="login-wrapper">
+    <h2>
+      Login
+    </h2>
 
-		<div class="row name-input-wrapper">
-			<span class="col-md-2 col-md-offset-4 input-label">Classroom: </span>
-			<select class="col-md-2 classroom-input" id="classroom-input" type="text" placeholder="Select class..."></select>
-		</div>
-		<div class="row name-input-wrapper">
-			<span class="col-md-2 col-md-offset-4 input-label">Name: </span>
-			<input class="col-md-2 name-input" id="name-input" type="text" placeholder="first name">
-		</div>
-		<input class="join-button" id="join-button" type="button" value="Join Class">
-	</div>
+    <div class="row name-input-wrapper">
+      <span class="col-md-2 col-md-offset-4 input-label">Classroom: </span>
+      <select class="col-md-2 classroom-input" id="classroom-input" type="text" placeholder="Select class..."></select>
+    </div>
+    <div class="row name-input-wrapper">
+      <span class="col-md-2 col-md-offset-4 input-label">Name: </span>
+      <input class="col-md-2 name-input" id="name-input" type="text" placeholder="first name">
+    </div>
+    <input class="join-button" id="join-button" type="button" value="Join Class">
+  </div>
 </body>
 </html>
 
@@ -39,35 +39,39 @@ window.onload = function()
 {
   var button = document.getElementById("join-button");
   var name_input = document.getElementById("name-input");
-	var student_class_input = document.getElementById("classroom-input");
+  var student_class_input = document.getElementById("classroom-input");
 
-	var ref = new Wilddog("https://blocklypipe.wilddogio.com/classes");
-	ref.on("child_added", function(child)
-	{
-		child = child['key']();
-		if (child)
-		{
-	    var opt = document.createElement('option');
-	    opt.value = child;
-	    opt.innerHTML = child;
-			student_class_input.appendChild(opt);
-		}
-	});
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com");
+  ref.child('classes').on("child_added", function(child)
+  {
+    child = child['key']();
+    if (child)
+    {
+      var opt = document.createElement('option');
+      opt.value = child;
+      opt.innerHTML = child;
+      student_class_input.appendChild(opt);
+    }
+  });
 
   button.addEventListener("click", function() {
-		var name = name_input.value;
-		var student_class = student_class_input.value;
+    var name = name_input.value;
+    name = name.toLowerCase();
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    var student_class = student_class_input.value;
+
+    ref.child('users').child(name).update({classroom: student_class});
 
     if (name && student_class) {
       window.location = "appengine/catalog.html?username=" + name;
     }
   });
 
-	name_input.addEventListener("keyup", function(event) {
-		event.preventDefault();
-		if (event.keyCode == 13) {
-				button.click();
-		}
-	});
+  name_input.addEventListener("keyup", function(event) {
+    event.preventDefault();
+    if (event.keyCode == 13) {
+        button.click();
+    }
+  });
 }
 </script>
