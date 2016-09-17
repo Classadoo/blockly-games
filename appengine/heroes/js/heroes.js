@@ -756,6 +756,17 @@ Heroes.init = function() {
 
   users['child'](getUsername())['on']("value", function(snapshot)
   {
+    //
+    // Hide levels if we are in a class.
+    //
+    if (!snapshot['val']())
+    {
+      return;
+    }
+    if (!snapshot['val']()['classroom'])
+    {
+      return;
+    }
     Heroes.classroom = snapshot['val']()['classroom'];
     classrooms["child"](Heroes.classroom)["on"]("value", function(snapshot)
     {
@@ -818,7 +829,7 @@ Heroes.init = function() {
     }
     else
     {
-      ref['child'](username)['on']("value", function(snapshot)
+      users['child'](username)['on']("value", function(snapshot)
       {
         if (snapshot['val']())
         {
