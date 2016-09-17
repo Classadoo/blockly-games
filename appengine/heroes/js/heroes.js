@@ -33,8 +33,6 @@ goog.require('Turtle_Collab.Blocks');
 goog.require('Heroes.soy');
 
 goog.require('WilddogUtils');
-goog.require('Wilddog');
-goog.require('JQuery');
 
 
 BlocklyGames.NAME = 'heroes';
@@ -164,7 +162,10 @@ var Game = function(username, blockly_workspace)
     // Kill the game event loop.
     clearInterval(self.eventLoop);
 
-    set_code_running(getUsername(), self.username, false);
+    var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername() + "/code_running");
+    var code_obj = {};
+    code_obj[self.username] = false;
+    ref['update'](code_obj);
   };
 
   /**
@@ -270,7 +271,11 @@ var Game = function(username, blockly_workspace)
     resetButton.style.display = 'inline';
     document.getElementById(self.username + '_spinner').style.visibility = 'visible';
     self.execute();
-    set_code_running(getUsername(), self.username, true);
+
+    var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername() + "/code_running");
+    var code_obj = {};
+    code_obj[self.username] = true;
+    ref['update'](code_obj);
   };
 
   /**
@@ -586,14 +591,14 @@ var Game = function(username, blockly_workspace)
     //
 
     var keys = {};
-    $(document).keydown(function( event ) {
+    $(document)['keydown'](function( event ) {
       if (self.key_events[event.which])
       {
         event.preventDefault();
       }
       keys[event.which] = true;
     });
-    $(document).keyup(function( event ) {
+    $(document)['keyup'](function( event ) {
       keys[event.which] = false;
     });
 
@@ -731,25 +736,32 @@ Heroes.init = function() {
       var project_name = prompt("Choose a project name", getUsername() + "'s game");
       if (project_name)
       {
-        update_snapshot(getUsername(), Blockly.Xml.domToText(
-          Blockly.Xml.workspaceToDom(student_workspace)), project_name);
+
+        snapshot_key = snapshot_key || "Untitled Heroes";
+        var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername() + "/snapshots");
+
+        var snapshot_obj = {};
+        snapshot_obj[snapshot_key] = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(student_workspace));
+        ref['update'](snapshot_obj);
+
       }
     };
     BlocklyGames.bindClick('publishButton', publish);
   }
 
   var student_dropdown = $('#student_dropdown');
-  add_new_student_callback(function(username)
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/");
+  ref['on']("child_added", function(username)
   {
-    if (username.key() == getUsername())
+    if (username['key']() == getUsername())
     {
       return;
     }
-    username = username.key();
-    student_dropdown.append($('<option></option>').val(username).html(username));
+    username = username['key']();
+    student_dropdown.append($('<option></option>')['val'](username)['html'](username));
     if (username == "Classadoo_instructor")
     {
-      student_dropdown.val(username);
+      student_dropdown['val'](username);
     }
     //
     // If this is the first user to show up, trigger the change event manually.
@@ -760,9 +772,9 @@ Heroes.init = function() {
     }
   });
 
-  student_dropdown.change(function()
+  student_dropdown['change'](function()
   {
-    Heroes.add_remote_user($(this).val());
+    Heroes.add_remote_user($(this)['val']());
   });
 
 

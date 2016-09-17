@@ -33,6 +33,7 @@ goog.require('Turtle_Collab.Blocks');
 goog.require('Heroes.Blocks');
 goog.require('Maze.Blocks');
 goog.require('Teacher_Dash.soy');
+
 goog.require('WilddogUtils');
 
 var newStudentBlockly = function(username)
@@ -50,7 +51,8 @@ var newStudentBlockly = function(username)
 
   document.getElementById(username + '_clear').addEventListener("click", function()
   {
-    clear_one_user(username);
+    var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username);
+    ref['remove']();
   });
 
   var toolbox = document.getElementById('toolbox');
@@ -68,6 +70,7 @@ var received_snapshots = {};
 /// Initialize a two-way collaborative canvas with a new student.
 var initStudent = function(username)
 {
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username);
   //
   // Inject a new blockly canvas into the list of canvases.
   //
@@ -87,33 +90,44 @@ var initStudent = function(username)
 
   connectSubscriber(username, workspace, getSavedGame());
 
-  add_user_remove_callback(username, function()
+  // Watch out for the user being deleted.
+  ref['parent']()['on']('child_removed', function(old_snapshot)
   {
+    if (old_snapshot['key']() == username)
+    {
       workspace.clear();
       var new_student = document.getElementById(username + "_container");
       new_student.style.display = "none";
+    }
   });
 
-  add_user_level_callback(username, function(level)
+
+  ref['child']("level")['on']("value",  function(level)
   {
     var level_div = document.getElementById(username + "_level");
     if (level_div)
     {
-      level_div.innerHTML = "Level " + level;
+      level_div.innerHTML = "Level " + level['val']();
     }
   });
 
-  add_error_callback(username, function(err_string)
+  ref['child']("error")['on']("value",  function(err_string)
   {
     var error_div = document.getElementById(username + "_error");
     if (error_div)
     {
-      error_div.innerHTML = err_string ? "ERROR: " + err_string : "";
+      error_div.innerHTML = err_string['val']() ? "ERROR: " + err_string : "";
     }
   });
 
   var code_running_div = document.getElementById(username + "_code_running");
-  add_code_running_callback(username, function(canvases){
+  ref['child']("code_running")['on']("value",  function(canvases)
+  {
+    canvases = canvases['val']();
+    if (!canvases)
+    {
+      return;
+    }
     code_running_div.innerHTML = "";
     for (var canvas in canvases)
     {
@@ -128,17 +142,15 @@ var initStudent = function(username)
 
 /// Initialize listener for new students and publisher for teacher updates.
 var initWildDog = function(){
-
-  var user_name = "classadoo_instructor";
-
   var new_student_callback = function(user) {
-    if (user.key() != user_name)
+    if (user['key']() != "classadoo_instructor")
     {
-      initStudent(user.key());
+      initStudent(user['key']());
     }
   }
 
-  add_new_student_callback(new_student_callback);
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/");
+  ref['on']("child_added", new_student_callback);
 }
 
 //myao end of the code to enable wilddog.
@@ -162,7 +174,8 @@ Turtle_Collab.init = function() {
   var clearStudents = document.getElementById('clearStudents');
   clearStudents.addEventListener("click", function()
   {
-    clear_users();
+    var ref = new Wilddog("https://blocklypipe.wilddogio.com/users");
+    ref['set']({"classadoo_instructor" : {}});
   });
 
   initWildDog();

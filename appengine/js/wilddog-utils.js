@@ -1,5 +1,6 @@
 
 goog.provide('WilddogUtils');
+
 goog.require('BlocklyGames');
 
 var getQueryParam = function(param)
@@ -24,11 +25,37 @@ var getSavedGame = function()
   return getQueryParam("saved");
 }
 
+///
+/// If we're using wilddog, we should send our errors to the teacher.
+///
+var last_err_string = 0;
+window.onerror = function(errorMsg, url, lineNumber)
+{
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername());
+
+  var err_string = errorMsg + " - " + url + " - " + lineNumber;
+  if (err_string != last_err_string)
+  {
+    ref['update']({"error" : err_string});
+    last_err_string = err_string;
+  }
+}
+
 var received_snapshots = {};
 var sent_snapshots = {};
 var connectSubscriber = function(username, workspace, saved_game)
 {
-  add_snapshot_callback(username, function(code) {
+
+  var snapshot_key = saved_game || "Untitled Heroes"
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/snapshots");
+
+  ref['child'](snapshot_key)['on']("value", function(code) {
+    code = code['val']();
+    if (!code)
+    {
+      return;
+    }
+
     //
     // Ignore updates from our own transmission..
     //
@@ -42,7 +69,8 @@ var connectSubscriber = function(username, workspace, saved_game)
     var xml = Blockly.Xml.textToDom(code);
     Blockly.Xml.domToWorkspace(xml, workspace);
     workspace.clearUndo();
-  }, saved_game);
+  });
+
 }
 
 var connectPublisher = function(username, workspace, saved_game)
@@ -74,7 +102,14 @@ var connectPublisher = function(username, workspace, saved_game)
       return;
     }
     sent_snapshots[username] = current_code;
-    update_snapshot(username, current_code, saved_game);
+
+    snapshot_key = saved_game || "Untitled Heroes";
+    var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/snapshots");
+
+    var snapshot_obj = {};
+    snapshot_obj[snapshot_key] = current_code;
+    ref['update'](snapshot_obj);
+
     return;
   });
 }
@@ -83,12 +118,13 @@ var initStudentWilddog = function(game, level, workspace, saved_game){
   //
   // Give us a fresh start.
   //
-  clear_error(getUsername());
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername());
+  ref['update']({error: ""});
 
   //
   // Send current level.
   //
-  update_level(getUsername(), game + "-" + level);
+  ref['update']({"level": game + "-" + level});
 
   //
   // Send all our blockly changes.

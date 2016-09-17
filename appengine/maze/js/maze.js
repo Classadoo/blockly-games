@@ -547,7 +547,10 @@ Maze.init = function() {
        'rtl': rtl,
        'zoom': {'startScale': scale}});
 
-  clear_one_snapshot(getUsername(), "maze");
+
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername() + "/snapshots/maze");
+  ref.remove();
+
   initStudentWilddog("maze", BlocklyGames.LEVEL, BlocklyGames.workspace, "maze");
   connectSubscriber("Classadoo_instructor", BlocklyGames.teacher_workspace, "maze");
 
