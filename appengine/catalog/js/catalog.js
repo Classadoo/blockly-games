@@ -31,7 +31,10 @@ Catalog.init = function()
       {username: getUsername()});
 
   var project_list = document.getElementById("project_list");
-  add_new_project_callback(getUsername(), function(project)
+
+
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/");
+  ref.child(username).child('snapshots').on("child_added", function(project)
   {
     var li = document.createElement("li");
     var new_project = document.createElement("a");
