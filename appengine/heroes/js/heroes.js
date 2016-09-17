@@ -879,7 +879,8 @@ Heroes.addGame = function(readOnly, username)
      {'media': 'third-party/blockly/media/',
       'toolbox': readOnly ? null : toolbox,
       'readOnly' : readOnly,
-      'zoom': {'controls': !readOnly, 'wheel': false, 'maxScale' : 1.3, 'minScale' : 0.7}});
+      'scrollbars':true,
+      'zoom': {'controls': true, 'wheel': false, 'maxScale' : 1.3, 'minScale' : 0.7}});
   workspace.traceOn(true);
   workspace.loadAudio_(['heroes/win.mp3', 'heroes/win.ogg'], 'win');
 
