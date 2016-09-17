@@ -569,50 +569,6 @@
         </value>
       </block>
 
-      {if $ij.level >= 2}
-      <block type="heroes_add_item">
-
-        {if $ij.level < 4}
-          <value name="X">
-            <block type="math_random_int">
-            <value name="FROM">
-              <block type="math_number">
-                <field name="NUM">0</field>
-              </block>
-            </value>
-            <value name="TO">
-              <block type="math_number">
-                <field name="NUM">600</field>
-              </block>
-            </value>
-            </block>
-          </value>
-          <value name="VY">
-            <block type="math_random_int">
-            <value name="FROM">
-              <block type="math_number">
-                <field name="NUM">1</field>
-              </block>
-            </value>
-            <value name="TO">
-              <block type="math_number">
-                <field name="NUM">5</field>
-              </block>
-            </value>
-            </block>
-          </value>
-
-          <value name="X">
-            <block type="math_number"><field name="NUM">0</field></block>
-          </value>
-          <value name="Y">
-            <block type="math_number"><field name="NUM">0</field></block>
-          </value>
-
-        {/if}
-      </block>
-      {/if}
-
       {if $ij.level >= 5}
       <block type="heroes_speak">
         <value name="TEXT">
@@ -632,21 +588,20 @@
   {if $ij.level >= 3}
   <category name="{msg meaning="Heroes.catItems" desc="IBID"}Events{/msg}">
     {if $ij.level == 3}
-    <block type="heroes_on_arrow">
-      <value name="DO0">
-        <block type="heroes_move">
-          <value name="VALUE">
-            <block type="math_number">
-              <field name="NUM">3</field>
-            </block>
-          </value>
-        </block>
-      </value>
-    </block>
+      <block type="heroes_on_arrow">
+        <value name="DO0">
+          <block type="heroes_move">
+            <value name="VALUE">
+              <block type="math_number">
+                <field name="NUM">3</field>
+              </block>
+            </value>
+          </block>
+        </value>
+      </block>
     {else}
-    <block type="heroes_on_arrow">
-    <block type="heroes_on_collision"></block>
-    </block>
+      <block type="heroes_on_arrow"></block>
+      <block type="heroes_on_collision"></block>
     {/if}
   </category>
   {/if}
@@ -680,28 +635,74 @@
   </category>
 
 
-  {if $ij.level >= 4}
-  <category name="{msg meaning="Heroes.game" desc="IBID"}Game{/msg}">
-    <block type="heroes_add_points">
-      {if $ij.level == 4}
-        <value name="VALUE">
-          <block type="math_number">
-            <field name="NUM">10</field>
-          </block>
-        </value>
-      {/if}
-    </block>
+  {if $ij.level >= 2}
+    <category name="{msg meaning="Heroes.game" desc="IBID"}Game{/msg}">
 
+      <block type="heroes_add_item">
 
-    {if $ij.level >= 5}
-      <block type="heroes_set_background"></block>
-      <block type="heroes_set_title">
-        <value name="TITLE">
-          <block type="text"></block>
-        </value>
+        {if $ij.level < 4}
+          <value name="X">
+            <block type="math_random_int">
+            <value name="FROM">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <value name="TO">
+              <block type="math_number">
+                <field name="NUM">600</field>
+              </block>
+            </value>
+            </block>
+          </value>
+
+          <value name="VY">
+            <block type="math_random_int">
+            <value name="FROM">
+              <block type="math_number">
+                <field name="NUM">1</field>
+              </block>
+            </value>
+            <value name="TO">
+              <block type="math_number">
+                <field name="NUM">5</field>
+              </block>
+            </value>
+            </block>
+          </value>
+
+          <value name="VX">
+            <block type="math_number"><field name="NUM">0</field></block>
+          </value>
+
+          <value name="Y">
+            <block type="math_number"><field name="NUM">0</field></block>
+          </value>
+        {/if}
       </block>
+
+      {if $ij.level >= 4}
+      <block type="heroes_add_points">
+        {if $ij.level == 4}
+          <value name="VALUE">
+            <block type="math_number">
+              <field name="NUM">10</field>
+            </block>
+          </value>
+        {/if}
+      </block>
+
+
+      {if $ij.level >= 5}
+        <block type="heroes_set_background"></block>
+        <block type="heroes_set_title">
+          <value name="TITLE">
+            <block type="text"></block>
+          </value>
+        </block>
+      {/if}
     {/if}
-  </category>
+    </category>
   {/if}
 
 {/template}
