@@ -751,25 +751,54 @@ Heroes.init = function() {
 
   var student_dropdown = $('#student_dropdown');
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/");
-  ref['on']("child_added", function(username)
+  ref['on']("child_added", function(user)
   {
-    if (username['key']() == getUsername())
+    var username = user['key']();
+    if (username == getUsername())
     {
+      Heroes.classroom = user['val']()['classroom'];
       return;
     }
-    username = username['key']();
-    student_dropdown.append($('<option></option>')['val'](username)['html'](username));
-    if (username == "Classadoo_instructor")
+
+    setTimeout(function()
     {
-      student_dropdown['val'](username);
-    }
-    //
-    // If this is the first user to show up, trigger the change event manually.
-    //
-    if (!Heroes.remote_user)
-    {
-      Heroes.add_remote_user(username);
-    }
+      var new_classmate = function()
+      {
+        student_dropdown.append($('<option></option>')['val'](username)['html'](username));
+        if (username == "Classadoo_instructor")
+        {
+          student_dropdown['val'](username);
+        }
+
+        //
+        // If this is the first user to show up, trigger the change event manually.
+        //
+        if (!Heroes.remote_user)
+        {
+          Heroes.add_remote_user(username);
+        }
+      }
+
+      var correct_class = !Heroes.classroom || user['val']()['classroom'] == Heroes.classroom;
+      if (correct_class)
+      {
+        new_classmate();
+      }
+      else
+      {
+        ref['child'](username)['on']("value", function(snapshot)
+        {
+          if (snapshot['val']())
+          {
+            if (snapshot['val']()['classroom'] == Heroes.classroom)
+            {
+              new_classmate();
+            }
+          }
+        });
+      }
+    }, 500);
+
   });
 
   student_dropdown['change'](function()
