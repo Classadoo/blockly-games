@@ -154,13 +154,13 @@ Turtle.init = function() {
        'toolbox': toolbox,
        'trashcan': true,
        'zoom': BlocklyGames.LEVEL == BlocklyGames.MAX_LEVEL ?
-           {'controls': true, 'wheel': true} : null});
+           {'controls': true, 'wheel': true, 'maxScale' : 1.3, 'minScale' : 0.7} : null});
    BlocklyGames.teacher_workspace = Blockly.inject('teacher_blockly',
        {'media': 'third-party/blockly/media/',
         'readOnly' : true,
         'rtl': rtl,
         'zoom': BlocklyGames.LEVEL == BlocklyGames.MAX_LEVEL ?
-            {'controls': true, 'wheel': true} : null});
+            {'controls': true, 'wheel': true, 'maxScale' : 1.3, 'minScale' : 0.7} : null});
 
   initStudentWilddog("turtle", BlocklyGames.LEVEL, BlocklyGames.workspace, "turtle");
   connectSubscriber("Classadoo_instructor", BlocklyGames.teacher_workspace, "turtle");
