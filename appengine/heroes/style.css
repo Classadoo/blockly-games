@@ -29,7 +29,14 @@ button.publish {
   bottom: 11px;
 }
 
-#visualization {
+.blockly, .visualization {
+  position: relative;
+  min-height: 1px;
+  padding-right: 15px;
+  padding-left: 15px;
+  float: left;
+}
+.visualization {
   width: 600px !important;
 }
 
