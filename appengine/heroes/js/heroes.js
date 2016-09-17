@@ -444,11 +444,7 @@ var Game = function(username, blockly_workspace)
       if (m) {
         id = m[1];
       }
-      var block = self.workspace.getBlockById(id);
-      if (block)
-      {
-        block.select();
-      }
+      this.workspace.highlightBlock(id);
       var stepSpeed = 1000 * Math.pow(1 - Heroes.speedSlider.getValue(), 2);
       self.pause = Math.max(1, stepSpeed);
     }
