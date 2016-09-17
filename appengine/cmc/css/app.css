@@ -2,7 +2,7 @@ body, html {
     background-color: gray;
     height: 100%;
 }
-#compability{
+#compability, #messagebox{
     display :none;
   position: fixed;
   top: 50%;
@@ -53,7 +53,7 @@ margin-bottom: 40px;
     border: 3px solid white;
     border-radius: 3px;
 }
-#mysignal, #mytext, #messagebox{
+#mysignal, #mytext{
     position: relative;
     width: 120px;
     height: 15px;

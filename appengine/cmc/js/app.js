@@ -103,13 +103,13 @@ $(document).ready(function() {
 
   var meetingID = GetURLParameter("meetingID");
   if ( meetingID === "undefined" || meetingID == null) {
-    uiDisplayMessage("Missing meetingID, please add meetingID");
+    uiDisplayMessage("Missing meetingID in your url, please add meetingID in the url. Please ask your teacher for help.");
     return;
   } 
 
   var name = GetURLParameter("name");
   if ( name === "undefined" || name == null) {
-    uiDisplayMessage("Missing user name, please add name");
+    uiDisplayMessage("Missing user name in your url, please add name in the url. Please ask your teacher for help.");
     return;
   }
   $("#camlight").html(name);
@@ -538,6 +538,7 @@ function uiSendCmd(){
 }
 
 function uiDisplayMessage(msg){
+  $('#messagebox').show();
   var uiHtml = formatString(msgHtml, {"msg":msg});
   $('#messagebox').append(uiHtml);
   //$('#messagebox').text( msg );
