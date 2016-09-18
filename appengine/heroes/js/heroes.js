@@ -445,7 +445,7 @@ var Game = function(username, blockly_workspace)
         id = m[1];
       }
       this.workspace.highlightBlock(id);
-      var stepSpeed = 1000 * Math.pow(1 - Heroes.speedSlider.getValue(), 2);
+      var stepSpeed = 600 * Math.pow(1 - Heroes.speedSlider.getValue(), 2);
       self.pause = Math.max(1, stepSpeed);
     }
   };
