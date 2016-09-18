@@ -887,7 +887,7 @@ Heroes.addGame = function(readOnly, username)
       'toolbox': readOnly ? null : toolbox,
       'readOnly' : readOnly,
       'scrollbars':true,
-      'zoom': {'controls': true, 'wheel': false, 'maxScale' : 1.3, 'minScale' : 0.7}});
+      'zoom': {'controls': true, 'wheel': false, 'maxScale' : 1.0, 'minScale' : 0.7}});
   workspace.traceOn(true);
   workspace.loadAudio_(['heroes/win.mp3', 'heroes/win.ogg'], 'win');
 
