@@ -117,6 +117,9 @@ var connectPublisher = function(username, workspace, saved_game)
     snapshot_obj[snapshot_key] = current_code;
     ref['update'](snapshot_obj);
 
+    workspace.zoomToFit();
+    workspace.zoomCenter(-1);
+
     return;
   });
 }
