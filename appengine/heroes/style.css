@@ -29,6 +29,10 @@ button.publish {
   bottom: 11px;
 }
 
+#visualization {
+  width: 600px !important;
+}
+
 .read_only_true .blocklySvg {
   background-color: #666 !important;
 }
