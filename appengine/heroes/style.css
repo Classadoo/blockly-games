@@ -10,8 +10,11 @@ button.publish {
   border-color: #0b9d09 !important;
 }
 
-.blockly {
+.blockly, .workspace {
   height: 400px;
+}
+.blockly {
+  margin-top: -42px;
 }
 .username {
   padding-left:20px;
@@ -33,11 +36,14 @@ button.publish {
   position: relative;
   min-height: 1px;
   padding-right: 15px;
-  padding-left: 15px;
   float: left;
 }
 .visualization {
   width: 600px !important;
+  padding-left: 20px;
+}
+#new_hero_button {
+  font-weight: bold;
 }
 
 .read_only_true .blocklySvg {

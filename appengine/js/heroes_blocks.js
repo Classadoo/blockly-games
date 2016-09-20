@@ -85,7 +85,6 @@ Blockly.Blocks['heroes_move'] = {
     this.setColour(Heroes.Blocks.HUE);
     this.appendValueInput('VALUE')
         .setCheck('Number')
-        .appendField(new Blockly.FieldDropdown(Heroes.HERO_NAMES), 'HERO')
         .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR');
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -98,7 +97,7 @@ Blockly.JavaScript['heroes_move'] = function(block) {
   var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
       Blockly.JavaScript.ORDER_NONE) || '0';
   return block.getFieldValue('DIR') +
-      '(\'' + block.getFieldValue('HERO') + '\','+ value + ', \'block_id_' + block.id + '\');\n';
+      '('+ value + ', \'block_id_' + block.id + '\');\n';
 };
 
 Blockly.Blocks['heroes_add_points'] = {
@@ -169,29 +168,6 @@ Blockly.JavaScript['heroes_noise'] = function(block) {
   return 'makeNoise(\'' + value + '\', \'block_id_' + block.id + '\');\n';
 };
 
-Blockly.Blocks['heroes_set_hero'] = {
-  /**
-   * Block for moving forward or backwards.
-   * @this Blockly.Block
-   */
-  init: function() {
-    var HEROES =
-        [[BlocklyGames.getMsg('Heroes_heroLion'), 'lion'],
-         [BlocklyGames.getMsg('Heroes_heroEagle'), 'eagle']];
-    this.setColour(Heroes.Blocks.HUE);
-    this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown(HEROES), 'HERO');
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-  }
-};
-
-Blockly.JavaScript['heroes_set_hero'] = function(block) {
-  // Generate JavaScript for changing the hero icon.
-  var value = block.getFieldValue('HERO');
-  return 'setHero(\'' + value + '\', \'block_id_' + block.id + '\');\n';
-};
-
 
 Blockly.Blocks['heroes_turn'] = {
   /**
@@ -254,15 +230,10 @@ Blockly.Blocks['heroes_speak'] = {
   init: function() {
 
     var names = [];
-    for (var i=0; i<Heroes.HERO_NAMES.length; i++)
-    {
-      names[i] = [Heroes.HERO_NAMES[i][0] + " say", Heroes.HERO_NAMES[i][1]];
-    }
 
     this.setColour(Heroes.Blocks.HUE);
 
     this.appendValueInput('TEXT')
-        .appendField(new Blockly.FieldDropdown(names), 'WHO')
     this.appendValueInput('SECONDS')
         .setCheck('Number')
         .appendField('for seconds');
@@ -276,10 +247,9 @@ Blockly.JavaScript['heroes_speak'] = function(block) {
   // Generate JavaScript for printing text.
   var what = String(Blockly.JavaScript.valueToCode(block, 'TEXT',
       Blockly.JavaScript.ORDER_NONE) || '\'\'');
-  var who = block.getFieldValue('WHO');
   var seconds = String(Blockly.JavaScript.valueToCode(block, 'SECONDS',
       Blockly.JavaScript.ORDER_NONE) || '\'\'');
-  return 'speak(\'' + who + '\',' + what + ',' + seconds + ',\'block_id_' + block.id + '\');\n';
+  return 'speak(' + what + ',' + seconds + ',\'block_id_' + block.id + '\');\n';
 };
 
 Blockly.Blocks['heroes_set_title'] = {
@@ -463,8 +433,6 @@ Blockly.Blocks['heroes_on_collision'] = {
      this.setNextStatement(true);
      this.appendDummyInput()
          .appendField('On Collision');
-     this.appendDummyInput()
-         .appendField(new Blockly.FieldDropdown(Heroes.HERO_NAMES), 'A');
 
      var OBJECTS = Heroes.HERO_NAMES.slice();
      OBJECTS.push(["item", "item"]);
@@ -493,7 +461,7 @@ Blockly.JavaScript['heroes_on_collision'] = function(block) {
   // Trim the spaces and newlines (for the stupid interpreter), and pass it thru as a string.
   //
 
-  var code = 'setCollisionCallback("'+ block.getFieldValue('A') + '",  "' +
+  var code = 'setCollisionCallback("' +
       block.getFieldValue('B') + '", \"' + branch+ '\", \'block_id_' + block.id +'\');';
   return code + '\n';
 };
@@ -508,7 +476,6 @@ Blockly.Blocks['heroes_width'] = {
     this.setColour(Heroes.Blocks.HUE);
     this.appendValueInput('WIDTH')
         .setCheck('Number')
-        .appendField(new Blockly.FieldDropdown(Heroes.HERO_NAMES), 'HERO')
         .appendField('Set pen width:');
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -519,7 +486,7 @@ Blockly.JavaScript['heroes_width'] = function(block) {
   // Generate JavaScript for setting the width.
   var width = Blockly.JavaScript.valueToCode(block, 'WIDTH',
       Blockly.JavaScript.ORDER_NONE) || '1';
-  return 'penWidth(\'' + block.getFieldValue('HERO') + '\',' + width + ', \'block_id_' + block.id + '\');\n';
+  return 'penWidth(' + width + ', \'block_id_' + block.id + '\');\n';
 };
 
 Blockly.Blocks['heroes_pen'] = {
@@ -533,7 +500,6 @@ Blockly.Blocks['heroes_pen'] = {
             ["Bring pen down", 'penDown']];
      this.setColour(Heroes.Blocks.HUE);
      this.appendDummyInput()
-         .appendField(new Blockly.FieldDropdown(Heroes.HERO_NAMES), 'HERO')
          .appendField(new Blockly.FieldDropdown(PEN), 'PEN');
      this.setPreviousStatement(true);
      this.setNextStatement(true);
@@ -543,7 +509,7 @@ Blockly.Blocks['heroes_pen'] = {
 Blockly.JavaScript['heroes_pen'] = function(block) {
   // Generate JavaScript for pen up/down.
   return block.getFieldValue('PEN') +
-      '(\'' + block.getFieldValue('HERO') + '\', \'block_id_' + block.id + '\');\n';
+      '(\'block_id_' + block.id + '\');\n';
 };
 
 Blockly.Blocks['heroes_colour'] = {
@@ -554,7 +520,6 @@ Blockly.Blocks['heroes_colour'] = {
   init: function() {
     this.setColour(Blockly.Blocks.colour.HUE);
     this.appendValueInput('COLOUR')
-        .appendField(new Blockly.FieldDropdown(Heroes.HERO_NAMES), 'HERO')
         .setCheck('Colour')
         .appendField("Set pen color");
     this.setPreviousStatement(true);
@@ -566,6 +531,6 @@ Blockly.JavaScript['heroes_colour'] = function(block) {
   // Generate JavaScript for setting the colour.
   var colour = Blockly.JavaScript.valueToCode(block, 'COLOUR',
       Blockly.JavaScript.ORDER_NONE) || '\'#000000\'';
-  return 'penColour(\'' + block.getFieldValue('HERO') + '\', ' + colour + ', \'block_id_' +
+  return 'penColour(' + colour + ', \'block_id_' +
       block.id + '\');\n';
 };

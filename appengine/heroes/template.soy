@@ -65,7 +65,7 @@ Game speed:
   {call .toolbox /}
 
   // The canvas and blockly div will go here. These are added programmatically.
-  <div id="games"></div>
+  <div id="games" class="container-fluid"></div>
 
   {call BlocklyGames.soy.dialog /}
   {call BlocklyGames.soy.doneDialog /}
@@ -172,5 +172,8 @@ Game speed:
 
   <xml id="toolbox" style="display: none">
   {call BlocklyGames.soy.heroes_tools /}
+  </xml>
+  <xml id="world_toolbox" style="display: none">
+  {call BlocklyGames.soy.heroes_world_tools /}
   </xml>
 {/template}

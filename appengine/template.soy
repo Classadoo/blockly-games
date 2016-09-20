@@ -635,6 +635,44 @@
   </category>
 
 
+
+{/template}
+
+/**
+ *  Tools needed to build a heroes game.
+ */
+{template .heroes_world_tools}
+
+
+  <category name="{msg meaning="Heroes.catNumbers" desc="IBID"}Number{/msg}">
+
+  {if $ij.level >= 3}
+  <block type="math_number"></block>
+
+    <block type="math_random_int">
+      <value name="FROM">
+        <block type="math_number">
+          <field name="NUM">1</field>
+        </block>
+      </value>
+      <value name="TO">
+        <block type="math_number">
+          <field name="NUM">5</field>
+        </block>
+      </value>
+    </block>
+    {/if}
+
+    <block type="controls_repeat_ext">
+      <value name="TIMES">
+        <block type="math_number">
+          <field name="NUM">10</field>
+        </block>
+      </value>
+    </block>
+  </category>
+
+
   {if $ij.level >= 2}
     <category name="{msg meaning="Heroes.game" desc="IBID"}Game{/msg}">
 

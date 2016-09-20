@@ -20,6 +20,9 @@
 
 goog.provide('HeroObject');
 
+goog.require('Blockly.inject');
+goog.require('SpriteLike');
+
 function getRandomColor() {
   var letters = '0123456789ABCDEF';
   var color = '#';
@@ -39,35 +42,54 @@ chars["human"].src = "heroes/andrew.png";
 
 var chars_per_line = 40;
 
-function Hero(char, radius, x, y) {
-  this.x = x || 0;
-  this.y = y || 0;
 
-  this.penDown = true;
-  this.colour = null;
-  this.width = 5;
+function Hero(name, char, radius, x, y, username, line_context) {
+  var self = this;
 
-  this.char = char;
-  this.image = chars[char] || chars["andrew"];
-  this.radius = radius;
-}
+  self.ctxLines = line_context;
+
+  self.x = x || 0;
+  self.y = y || 0;
+
+  self.pen = true;
+  self.colour = null;
+  self.width = 5;
+
+  self.char = char;
+  self.image = chars[char] || chars["andrew"];
+  self.radius = radius;
+
+  SpriteLike.call(self, username, name);
+
+
+  //
+  // Add sounds to our library.
+  //
+  Heroes.NOISES.forEach(function(el)
+  {
+    self.workspace.loadAudio_(['heroes/' + el[1] + '.mp3'], el[1]);
+  });
+
 
 // Draws this item to a given context.
-Hero.prototype.draw = function(ctx) {
-  ctx.drawImage(this.image, this.x - this.radius,
-    this.y - this.radius, this.radius * 2, this.radius * 2);
+self.draw = function(ctx)
+{
+  ctx.drawImage(self.image, self.x - self.radius,
+    self.y - self.radius, self.radius * 2, self.radius * 2);
+  self.draw_speech(ctx);
 }
 
-Hero.prototype.speak = function(ctx, words)
+
+self.draw_speech = function(ctx)
 {
-  if (words)
+  if (self.words)
   {
     ctx.font = "12px Arial";
     var height = 24;
     var radius = height/4;
-    var width = ctx.measureText(words).width + radius * 2;
-    var x = this.x + this.radius;
-    var y = this.y + this.radius;
+    var width = ctx.measureText(self.words).width + radius * 2;
+    var x = self.x + self.radius;
+    var y = self.y + self.radius;
 
     var r = x + width;
     var b = y + height;
@@ -91,12 +113,202 @@ Hero.prototype.speak = function(ctx, words)
     ctx.fill();
 
     ctx.fillStyle = "#000000";
-    ctx.fillText(words, x + radius, y + radius * 3);
+    ctx.fillText(self.words, x + radius, y + radius * 3);
   }
 }
 
-Hero.prototype.set_pos = function(x, y)
+self.set_pos = function(x, y)
 {
-  this.x = x;
-  this.y = y;
+  var self = this;
+  self.x = x;
+  self.y = y;
 }
+
+self.reset = function()
+{
+  self.words = "";
+  self.word_timeouts = 0;
+}
+
+self.key_event = function(key)
+{
+  return; //todo setup keypress events
+  if (keys[keypress])
+  {
+    //TODO reorder code so events are always processed first.
+    self.interpreter['appendCode'](self.key_events[keypress]);
+    while (self.interpreter.step()){}; //TODO maybe just append code and have a loop that is always looking for new code
+  }
+}
+
+self.makeNoise = function(name, id)
+{
+  self.workspace.playAudio(name, 0.5);
+  self.animate(id);
+}
+
+//
+// Hero speech.
+//
+self.speak = function(what, seconds, id)
+{
+  self.words = what;
+  clearTimeout(self.word_timeout);
+  self.word_timeout = setTimeout(function()
+  {
+    self.words = "";
+  }, seconds*1000);
+  self.animate(id);
+}
+
+
+/**
+ * Lift or lower the pen.
+ * @param {boolean} down True if down, false if up.
+ * @param {?string} id ID of block.
+ */
+self.penDown = function(down, id) {
+  self.pen = down;
+  self.animate(id);
+};
+
+/**
+ * Change the thickness of lines.
+ * @param {number} width New thickness in pixels.
+ * @param {?string} id ID of block.
+ */
+self.penWidth = function(width, id) {
+  self.width = width;
+  self.animate(id);
+};
+
+/**
+ * Change the colour of the pen.
+ * @param {string} colour Hexadecimal #rrggbb colour string.
+ * @param {?string} id ID of block.
+ */
+self.penColour = function(colour, id) {
+  self.colour = colour;
+  self.animate(id);
+};
+
+self.move = function(x, y, id) {
+  if (self.pen) {
+    self.ctxLines.strokeStyle = self.colour || getRandomColor();
+    self.ctxLines.fillStyle = self.colour;
+    self.ctxLines.lineWidth = self.width;
+    self.ctxLines.beginPath();
+    self.ctxLines.moveTo(self.x, self.y);
+  }
+
+  self.x += x;
+  self.y -= y;
+
+  if (self.pen) {
+    self.ctxLines.lineTo(self.x, self.y);
+    self.ctxLines.stroke();
+  }
+
+  self.animate(id);
+};
+
+
+
+/**
+ * Inject the Heroes API into a JavaScript interpreter.
+ * @param {!Object} scope Global scope.
+ * @param {!Interpreter} interpreter The JS interpreter.
+ */
+self.initInterpreter = function(interpreter, scope) {
+  // API
+  var wrapper = function(distance, id) {
+    self.move(0, distance.valueOf(), id.toString());
+  };
+  interpreter.setProperty(scope, 'moveUp',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(distance, id) {
+    self.move(0, -distance.valueOf(), id.toString());
+  };
+  interpreter.setProperty(scope, 'moveDown',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(distance, id) {
+    self.move(-distance.valueOf(), 0, id.toString());
+  };
+  interpreter.setProperty(scope, 'moveLeft',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(distance, id) {
+    self.move(distance.valueOf(), 0, id.toString());
+  };
+  interpreter.setProperty(scope, 'moveRight',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(which, fn, id) {
+    self.setButtonCallback(which.data, fn.toString(), id.toString());
+  };
+  interpreter.setProperty(scope, 'setButtonCallback',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(a, b, fn, id) {
+    self.setCollisionCallback(a.toString(), b.toString(), fn.toString(), id.toString());
+  };
+  interpreter.setProperty(scope, 'setCollisionCallback',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(noise, id) {
+    self.makeNoise(noise.toString(), id.toString());
+  };
+  interpreter.setProperty(scope, 'makeNoise',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(what, seconds, id) {
+    self.speak(what.toString(), seconds.data, id.toString());
+  };
+  interpreter.setProperty(scope, 'speak',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(id) {
+    self.penDown(false, id.toString());
+  };
+  interpreter.setProperty(scope, 'penUp',
+      interpreter.createNativeFunction(wrapper));
+  wrapper = function(id) {
+    self.penDown(true, id.toString());
+  };
+  interpreter.setProperty(scope, 'penDown',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(width, id) {
+    self.penWidth(width.valueOf(), id.toString());
+  };
+  interpreter.setProperty(scope, 'penWidth',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(colour, id) {
+    self.penColour(colour.toString(), id.toString());
+  };
+  interpreter.setProperty(scope, 'penColour',
+      interpreter.createNativeFunction(wrapper));
+};
+
+
+/**
+ * Highlight a block and pause.
+ * @param {?string} id ID of block.
+ */
+self.animate = function(id) {
+  if (id) {
+    var m = id.match(/^block_id_([^']+)$/);
+    if (m) {
+      id = m[1];
+    }
+    self.workspace.highlightBlock(id);
+    var stepSpeed = 600 * Math.pow(1 - Heroes.speedSlider.getValue(), 2);
+    self.pause = Math.max(1, stepSpeed);
+  }
+};
+}
+
+Hero.prototype = Object.create(SpriteLike.prototype);
