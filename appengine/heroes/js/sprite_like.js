@@ -58,6 +58,16 @@ var blocklyDiv = document.getElementById(id);
 var onresize = function(e) {
   var width = window.innerWidth - 620;
   blocklyDiv.style.width = width + 'px';
+
+  // We may have loaded stuff when the canvas was hidden, which corrupts the blocks.
+  // We have to clear and reload everything...
+  // This sucks but it's expected  https://groups.google.com/forum/#!msg/blockly/XaeaMAMqnLg/yTV0Z1b3DwAJ
+
+  var xml = Blockly.Xml.workspaceToDom(self.workspace);
+  self.workspace.clear();
+  Blockly.Xml.domToWorkspace(xml, self.workspace);
+
+
   Blockly.svgResize(self.workspace);
 };
 window.addEventListener('resize', onresize);

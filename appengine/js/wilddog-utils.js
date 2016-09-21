@@ -43,13 +43,14 @@ window.onerror = function(errorMsg, url, lineNumber)
 
 var received_snapshots = {};
 var sent_snapshots = {};
-var connectSubscriber = function(username, workspace, saved_game)
+
+
+var connectSubscriberWorkspace = function(username, game_ref, workspace, hero_name)
 {
+  console.log(hero_name, username);
+  var workspace_ref = game_ref['child'](hero_name)['child']("workspace");
 
-  var snapshot_key = saved_game || "Untitled Heroes"
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/snapshots");
-
-  ref['child'](snapshot_key)['on']("value", function(code) {
+  workspace_ref['on']("value", function(code) {
     code = code['val']();
     if (!code)
     {
@@ -59,13 +60,13 @@ var connectSubscriber = function(username, workspace, saved_game)
     //
     // Ignore updates from our own transmission..
     //
-    if (code == sent_snapshots[username])
+    if (code == sent_snapshots[username + hero_name])
     {
       return;
     }
     workspace.clear();
 
-    received_snapshots[username] = code;
+    received_snapshots[username + hero_name] = code;
     var xml = Blockly.Xml.textToDom(code);
     Blockly.Xml.domToWorkspace(xml, workspace);
     workspace.clearUndo();
@@ -77,10 +78,63 @@ var connectSubscriber = function(username, workspace, saved_game)
     workspace.zoomToFit();
     workspace.zoomCenter(-1);
   });
+}
+
+
+//
+// Connect to a remote game and apply all wilddog updates to our replica.
+//
+var connectSubscriber = function(username, game, saved_game)
+{
+
+  var snapshot_key = saved_game || "Untitled Heroes"
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + snapshot_key);
+
+  //
+  // First listen for new workspaces.
+  //
+
+  ref['on']("child_added", function(child)
+  {
+
+    //
+    // New workspace! Add a world/hero for it, and connect the new workspace.
+    //
+    var name = child['key']();
+    var workspace;
+    if (name.toLowerCase() == "world")
+    {
+      workspace = game.game_world.workspace;
+    }
+    else
+    {
+      var hero = game.addHero(name, child['val']()['type']);
+      if (!hero)
+      {
+        hero = game.heroes[name]
+      }
+      workspace = hero.workspace;
+    }
+    connectSubscriberWorkspace(username, ref, workspace, name);
+  });
 
 }
 
-var connectPublisher = function(username, workspace, saved_game)
+var connectPublisher = function(username, game, saved_game)
+{
+  var snapshot_key = saved_game || "Untitled Heroes"
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + snapshot_key);
+
+  game.register_new_hero_callback(function(hero_name, hero_type, workspace)
+  {
+    // Update the type of the hero.
+
+    ref['child'](hero_name)["update"]({type: hero_type});
+    connectPublisherWorkspace(username, ref, hero_name, workspace)
+  });
+}
+
+var connectPublisherWorkspace = function(username, game_ref, hero_name, workspace)
 {
   workspace.addChangeListener(function(change) {
     //
@@ -96,32 +150,29 @@ var connectPublisher = function(username, workspace, saved_game)
     //
     var current_code = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(workspace));
 
-
     //
     // If we just sent or received this code, we can ignore it.
     //
-    if (current_code === received_snapshots[username])
+    if (current_code === received_snapshots[username + hero_name])
     {
       return;
     }
-    if (current_code === sent_snapshots[username])
+    if (current_code === sent_snapshots[username + hero_name])
     {
       return;
     }
-    sent_snapshots[username] = current_code;
+    sent_snapshots[username + hero_name] = current_code;
 
-    snapshot_key = saved_game || "Untitled Heroes";
-    var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/snapshots");
-
-    var snapshot_obj = {};
-    snapshot_obj[snapshot_key] = current_code;
-    ref['update'](snapshot_obj);
+    //
+    // Send the code to wilddog.
+    //
+    game_ref['child'](hero_name)['update']({workspace : current_code});
 
     return;
   });
 }
 
-var initStudentWilddog = function(game, level, workspace, saved_game){
+var initStudentWilddog = function(game_name, level, game_object, saved_game){
   //
   // Give us a fresh start.
   //
@@ -131,15 +182,15 @@ var initStudentWilddog = function(game, level, workspace, saved_game){
   //
   // Send current level.
   //
-  ref['update']({"level": game + "-" + level});
+  ref['update']({"level": game_name + "-" + level});
 
   //
   // Send all our blockly changes.
   //
-  connectPublisher(getUsername(), workspace, saved_game);
+  connectPublisher(getUsername(), game_object, saved_game);
 
   //
   // Subscribe to all our/teacher blockly changes.
   //
-  connectSubscriber(getUsername(), workspace, saved_game);
+  connectSubscriber(getUsername(), game_object, saved_game);
 }
