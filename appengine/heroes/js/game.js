@@ -244,9 +244,9 @@ var Game = function(username)
 
     for (var hero in self.heroes)
     {
-      self.heroes[hero].workspace.objects.push([name, name]);
       if (name != hero)
       {
+        self.heroes[hero].workspace.objects.push([name, name]);
         self.heroes[name].workspace.objects.push([hero, hero]);
       }
     }
