@@ -81,21 +81,21 @@ $('#' + username + '-tabs a').click(function (e) {
 })
 $('#' + username + '-tabs a[href="#' + id + '-container"]').click();
 
-self.execute = function(game_speed)
+self.execute = function()
 {
   var code = Blockly.JavaScript.workspaceToCode(self.workspace);
   self.interpreter = new Interpreter(code, self.initInterpreter);
-  self.pidList.push(setTimeout(function(){self.executeChunk_(game_speed)}, 100));
+  self.pidList.push(setTimeout(function(){self.executeChunk_(self.interpreter)}, 100));
 }
 
-self.executeChunk_ = function(game_speed) {
+self.executeChunk_ = function(interpreter) {
   // All tasks should be complete now.  Clean up the PID list.
   self.pidList.length = 0;
   self.pause = 0;
   var go;
   do {
     try {
-      go = self.interpreter.step();
+      go = interpreter.step();
     } catch (e) {
       // User error, terminate in shame.
       alert(e);
@@ -105,7 +105,7 @@ self.executeChunk_ = function(game_speed) {
       // The last executed command requested a pause.
       go = false;
       self.pidList.push(
-          setTimeout(function(){self.executeChunk_(game_speed)}, self.pause));
+          setTimeout(function(){self.executeChunk_(interpreter)}, self.pause));
     }
   } while (go);
 
@@ -113,10 +113,6 @@ self.executeChunk_ = function(game_speed) {
   if (!self.pause || self.event_mode) {
   //  document.getElementById(self.username + '-spinner').style.visibility = 'hidden'; // TODO make a spinner per sprite? Or just have them || to this spinner?
     self.workspace.highlightBlock(null);
-
-    // Continue to check for events, but now we never want to pause.
-    self.event_mode = true;
-    self.pidList.push(setTimeout(function(){self.executeChunk_(game_speed)}, game_speed));
   }
 };
 
@@ -155,7 +151,8 @@ self.checkKeyEvents = function()
     if (self.key_events[key] && self.keys_down[key])
     {
       //TODO reorder code so events are always processed first.
-      self.interpreter['appendCode'](self.key_events[key]);
+      var interpreter = new Interpreter(self.key_events[key], self.initInterpreter);
+      setTimeout( function(){self.executeChunk_(interpreter);}, 1);
     }
   }
 }
