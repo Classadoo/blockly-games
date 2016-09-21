@@ -132,7 +132,7 @@ var Game = function(username)
     self.reset();
     self.startGame(game_speed);
 
-    self.game_world.execute(game_speed);
+    self.game_world.execute();
     for (var hero in self.heroes)
     {
       self.heroes[hero].execute(game_speed);

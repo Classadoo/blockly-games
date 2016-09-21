@@ -238,11 +238,12 @@ self.checkCollisions = function(other_heroes, items, item_radius)
       var i = items.length;
       var item;
       while (i--) {
-        item = self.items[i];
+        item = items[i];
         if (compute_distance(item.x, item.y, self.x, self.y) < (self.radius + item_radius))
         {
-          self.interpreter['appendCode'](self.collision_events[what]);
-          self.items.splice(i, 1);
+          var interpreter = new Interpreter(self.collision_events[what], self.initInterpreter);
+          setTimeout( function(){self.executeChunk_(interpreter);}, 1);
+          items.splice(i, 1);
         }
       }
     }
@@ -253,7 +254,8 @@ self.checkCollisions = function(other_heroes, items, item_radius)
       {
         if (self.collisions_in_progress[what] == false)
         {
-          self.interpreter['appendCode'](self.collision_events[what]);
+          var interpreter = new Interpreter(self.collision_events[what], self.initInterpreter);
+          setTimeout( function(){self.executeChunk_(interpreter);}, 1);
         }
         self.collisions_in_progress[what] = true;
       }
