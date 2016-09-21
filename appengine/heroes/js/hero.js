@@ -50,6 +50,9 @@ function Hero(name, char, radius, x, y, username, line_context) {
 
   self.x = x || 0;
   self.y = y || 0;
+  self.starting_x = self.x;
+  self.starting_y = self.y;
+
 
   self.pen = true;
   self.colour = null;
@@ -58,6 +61,9 @@ function Hero(name, char, radius, x, y, username, line_context) {
   self.char = char;
   self.image = chars[char] || chars["andrew"];
   self.radius = radius;
+
+  self.collision_events = {};
+  self.collisions_in_progress = {};
 
   SpriteLike.call(self, username, name);
 
@@ -128,17 +134,15 @@ self.reset = function()
 {
   self.words = "";
   self.word_timeouts = 0;
-}
 
-self.key_event = function(key)
-{
-  return; //todo setup keypress events
-  if (keys[keypress])
-  {
-    //TODO reorder code so events are always processed first.
-    self.interpreter['appendCode'](self.key_events[keypress]);
-    while (self.interpreter.step()){}; //TODO maybe just append code and have a loop that is always looking for new code
-  }
+  self.x = self.starting_x;
+  self.y = self.starting_y;
+
+  self.collision_events = {};
+  self.key_events = {};
+  self.keys_down = {};
+
+  self.end_process();
 }
 
 self.makeNoise = function(name, id)
@@ -212,7 +216,54 @@ self.move = function(x, y, id) {
   self.animate(id);
 };
 
+self.setCollisionCallback = function(what, fn, id)
+{
+  self.collision_events[what] = fn;
+  self.animate(id);
+}
 
+
+//
+// Check for collision events.
+//
+self.checkCollisions = function(other_heroes, items, item_radius)
+{
+
+  for (var what in self.collision_events)
+  {
+    // Assume WHAT is either an item or a hero.
+    if (what == "item")
+    {
+      // Iterate in reverse so the index isn't affected when we remove elements.
+      var i = items.length
+      var item;
+      while (i--) {
+        item = self.items[i];
+        if (compute_distance(item.x, item.y, self.x, self.y) < (self.radius + item_radius))
+        {
+          self.interpreter['appendCode'](self.collision_events[what]);
+          self.items.splice(i, 1);
+        }
+      }
+    }
+    else
+    {
+      var other_hero = other_heroes[what];
+      if (compute_distance(other_hero.x, other_hero.y, self.x, self.y) < (self.radius + other_hero.radius))
+      {
+        if (self.collisions_in_progress[what] == false)
+        {
+          self.interpreter['appendCode'](self.collision_events[what]);
+        }
+        self.collisions_in_progress[what] = true;
+      }
+      else
+      {
+        self.collisions_in_progress[what] = false;
+      }
+    }
+  }
+}
 
 /**
  * Inject the Heroes API into a JavaScript interpreter.
@@ -251,8 +302,8 @@ self.initInterpreter = function(interpreter, scope) {
   interpreter.setProperty(scope, 'setButtonCallback',
       interpreter.createNativeFunction(wrapper));
 
-  wrapper = function(a, b, fn, id) {
-    self.setCollisionCallback(a.toString(), b.toString(), fn.toString(), id.toString());
+  wrapper = function(what, fn, id) {
+    self.setCollisionCallback(what.toString(), fn.toString(), id.toString());
   };
   interpreter.setProperty(scope, 'setCollisionCallback',
       interpreter.createNativeFunction(wrapper));
@@ -291,23 +342,6 @@ self.initInterpreter = function(interpreter, scope) {
   };
   interpreter.setProperty(scope, 'penColour',
       interpreter.createNativeFunction(wrapper));
-};
-
-
-/**
- * Highlight a block and pause.
- * @param {?string} id ID of block.
- */
-self.animate = function(id) {
-  if (id) {
-    var m = id.match(/^block_id_([^']+)$/);
-    if (m) {
-      id = m[1];
-    }
-    self.workspace.highlightBlock(id);
-    var stepSpeed = 600 * Math.pow(1 - Heroes.speedSlider.getValue(), 2);
-    self.pause = Math.max(1, stepSpeed);
-  }
 };
 }
 
