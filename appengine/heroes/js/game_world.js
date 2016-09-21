@@ -101,7 +101,7 @@ self.drawBackground = function(ctx)
 
 self.drawHUD = function(ctx)
 {
-  if (self.points !== undefined)
+  if (self.points !== null)
   {
     ctx.fillStyle = "#FFFFFF";
     ctx.font = "15px Arial";
