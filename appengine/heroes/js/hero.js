@@ -229,14 +229,13 @@ self.setCollisionCallback = function(what, fn, id)
 //
 self.checkCollisions = function(other_heroes, items, item_radius)
 {
-
   for (var what in self.collision_events)
   {
     // Assume WHAT is either an item or a hero.
     if (what == "item")
     {
       // Iterate in reverse so the index isn't affected when we remove elements.
-      var i = items.length
+      var i = items.length;
       var item;
       while (i--) {
         item = self.items[i];

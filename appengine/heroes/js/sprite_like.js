@@ -52,6 +52,9 @@ self.workspace = Blockly.inject(id,
     'readOnly' : false, //readOnly,
     'scrollbars':true,
     'zoom': {'controls': true, 'wheel': false, 'maxScale' : 1.0, 'minScale' : 0.7}});
+
+// Start a list of objects that we can interact with in this game.
+self.workspace.objects = [["item", "item"]];
 self.workspace.traceOn(true);
 
 var blocklyDiv = document.getElementById(id);
@@ -67,7 +70,6 @@ var onresize = function(e) {
   self.workspace.clear();
   Blockly.Xml.domToWorkspace(xml, self.workspace);
 
-
   Blockly.svgResize(self.workspace);
 };
 window.addEventListener('resize', onresize);
@@ -82,7 +84,6 @@ $('#' + username + '-tabs a[href="#' + id + '-container"]').click();
 self.execute = function(game_speed)
 {
   var code = Blockly.JavaScript.workspaceToCode(self.workspace);
-  console.log(code);
   self.interpreter = new Interpreter(code, self.initInterpreter);
   self.pidList.push(setTimeout(function(){self.executeChunk_(game_speed)}, 100));
 }

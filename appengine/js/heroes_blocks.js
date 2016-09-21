@@ -43,7 +43,6 @@ goog.require('Blockly.JavaScript.texts');
 goog.require('Blockly.JavaScript.variables');
 goog.require('BlocklyGames');
 
-Heroes.HERO_NAMES = [["Leo", "Leo"],["William", "William"],["Andrew", "Andrew"]];
 Heroes.NOISES = [["Play bow sound", "bow"], ["Play pop sound", "pop"],
   ["Play moo sound", "moo"], ["Play seal sound", "seal"],
   ["Play sneeze sound", "sneeze"], ["Play balloon sound", "balloon"]];
@@ -434,13 +433,11 @@ Blockly.Blocks['heroes_on_collision'] = {
      this.appendDummyInput()
          .appendField('On Collision');
 
-     var OBJECTS = Heroes.HERO_NAMES.slice();
-     OBJECTS.push(["item", "item"]);
-
+     var workspace = this.workspace.targetWorkspace || this.workspace;
      this.appendDummyInput()
          .appendField('with');
      this.appendDummyInput()
-         .appendField(new Blockly.FieldDropdown(OBJECTS), 'WHAT');
+         .appendField(new Blockly.FieldDropdown(workspace.objects), 'WHAT');
 
      this.appendStatementInput('DO0')
          .appendField(Blockly.Msg.CONTROLS_IF_MSG_THEN);

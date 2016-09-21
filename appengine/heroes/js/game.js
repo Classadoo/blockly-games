@@ -237,6 +237,20 @@ var Game = function(username)
       }
     }
 
+    //
+    // Tell all the workspaces about this hero, so they can use her in their events.
+    // Simultaneously, tell this workspace about all the old heroes.
+    //
+
+    for (var hero in self.heroes)
+    {
+      self.heroes[hero].workspace.objects.push([name, name]);
+      if (name != hero)
+      {
+        self.heroes[name].workspace.objects.push([hero, hero]);
+      }
+    }
+
     self.new_hero_callback(name, self.heroes[name].char, self.heroes[name].workspace);
     return self.heroes[name];
   };
