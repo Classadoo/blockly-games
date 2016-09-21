@@ -440,7 +440,7 @@ Blockly.Blocks['heroes_on_collision'] = {
      this.appendDummyInput()
          .appendField('with');
      this.appendDummyInput()
-         .appendField(new Blockly.FieldDropdown(OBJECTS), 'B');
+         .appendField(new Blockly.FieldDropdown(OBJECTS), 'WHAT');
 
      this.appendStatementInput('DO0')
          .appendField(Blockly.Msg.CONTROLS_IF_MSG_THEN);
@@ -462,7 +462,7 @@ Blockly.JavaScript['heroes_on_collision'] = function(block) {
   //
 
   var code = 'setCollisionCallback("' +
-      block.getFieldValue('B') + '", \"' + branch+ '\", \'block_id_' + block.id +'\');';
+      block.getFieldValue('WHAT') + '", \"' + branch+ '\", \'block_id_' + block.id +'\');';
   return code + '\n';
 };
 

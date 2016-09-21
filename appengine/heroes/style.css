@@ -13,6 +13,9 @@ button.publish {
 .blockly, .workspace {
   height: 400px;
 }
+.workspace {
+  margin-top: 5px;
+}
 .blockly {
   margin-top: -42px;
 }

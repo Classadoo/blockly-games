@@ -42,19 +42,19 @@ BlocklyGames.NAME = 'heroes';
 // TODO(aheine): use jquery instead of a string of HTML. Also move this to a new file.
 Heroes.GAME_HTML =
   '<div class="visualization">' +
-    '<canvas id="{user}_scratch" width="570" height="400" style="display: none"></canvas>' +
-    '<canvas id="{user}_display" width="570" height="400"></canvas>' +
-    '<canvas id="{user}_lines" width="570" height="400" style="display: none"></canvas>' +
+    '<canvas id="{user}-scratch" width="570" height="400" style="display: none"></canvas>' +
+    '<canvas id="{user}-display" width="570" height="400"></canvas>' +
+    '<canvas id="{user}-lines" width="570" height="400" style="display: none"></canvas>' +
     '<table style="padding-top: 1em;">' +
       '<tr>' +
         '<td style="width: 15px;">' +
-          '<img id="{user}_spinner" style="visibility: hidden;" src="heroes/loading.gif" height=15 width=15>' +
+          '<img id="{user}-spinner" style="visibility: hidden;" src="heroes/loading.gif" height=15 width=15>' +
         '</td>' +
         '<td style="width: 190px; text-align: center">' +
-          '<button id="{user}_runButton" class="primary" title="Run the program you wrote.">' +
+          '<button id="{user}-runButton" class="primary" title="Run the program you wrote.">' +
             '<img src="common/1x1.gif" class="run icon21"> Run Program' +
           '</button>' +
-          '<button id="{user}_resetButton" class="primary" style="display: none" title="Stop the program and reset the level.">' +
+          '<button id="{user}-resetButton" class="primary" style="display: none" title="Stop the program and reset the level.">' +
             '<img src="common/1x1.gif" class="stop icon21"> Reset' +
           '</button>' +
           '{publish_button}' +
@@ -63,10 +63,22 @@ Heroes.GAME_HTML =
     '</table>' +
   '</div>' +
   '<div class=blockly>' +
-    '<ul class="nav nav-tabs" id="{user}_tabs" role="tablist">' +
-      '<li role="presentation" id="new_hero_button"><a data-toggle="tab" role="tab"> + New Hero</a></li>'  +
+    '<ul class="nav nav-tabs" id="{user}-tabs" role="tablist">' +
+      '<li role="presentation" id="{user}-new-hero-button"><a data-toggle="tab" role="tab" href="#{user}-add-hero" aria-controls="{user}-add-hero"> + New Hero</a></li>'  +
     '</ul>' +
-    '<div class="tab-content" id="{user}_blockly"></div>' +
+    '<div class="tab-content" id="{user}-blockly">' +
+      '<form role="tabpanel" class="tab-pane active" id="{user}-add-hero">' +
+        '<div class="form-group">' +
+          '<label for="hero-name">Name</label>' +
+          '<input type="text" class="form-control" id="{user}-hero-name" placeholder="Andrew">' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label for="hero-type">Type</label>' +
+          '<select class="form-control" id="{user}-hero-type"></select>' +
+        '</div>' +
+        '<button type="button" class="btn btn-default" id={user}-submit-hero>Submit</button>' +
+      '</form>' +
+    '</div>' +
   '</div>';
 
 
@@ -284,8 +296,8 @@ Heroes.addGame = function(readOnly, username)
   var game = new Game(username);
   game.reset();
 
-  BlocklyGames.bindClick(username + '_runButton', game.runButtonClick);
-  BlocklyGames.bindClick(username + '_resetButton', game.resetButtonClick);
+  BlocklyGames.bindClick(username + '-runButton', game.runButtonClick);
+  BlocklyGames.bindClick(username + '-resetButton', game.resetButtonClick);
 }
 
 Heroes.add_remote_user = function(username)

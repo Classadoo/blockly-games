@@ -33,6 +33,17 @@ self.items = [];
 self.item_radius = 5;
 self.radius = 32;
 
+self.reset = function()
+{
+  self.background = null;
+  self.points = null;
+  self.items.length = 0;
+  self.title = "";
+  self.key_events = {};
+
+  self.end_process();
+}
+
 self.setBackground = function(style, id)
 {
   self.background = Heroes.backgrounds[style];
@@ -105,10 +116,10 @@ self.addItem = function(x, y, vx, vy, id) {
   self.animate(id);
 };
 
-  self.setTitle = function(title, id)
-  {
-    self.title = title;
-  }
+self.setTitle = function(title, id)
+{
+  self.title = title;
+}
 
 
 
