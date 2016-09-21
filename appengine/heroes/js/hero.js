@@ -54,6 +54,8 @@ self.y = y || 0;
 self.starting_x = self.x;
 self.starting_y = self.y;
 
+// Zero is straight right.
+self.heading = 0;
 
 self.pen = true;
 self.colour = null;
@@ -124,13 +126,9 @@ self.draw_speech = function(ctx)
   }
 }
 
-self.set_pos = function(x, y)
-{
-  var self = this;
-  self.x = x;
-  self.y = y;
-}
-
+//
+// Set everything back to the beginning state.
+//
 self.reset = function()
 {
   self.words = "";
@@ -138,6 +136,7 @@ self.reset = function()
 
   self.x = self.starting_x;
   self.y = self.starting_y;
+  self.heading = 0;
 
   self.collision_events = {};
   self.key_events = {};
@@ -197,6 +196,28 @@ self.penColour = function(colour, id) {
   self.animate(id);
 };
 
+self.rotate = function(clockwise, degrees, id)
+{
+  // Clockwise amounts to a negative multiplier.
+  clockwise = clockwise ? -1 : 1;
+  self.heading += clockwise * degrees * Math.PI / 180.0;
+
+  self.animate(id);
+}
+
+//
+// Move in the direction we're facing.
+//
+self.move_forward = function(distance, id)
+{
+  var x = Math.cos(self.heading) * distance;
+  var y = Math.sin(self.heading) * distance
+  self.move(x, y, id);
+}
+
+//
+// Move in an absolute direction.
+//
 self.move = function(x, y, id) {
   if (self.pen) {
     self.ctxLines.strokeStyle = self.colour || getRandomColor();
@@ -274,7 +295,25 @@ self.checkCollisions = function(other_heroes, items, item_radius)
  */
 self.initInterpreter = function(interpreter, scope) {
   // API
-  var wrapper = function(distance, id) {
+  var wrapper = function(degrees, id) {
+    self.rotate(false, degrees.valueOf(), id.toString());
+  };
+  interpreter.setProperty(scope, 'turnLeft',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(degrees, id) {
+    self.rotate(true, degrees.valueOf(), id.toString());
+  };
+  interpreter.setProperty(scope, 'turnRight',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(distance, id) {
+    self.move_forward(distance.valueOf(), id.toString());
+  };
+  interpreter.setProperty(scope, 'moveForward',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(distance, id) {
     self.move(0, distance.valueOf(), id.toString());
   };
   interpreter.setProperty(scope, 'moveUp',
