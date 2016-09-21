@@ -54,11 +54,6 @@ Heroes.Blocks.HUE = 160;
 Heroes.Blocks.EVENT_HUE = 320;
 
 /**
- * Don't let people inject malicious code.
- */
-Heroes.Blocks.MAX_FOR = 1000;
-
-/**
  * Left turn arrow to be appended to messages.
  */
 Heroes.Blocks.LEFT_TURN = ' \u21BA';
@@ -70,9 +65,64 @@ Heroes.Blocks.RIGHT_TURN = ' \u21BB';
 
 // Extensions to Blockly's language and JavaScript generator.
 
+
+Blockly.Blocks['heroes_turn'] = {
+  /**
+   * Block for turning left or right.
+   * @this Blockly.Block
+   */
+  init: function() {
+    var DIRECTIONS =
+        [[BlocklyGames.getMsg('Heroes_turnRight'), 'turnRight'],
+         [BlocklyGames.getMsg('Heroes_turnLeft'), 'turnLeft']];
+    // Append arrows to direction messages.
+    DIRECTIONS[0][0] += Heroes.Blocks.RIGHT_TURN;
+    DIRECTIONS[1][0] += Heroes.Blocks.LEFT_TURN;
+    this.setColour(Heroes.Blocks.HUE);
+    this.appendValueInput('VALUE')
+        .setCheck('Number')
+        .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(BlocklyGames.getMsg('Heroes`_turnTooltip'));
+
+  }
+};
+
+Blockly.JavaScript['heroes_turn'] = function(block) {
+  // Generate JavaScript for turning left or right.
+  var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+      Blockly.JavaScript.ORDER_NONE) || '0';
+  return block.getFieldValue('DIR') +
+      '(' + value + ', \'block_id_' + block.id + '\');\n';
+};
+
+Blockly.Blocks['heroes_move_forward'] = {
+  /**
+   * Block for moving forward.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(Heroes.Blocks.HUE);
+    this.appendValueInput('VALUE')
+        .setCheck('Number')
+        .appendField('Move forward');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(BlocklyGames.getMsg('Heroes_moveTooltip'));
+  }
+};
+
+Blockly.JavaScript['heroes_move_forward'] = function(block) {
+  // Generate JavaScript for moving forward or backwards.
+  var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+      Blockly.JavaScript.ORDER_NONE) || '0';
+  return 'moveForward('+ value + ', \'block_id_' + block.id + '\');\n';
+};
+
 Blockly.Blocks['heroes_move'] = {
   /**
-   * Block for moving forward or backwards.
+   * Block for moving forward.
    * @this Blockly.Block
    */
   init: function() {
@@ -92,7 +142,7 @@ Blockly.Blocks['heroes_move'] = {
 };
 
 Blockly.JavaScript['heroes_move'] = function(block) {
-  // Generate JavaScript for moving forward or backwards.
+  // Generate JavaScript for moving absolute directions.
   var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
       Blockly.JavaScript.ORDER_NONE) || '0';
   return block.getFieldValue('DIR') +
@@ -101,7 +151,7 @@ Blockly.JavaScript['heroes_move'] = function(block) {
 
 Blockly.Blocks['heroes_add_points'] = {
   /**
-   * Block for moving forward or backwards.
+   * Block for moving absolute directions.
    * @this Blockly.Block
    */
   init: function() {

@@ -144,6 +144,11 @@
         <span id="Heroes_moveLeft">{msg meaning="Heroes.moveLeft" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] .  See [[Translating:Blockly#Drop-Down_Menus]]."}move left by{/msg}</span>
         <span id="Heroes_moveRight">{msg meaning="Heroes.moveRight" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] ."}move right by{/msg}</span>
 
+        <span id="Heroes_turnRight">{msg meaning="Heroes.turnRight" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of verb telling a hero to rotate clockwise.  This is followed by a number indicating how far (how many degrees) to turn.  Prefer a translation that has text in common with the translation of 'turn left by'."}turn right by{/msg}</span>
+        <span id="Heroes_turnLeft">{msg meaning="Heroes.turnLeft" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of verb telling a hero to rotate counter-clockwise (anti-clockwise).  This is followed by a number indicating how far (how many degrees) to turn.  Prefer a translation that has text in common with the translation of 'turn right by'."}turn left by{/msg}</span>
+        <span id="Heroes_turnTooltip">{msg meaning="Heroes.turnTooltip" desc="'Left' means counter-clockwise/anti-clockwise, and 'right' means clockwise."}Turns the hero left or right by the specified number of degrees.{/msg}</span>
+
+
         // Arrow events
         <span id="Heroes_upArrow">{msg meaning="Heroes.upArrow" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of a verb telling a heroes to move (walk) in the direction he/she is facing.  This is followed by a number indicating how far (how many pixels) to go.  Prefer a translation that has text in common with the translation of 'move backward'.  See [[Translating:Blockly#Drop-Down_Menus]]."}if up arrow pressed{/msg}</span>
         <span id="Heroes_downArrow">{msg meaning="Heroes.downArrow" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Infinitive or imperative of a verb telling a heroes to move (walk) in the direction opposite to where he/she is facing.  This is followed by a number indicating how far (how many pixels) to go.  Prefer a translation that has text in common with the translation of 'move forward'."}if down arrow pressed{/msg}</span>
@@ -551,6 +556,22 @@
           <block type="math_number">
             <field name="NUM">100</field>
           </block>
+        </value>
+      </block>
+
+      <block type="heroes_turn">
+        <value name="VALUE">
+          <shadow type="math_number">
+            <field name="NUM">90</field>
+          </shadow>
+        </value>
+      </block>
+
+      <block type="heroes_move_forward">
+        <value name="VALUE">
+          <shadow type="math_number">
+            <field name="NUM">90</field>
+          </shadow>
         </value>
       </block>
 
