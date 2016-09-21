@@ -158,7 +158,6 @@ var Game = function(username)
     }
     runButton.style.display = 'none';
     resetButton.style.display = 'inline';
-    document.getElementById(self.username + '-spinner').style.visibility = 'visible';
     self.execute();
 
     var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername() + "/code_running");
@@ -179,7 +178,6 @@ var Game = function(username)
     var runButton = document.getElementById(self.username + '-runButton');
     runButton.style.display = 'inline';
     document.getElementById(self.username + '-resetButton').style.display = 'none';
-    document.getElementById(self.username + '-spinner').style.visibility = 'hidden';
     self.reset();
   };
 
@@ -276,6 +274,14 @@ var Game = function(username)
 
     self.addHero(name, type);
   })
+
+  // If the user hits enter, prevent the POST event and just add a hero.
+  $('.tab-pane').keydown(function(event){
+    if(event.keyCode == 13) {
+      event.preventDefault();
+      $("#" + self.username + "-submit-hero").click();
+    }
+  });
 
   /**
    * Start the event polling.

@@ -47,9 +47,6 @@ Heroes.GAME_HTML =
     '<canvas id="{user}-lines" width="570" height="400" style="display: none"></canvas>' +
     '<table style="padding-top: 1em;">' +
       '<tr>' +
-        '<td style="width: 15px;">' +
-          '<img id="{user}-spinner" style="visibility: hidden;" src="heroes/loading.gif" height=15 width=15>' +
-        '</td>' +
         '<td style="width: 190px; text-align: center">' +
           '<button id="{user}-runButton" class="primary" title="Run the program you wrote.">' +
             '<img src="common/1x1.gif" class="run icon21"> Run Program' +

@@ -41,7 +41,11 @@ self.keys_down = {};
 var id = username + "-" + sprite_name;
 
 var workspaces = $('#' + username + '-blockly');
-$('<li role="presentation"><a href="#' + id + '-container" aria-controls="' + id + '-container" data-toggle="tab" role="tab">' + sprite_name + '</a></li>').insertBefore("#" + username + "-new-hero-button");
+$('<li role="presentation">' +
+    '<a href="#' + id + '-container" aria-controls="' + id + '-container" data-toggle="tab" role="tab" class="hero-tab">' +
+      sprite_name + '<img id="' + id + '-spinner" class="spinner" src="heroes/loading.gif" height=15 width=15>' +
+    '</a>' +
+  '</li>').insertBefore("#" + username + "-new-hero-button");
 $('<div role="tabpanel" class="tab-pane active" id="' + id + '-container"><div class="workspace" id="' + id + '"</div></div>').insertBefore("#" + username + "-add-hero");
 
 
@@ -83,6 +87,7 @@ $('#' + username + '-tabs a[href="#' + id + '-container"]').click();
 
 self.execute = function()
 {
+  document.getElementById(id + '-spinner').style.visibility = 'visible';
   var code = Blockly.JavaScript.workspaceToCode(self.workspace);
   self.interpreter = new Interpreter(code, self.initInterpreter);
   self.pidList.push(setTimeout(function(){self.executeChunk_(self.interpreter)}, 100));
@@ -111,7 +116,7 @@ self.executeChunk_ = function(interpreter) {
 
   // Wrap up if complete.
   if (!self.pause || self.event_mode) {
-  //  document.getElementById(self.username + '-spinner').style.visibility = 'hidden'; // TODO make a spinner per sprite? Or just have them || to this spinner?
+    document.getElementById(id + '-spinner').style.visibility = 'hidden';
     self.workspace.highlightBlock(null);
   }
 };
@@ -166,6 +171,7 @@ self.end_process = function()
   self.pidList.length = 0;
   self.interpreter = null;
   self.event_mode = false;
+  document.getElementById(id + '-spinner').style.visibility = 'hidden';
 }
 
 

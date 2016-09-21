@@ -233,9 +233,10 @@ Blockly.Blocks['heroes_speak'] = {
     this.setColour(Heroes.Blocks.HUE);
 
     this.appendValueInput('TEXT')
+        .appendField('Say');
     this.appendValueInput('SECONDS')
         .setCheck('Number')
-        .appendField('for seconds');
+        .appendField('Time:');
 
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -393,8 +394,6 @@ Blockly.Blocks['heroes_on_arrow'] = {
      this.setColour(Heroes.Blocks.EVENT_HUE);
      this.appendDummyInput('VALUE')
          .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR');
-     this.setPreviousStatement(true);
-     this.setNextStatement(true);
      this.appendStatementInput('DO0')
          .appendField(Blockly.Msg.CONTROLS_IF_MSG_THEN);
    }
@@ -428,16 +427,12 @@ Blockly.Blocks['heroes_on_collision'] = {
 
    init: function() {
      this.setColour(Heroes.Blocks.EVENT_HUE);
-     this.setPreviousStatement(true);
-     this.setNextStatement(true);
-     this.appendDummyInput()
-         .appendField('On Collision');
 
      var workspace = this.workspace.targetWorkspace || this.workspace;
      this.appendDummyInput()
-         .appendField('with');
-     this.appendDummyInput()
+         .appendField('If I Touch')
          .appendField(new Blockly.FieldDropdown(workspace.objects), 'WHAT');
+
 
      this.appendStatementInput('DO0')
          .appendField(Blockly.Msg.CONTROLS_IF_MSG_THEN);
