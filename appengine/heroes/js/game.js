@@ -37,14 +37,11 @@ var Game = function(username)
   self.ctxScratch = document.getElementById(self.username + '-scratch').getContext('2d');
   self.ctxLines = document.getElementById(self.username + '-lines').getContext('2d');
 
-  self.game_world = new GameWorld(username);
-
   /**
    * Number of milliseconds that execution should delay.
    * @type number
    */
   self.pause = 0;
-
   self.radius = 32;
 
 
@@ -63,7 +60,10 @@ var Game = function(username)
     {
       self.heroes[hero].reset();
     }
-    self.game_world.reset();
+    if (self.game_world)
+    {
+      self.game_world.reset();
+    }
 
     //
     // Clear game state.
@@ -99,7 +99,10 @@ var Game = function(username)
     self.ctxScratch.clearRect(0, 0, self.ctxDisplay.canvas.clientWidth, self.ctxDisplay.canvas.clientHeight);
     self.ctxDisplay.clearRect(0, 0, self.ctxDisplay.canvas.clientWidth, self.ctxDisplay.canvas.clientHeight);
 
-    self.game_world.draw(self.ctxDisplay);
+    if (self.game_world)
+    {
+      self.game_world.draw(self.ctxDisplay);
+    }
     for (var hero in self.heroes)
     {
       self.heroes[hero].draw(self.ctxScratch);
@@ -184,15 +187,31 @@ var Game = function(username)
   //
   // Each new hero should be offset from the last.
   //
-  var hero_offset = 6;
-  self.starting_x = Heroes.WIDTH/hero_offset;
+  var hero_offset = 4;
+  self.starting_x = Heroes.WIDTH/hero_offset/2;
   self.starting_y = Heroes.HEIGHT - Heroes.HEIGHT/hero_offset;
+
+  self.new_hero_callback = function(){};
+  self.register_new_hero_callback = function(fn)
+  {
+    self.new_hero_callback = fn;
+  }
+
+  self.setup_game_world = function()
+  {
+    self.game_world = new GameWorld(username);
+    self.new_hero_callback("world", "world", self.game_world.workspace);
+  }
 
   self.addHero = function(name, type) {
     //
     // Register the hero.
     //
-
+    if (self.heroes[name])
+    {
+      console.log("This hero already exists: ", name);
+      return;
+    }
     self.heroes[name] = new Hero(name, type, self.radius, self.starting_x,
       self.starting_y, username, self.ctxLines);
 
@@ -209,18 +228,20 @@ var Game = function(username)
     self.starting_x += Heroes.WIDTH/hero_offset;
     if (self.starting_x > Heroes.WIDTH)
     {
-      self.starting_x = Heroes.WIDTH/hero_offset;
+      self.starting_x = Heroes.WIDTH/hero_offset/2;
       self.starting_y -= Heroes.HEIGHT/hero_offset;
 
       if (self.starting_y < 0)
       {
-        self.starting_y = Heroes.HEIGHT/hero_offset;
+        self.starting_y = Heroes.HEIGHT/hero_offset/2;
       }
     }
+
+    self.new_hero_callback(name, self.heroes[name].char, self.heroes[name].workspace);
+    return self.heroes[name];
   };
 
   self.heroes = {};
-  self.addHero(self.username, "human");
 
   ["lion", "eagle", "human"].forEach(function(animal)
   {
@@ -233,11 +254,6 @@ var Game = function(username)
     var name = $("#" + username + "-hero-name").val();
     var type = $("#" + username + "-hero-type").val();
 
-    if (self.heroes[name])
-    {
-      console.log("This hero already exists: ", name);
-      return;
-    }
     if (!name || !type)
     {
       console.log("Fill out the whole form: ", name, type);

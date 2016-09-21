@@ -64,10 +64,10 @@ Heroes.GAME_HTML =
   '</div>' +
   '<div class=blockly>' +
     '<ul class="nav nav-tabs" id="{user}-tabs" role="tablist">' +
-      '<li role="presentation" id="{user}-new-hero-button"><a data-toggle="tab" role="tab" href="#{user}-add-hero" aria-controls="{user}-add-hero"> + New Hero</a></li>'  +
+      '<li class="{read_only}-hero-form" role="presentation" id="{user}-new-hero-button"><a data-toggle="tab" role="tab" href="#{user}-add-hero" aria-controls="{user}-add-hero"> + New Hero</a></li>'  +
     '</ul>' +
     '<div class="tab-content" id="{user}-blockly">' +
-      '<form role="tabpanel" class="tab-pane active" id="{user}-add-hero">' +
+      '<form role="tabpanel" class="tab-pane" id="{user}-add-hero">' +
         '<div class="form-group">' +
           '<label for="hero-name">Name</label>' +
           '<input type="text" class="form-control" id="{user}-hero-name" placeholder="Andrew">' +
@@ -144,12 +144,15 @@ Heroes.init = function() {
   setTimeout(BlocklyInterface.importPrettify, 1);
 
   // Add a game
-  var student_workspace = Heroes.addGame(false, getUsername());
-  //initStudentWilddog( "Heroes", BlocklyGames.LEVEL, student_workspace, getSavedGame());
+  var student_game = Heroes.addGame(false, getUsername());
+  initStudentWilddog( "Heroes", BlocklyGames.LEVEL, student_game, getSavedGame());
+  student_game.setup_game_world();
+  student_game.addHero(getUsername(), "human");
+  student_game.reset();
 
   if (getUsername() !== "Classadoo_instructor")
   {
-//    Heroes.add_remote_user("Classadoo_instructor");
+    Heroes.add_remote_user("Classadoo_instructor");
     var publish = function(e) {
       var project_name = prompt("Choose a project name", getUsername() + "'s game");
       if (project_name)
@@ -236,7 +239,7 @@ Heroes.init = function() {
       //
       if (!Heroes.remote_user)
       {
-    //    Heroes.add_remote_user(username);
+        Heroes.add_remote_user(username);
       }
     }
 
@@ -294,10 +297,11 @@ Heroes.addGame = function(readOnly, username)
 
 
   var game = new Game(username);
-  game.reset();
 
   BlocklyGames.bindClick(username + '-runButton', game.runButtonClick);
   BlocklyGames.bindClick(username + '-resetButton', game.resetButtonClick);
+
+  return game;
 }
 
 Heroes.add_remote_user = function(username)
@@ -320,10 +324,10 @@ Heroes.add_remote_user = function(username)
   }
   else
   {
-    var remote_workspace = Heroes.addGame(true, username);
-
-    //todo make it collaborative with all the workspaces. yikes.
-//    connectSubscriber(username, remote_workspace, getSavedGame());
+    var remote_game = Heroes.addGame(true, username);
+    remote_game.setup_game_world();
+    remote_game.reset()
+    connectSubscriber(username, remote_game, getSavedGame());
   }
 }
 

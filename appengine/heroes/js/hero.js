@@ -44,37 +44,38 @@ var chars_per_line = 40;
 
 
 function Hero(name, char, radius, x, y, username, line_context) {
-  var self = this;
 
-  self.ctxLines = line_context;
+var self = this;
 
-  self.x = x || 0;
-  self.y = y || 0;
-  self.starting_x = self.x;
-  self.starting_y = self.y;
+self.ctxLines = line_context;
 
-
-  self.pen = true;
-  self.colour = null;
-  self.width = 5;
-
-  self.char = char;
-  self.image = chars[char] || chars["andrew"];
-  self.radius = radius;
-
-  self.collision_events = {};
-  self.collisions_in_progress = {};
-
-  SpriteLike.call(self, username, name);
+self.x = x || 0;
+self.y = y || 0;
+self.starting_x = self.x;
+self.starting_y = self.y;
 
 
-  //
-  // Add sounds to our library.
-  //
-  Heroes.NOISES.forEach(function(el)
-  {
-    self.workspace.loadAudio_(['heroes/' + el[1] + '.mp3'], el[1]);
-  });
+self.pen = true;
+self.colour = null;
+self.width = 5;
+
+self.char = char;
+self.image = chars[char] || chars["andrew"];
+self.radius = radius;
+
+self.collision_events = {};
+self.collisions_in_progress = {};
+
+SpriteLike.call(self, username, name);
+
+
+//
+// Add sounds to our library.
+//
+Heroes.NOISES.forEach(function(el)
+{
+  self.workspace.loadAudio_(['heroes/' + el[1] + '.mp3'], el[1]);
+});
 
 
 // Draws this item to a given context.

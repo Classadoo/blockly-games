@@ -19,6 +19,11 @@ button.publish {
 .blockly {
   margin-top: -42px;
 }
+
+.true-hero-form
+{
+  display:none !important;
+}
 .username {
   padding-left:20px;
   font-family:Helvetica;
