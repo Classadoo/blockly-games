@@ -103,6 +103,7 @@ self.execute = function()
 {
   document.getElementById(self.dom_id + '-spinner').style.visibility = 'visible';
   var code = Blockly.JavaScript.workspaceToCode(self.workspace);
+  code = prioritize_callbacks(code);
   self.interpreter = new Interpreter(code, self.initInterpreter);
   self.pidList.push(setTimeout(function(){self.executeChunk_(self.interpreter)}, 100));
 }
@@ -210,4 +211,35 @@ self.remove = function()
   $("#" + self.dom_id + "-li").remove();
   $("#" + self.dom_id + "-container").remove();
 };
+}
+
+
+//
+// HACK! Utility for grabbing all event code and moving it to the front of our code.
+// Functions MUST start with a specific string to be moved forward.
+// Also we're screwed if there is a random ( or ) in a string.
+//
+var prioritize_callbacks = function(code)
+{
+  var start_token = "<callback>";
+  var end_token = "</callback>";
+
+  while (true)
+  {
+    var start_index = code.indexOf(start_token);
+    var end_index = code.indexOf(end_token);
+
+    if ((start_index == -1) ^ (end_index == -1))
+    {
+      console.log("Uh oh, there weren't matching callback tokens. We're giving up...");
+      return code;
+    }
+    if (start_index == -1)
+    {
+      break;
+    }
+    var callback = code.substring(start_index + start_token.length, end_index);
+    code = callback + code.substring(0, start_index) + code.substring(end_index + end_token.length, code.length);
+  }
+  return code;
 }

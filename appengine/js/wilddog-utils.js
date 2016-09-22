@@ -129,8 +129,8 @@ var publishDeleteHero = function(username, hero_name, saved_game)
 var connectPublisherWorkspace = function(username, hero_name, hero_type, workspace, saved_game)
 {
   var snapshot_key = saved_game || "Untitled Heroes"
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + snapshot_key);
-  ref['child'](hero_name)["update"]({type: hero_type});
+  var game_ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + snapshot_key);
+  game_ref['child'](hero_name)["update"]({type: hero_type});
 
   workspace.addChangeListener(function(change) {
     //
