@@ -32,6 +32,26 @@ function getRandomColor() {
   return color;
 }
 
+function draw_rotated_image(context, image, x, y, width, height, angle)
+{
+    // save the current co-ordinate system
+    // before we screw with it
+    context.save();
+
+    // move to the middle of where we want to draw our image
+    context.translate(x, y);
+
+    // rotate around that point
+    context.rotate(-angle);
+
+    // draw it up and to the left by half the width
+    // and height of the image
+    context.drawImage(image, -width/2, -height/2, width, height);
+
+    // and restore the co-ords to how they were when we began
+    context.restore();
+}
+
 var chars = {};
 chars["eagle"] = new Image();
 chars["eagle"].src = "heroes/eagle.png";
@@ -73,8 +93,8 @@ SpriteLike.call(self, name, sprite_ide);
 // Draws this item to a given context.
 self.draw = function(ctx)
 {
-  ctx.drawImage(self.image, self.x - self.radius,
-    self.y - self.radius, self.radius * 2, self.radius * 2);
+  draw_rotated_image(ctx, self.image, self.x,
+    self.y, self.radius * 2, self.radius * 2, self.heading);
   self.draw_speech(ctx);
 }
 
