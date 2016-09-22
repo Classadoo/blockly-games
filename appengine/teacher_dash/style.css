@@ -1,15 +1,3 @@
-button.primary {
-  /* Can't use "text-align: start" due to IE. */
-  text-align: left;
-}
-html[dir="RTL"] button.primary {
-  text-align: right;
-}
-
-.blockly {
-  height: 300px;
-  width: 1000px;
-}
 .user_error {
   color:#ff1111;
   font-weight:bold;
@@ -25,37 +13,6 @@ html[dir="RTL"] button.primary {
   width: 250px;
 }
 
-/* Slider. */
-.sliderTrack {
-  stroke: #aaa;
-  stroke-width: 6px;
-  stroke-linecap: round;
-}
-.sliderKnob {
-  fill: #ddd;
-  stroke: #bbc;
-  stroke-width: 1px;
-  stroke-linejoin: round;
-}
-.sliderKnob:hover {
-  fill: #eee;
-}
-
-/* Sprited icons. */
-.icon21 {
-  height: 21px;
-  width: 21px;
-  background-image: url(icons.png);
-}
-.camera {
-  background-position: -21px 0px;
-}
-.stop {
-  background-position: -42px 0px;
-}
-.run {
-  background-position: -63px 0px;
-}
 .username, .user_level {
   padding: 4px
 }

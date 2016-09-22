@@ -58,8 +58,9 @@ Heroes.GAME_HTML =
         '</td>' +
       '</tr>' +
     '</table>' +
-  '</div>' +
-  '<div class=blockly>' +
+  '</div>'
+Heroes.BLOCKLY_HTML =
+  '<div class="blockly">' +
     '<ul class="nav nav-tabs" id="{user}-tabs" role="tablist">' +
       '<li class="{read_only}-hero-form" role="presentation" id="{user}-new-hero-button"><a data-toggle="tab" role="tab" href="#{user}-add-hero" aria-controls="{user}-add-hero"> + New Hero</a></li>'  +
     '</ul>' +
@@ -82,7 +83,7 @@ Heroes.GAME_HTML =
 
 Heroes.PUBLISH_HTML =
 '<td><button id="publishButton" class="primary publish" title="Save this program for viewing later.">' +
-  '<img src="common/1x1.gif" class="camera icon21"> Publish Project</button></td>'
+  '<img src="common/1x1.gif" class="camera icon21"> Save Project</button></td>'
 
 Heroes.USER_DROPDOWN = '<select id="student_dropdown"></select>';
 
@@ -142,9 +143,9 @@ Heroes.init = function() {
 
   // Add a game
   var student_game = Heroes.addGame(false, getUsername());
-  initStudentWilddog( "Heroes", BlocklyGames.LEVEL, student_game, getSavedGame());
-  student_game.setup_game_world();
-  student_game.addHero(getUsername(), "human");
+  initStudentWilddog( "Heroes", BlocklyGames.LEVEL, student_game.ide, getSavedGame());
+  student_game.ide.new_world_tab();
+  student_game.ide.new_hero_tab(getUsername(), "human");
   student_game.reset();
 
   if (getUsername() !== "Classadoo_instructor")
@@ -225,7 +226,7 @@ Heroes.init = function() {
 
     var new_classmate = function()
     {
-      student_dropdown.append($('<option></option>')['val'](username)['html'](username));
+      student_dropdown['append']($('<option></option>')['val'](username)['html'](username));
       if (username == "Classadoo_instructor")
       {
         student_dropdown['val'](username);
@@ -277,10 +278,15 @@ Heroes.addGame = function(readOnly, username)
   var new_game = document.createElement("div");
   new_game.id = username + "_container";
   new_game.className = "row";
+
   var publish_button = readOnly ? "" : Heroes.PUBLISH_HTML;
-  new_game.innerHTML = Heroes.GAME_HTML.replace(/{user}/g, username)
-    .replace(/{read_only}/g, readOnly)
+  var game_html = Heroes.GAME_HTML.replace(/{user}/g, username)
     .replace("{publish_button}", publish_button);
+
+  var blockly_html = Heroes.BLOCKLY_HTML.replace(/{user}/g, username)
+    .replace(/{read_only}/g, readOnly)
+
+  new_game.innerHTML = game_html + blockly_html;
 
   var games_div = document.getElementById('games');
   games_div.appendChild(new_game);
@@ -322,9 +328,9 @@ Heroes.add_remote_user = function(username)
   else
   {
     var remote_game = Heroes.addGame(true, username);
-    remote_game.setup_game_world();
+    remote_game.ide.new_world_tab();
     remote_game.reset()
-    connectSubscriber(username, remote_game, getSavedGame());
+    connectSubscriber(username, remote_game.ide, getSavedGame());
   }
 }
 

@@ -22,11 +22,11 @@ goog.provide('GameWorld');
 goog.require('SpriteLike');
 
 
-var GameWorld = function(username)
+var GameWorld = function(username, sprite_ide)
 {
 var self = this;
 
-SpriteLike.call(self, username, "World", "world_toolbox");
+SpriteLike.call(self, "World", sprite_ide);
 
 
 self.items = [];
