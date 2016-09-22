@@ -139,7 +139,7 @@ Blockly.JavaScript['heroes_sleep'] = function(block) {
   // Generate JavaScript for sleeping.
   var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
       Blockly.JavaScript.ORDER_NONE) || '0';
-  return 'sleep('+ value + ', \'block_id_' + block.id + '\');\n';
+  return 'set_sleep('+ value + ', \'block_id_' + block.id + '\');\n';
 };
 
 Blockly.Blocks['heroes_move'] = {

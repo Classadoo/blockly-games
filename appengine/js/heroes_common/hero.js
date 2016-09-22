@@ -271,8 +271,11 @@ self.checkCollisions = function(other_heroes, items, item_radius)
         item = items[i];
         if (compute_distance(item.x, item.y, self.x, self.y) < (self.radius + item_radius))
         {
-          var interpreter = new Interpreter(self.collision_events[what], self.initInterpreter);
-          setTimeout( function(){self.executeChunk_(interpreter);}, 1);
+          // Use anonymous function to put a closure around the temporary interpreter.
+          (function() {
+            var interpreter = new Interpreter(self.collision_events[what], self.initInterpreter);
+            setTimeout( function(){self.executeChunk_(interpreter);}, 1);
+          })();
           items.splice(i, 1);
         }
       }
@@ -394,9 +397,9 @@ self.initInterpreter = function(interpreter, scope) {
       interpreter.createNativeFunction(wrapper));
 
   wrapper = function(duration, id) {
-    self.sleep(duration.valueOf(), id.toString());
+    self.set_sleep(duration.valueOf(), id.toString());
   };
-  interpreter.setProperty(scope, 'sleep',
+  interpreter.setProperty(scope, 'set_sleep',
       interpreter.createNativeFunction(wrapper));
 };
 }

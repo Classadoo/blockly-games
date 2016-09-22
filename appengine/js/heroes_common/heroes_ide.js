@@ -228,6 +228,8 @@ $('#' + username + '-tabs a')['click'](function (e) {
   e['preventDefault']();
   $(this)['tab']('show');
   onresize();
+  self.workspace.zoomToFit();
+  self.workspace.zoomCenter(-1);
 })
 $('#' + username + '-tabs a[href="#' + self.dom_id + '-container"]')['click']();
 

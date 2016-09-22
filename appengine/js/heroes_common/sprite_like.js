@@ -53,24 +53,25 @@ self.executeChunk_ = function(interpreter) {
       alert(e);
       go = false;
     }
-    if (go && self.pause) {
+    if (go && (self.pause || self.sleep)) {
       // The last executed command requested a pause.
       go = false;
       self.pidList.push(
-          setTimeout(function(){self.executeChunk_(interpreter)}, self.pause));
+          setTimeout(function(){self.executeChunk_(interpreter)}, self.pause + self.sleep));
     }
   } while (go);
 
   // Wrap up if complete.
-  if (!self.pause) {
+  if (!(self.pause || self.sleep)) {
     self.ide.spinner(false);
     self.ide.highlightBlock(null);
   }
 };
 
-self.sleep = function(duration_s, id)
+self.set_sleep = function(duration_s, id)
 {
-  self.pause = duration_s * 1000;
+  self.sleep = duration_s * 1000;
+  setTimeout(function(){self.sleep = 0}, self.sleep);
   self.animate(id, true);
 }
 
