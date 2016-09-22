@@ -68,6 +68,12 @@ self.executeChunk_ = function(interpreter) {
   }
 };
 
+self.sleep = function(duration_s, id)
+{
+  self.pause = duration_s * 1000;
+  self.animate(id, true);
+}
+
 // Events for override.
 self.setButtonCallback = function(which, fn, id)
 {
@@ -127,7 +133,7 @@ self.end_process = function()
  * Highlight a block and pause.
  * @param {?string} id ID of block.
  */
-self.animate = function(id) {
+self.animate = function(id, skip_pause) {
   if (id) {
     var m = id.match(/^block_id_([^']+)$/);
     if (m) {
@@ -135,7 +141,7 @@ self.animate = function(id) {
     }
     self.ide.highlightBlock(id);
     var stepSpeed = 600 * Math.pow(1 - Heroes.speedSlider.getValue(), 2);
-    self.pause = Math.max(1, stepSpeed);
+    self.pause = skip_pause ? self.pause : Math.max(1, stepSpeed);
   }
 };
 }

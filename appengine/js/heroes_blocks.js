@@ -114,10 +114,32 @@ Blockly.Blocks['heroes_move_forward'] = {
 };
 
 Blockly.JavaScript['heroes_move_forward'] = function(block) {
-  // Generate JavaScript for moving forward or backwards.
+  // Generate JavaScript for moving forward.
   var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
       Blockly.JavaScript.ORDER_NONE) || '0';
   return 'moveForward('+ value + ', \'block_id_' + block.id + '\');\n';
+};
+
+Blockly.Blocks['heroes_sleep'] = {
+  /**
+   * Block for sleeping.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(Heroes.Blocks.HUE);
+    this.appendValueInput('VALUE')
+        .setCheck('Number')
+        .appendField('Pause');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+  }
+};
+
+Blockly.JavaScript['heroes_sleep'] = function(block) {
+  // Generate JavaScript for sleeping.
+  var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+      Blockly.JavaScript.ORDER_NONE) || '0';
+  return 'sleep('+ value + ', \'block_id_' + block.id + '\');\n';
 };
 
 Blockly.Blocks['heroes_move'] = {

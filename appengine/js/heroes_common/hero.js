@@ -392,6 +392,12 @@ self.initInterpreter = function(interpreter, scope) {
   };
   interpreter.setProperty(scope, 'penColour',
       interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(duration, id) {
+    self.sleep(duration.valueOf(), id.toString());
+  };
+  interpreter.setProperty(scope, 'sleep',
+      interpreter.createNativeFunction(wrapper));
 };
 }
 
