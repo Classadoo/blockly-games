@@ -413,14 +413,12 @@ Blockly.JavaScript['heroes_add_hero'] = function(block) {
       block.id + '\');\n';
 };
 
-
+// Remove newlines, and mark this as a callback, which should be moved to the front of the
+// code sequence. Kinda fishy, yes.
+// TODO(aheine): figure out why the stupid interpreter can't handle newlines the way I did it.
 var clean_event_block = function(branch)
 {
-  // The interpreter can't handle nested events due to the nested strings.
-  // They don't make a ton of sense, so let's remove them.
-  // Note: We used to not have previous/next statements, so these had to be standalone statements,
-  // but not having order made it confusing. Often events wouldn't be set up until after a collision had occurred, for example.
-  return branch.replace(/setCollisionCallback.*;/g, "").replace(/setButtonCallback.*;/g, "").trim().replace(/\n/g, "");
+  return "<callback>" + branch.trim().replace(/\n/g, "") + "\n</callback>";
 }
 
 Blockly.Blocks['heroes_on_arrow'] = {
@@ -457,7 +455,6 @@ Blockly.JavaScript['heroes_on_arrow'] = function(block) {
   //
 
   var branch = Blockly.JavaScript.statementToCode(block, 'DO0');
-  branch = clean_event_block(branch);
   var direction_number = parseInt(block.getFieldValue('DIR'));
 
   //
@@ -465,6 +462,7 @@ Blockly.JavaScript['heroes_on_arrow'] = function(block) {
   //
 
   var code = 'setButtonCallback(' + direction_number + ', \"' + branch + '\", \'block_id_' + block.id +'\');';
+  code = clean_event_block(code);
   return code + '\n';
 };
 
@@ -497,7 +495,6 @@ Blockly.JavaScript['heroes_on_collision'] = function(block) {
   //
 
   var branch = Blockly.JavaScript.statementToCode(block, 'DO0');
-  branch = clean_event_block(branch);
 
   //
   // Trim the spaces and newlines (for the stupid interpreter), and pass it thru as a string.
@@ -505,6 +502,7 @@ Blockly.JavaScript['heroes_on_collision'] = function(block) {
 
   var code = 'setCollisionCallback("' +
       block.getFieldValue('WHAT') + '", \"' + branch+ '\", \'block_id_' + block.id +'\');';
+  code = clean_event_block(code);
   return code + '\n';
 };
 
