@@ -1,0 +1,29 @@
+
+.workspace {
+  height: 400px;
+  margin-top: 5px;
+}
+
+.blockly {
+  height: 450px;
+  min-height: 1px;
+  padding-right: 15px;
+  float: left;
+}
+.hero-tab {
+  font-weight:bold;
+}
+.spinner
+{
+  visibility: hidden;
+  margin-left:5px
+}
+.true-hero-form
+{
+  display:none !important;
+}
+.username {
+  padding-left:20px;
+  font-family:Helvetica;
+  font-size:20px;
+}

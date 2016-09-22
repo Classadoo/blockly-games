@@ -21,6 +21,7 @@ goog.provide('HeroesGame');
 
 goog.require('HeroObject');
 goog.require('GameWorld');
+goog.require('HeroesIDE');
 
 
 //
@@ -31,6 +32,7 @@ var Game = function(username)
 var self = this;
 
 self.username = username;
+self.ide = new IDE(username, self);
 self.pidList = [];
 
 self.ctxDisplay = document.getElementById(self.username + '-display').getContext('2d');
@@ -185,34 +187,28 @@ var hero_offset = 4;
 self.starting_x = Heroes.WIDTH/hero_offset/2;
 self.starting_y = Heroes.HEIGHT - Heroes.HEIGHT/hero_offset;
 
-self.setup_game_world = function()
+self.setup_game_world = function(ide_tab)
 {
-  self.game_world = new GameWorld(username);
-  connectPublisherWorkspace(self.username, "world", "world", self.game_world.workspace);
+  self.game_world = new GameWorld(username, ide_tab);
 }
 
-self.addHero = function(name, type) {
-  //
-  // Register the hero.
-  //
-  if (self.heroes[name])
-  {
-    console.log("This hero already exists: ", name);
-    return;
-  }
+self.addHero = function(name, type, ide_tab) {
+
   self.heroes[name] = new Hero(name, type, hero_radius, self.starting_x,
-    self.starting_y, username, self.ctxLines);
+    self.starting_y, self.ctxLines, ide_tab);
 
   //
   // Draw her.
   //
 
   self.display();
+  self.cycle_starting_locations();
 
-  //
-  // Adjust the starting points.
-  //
+  return self.heroes[name];
+};
 
+self.cycle_starting_locations = function()
+{
   self.starting_x += Heroes.WIDTH/hero_offset;
   if (self.starting_x > Heroes.WIDTH)
   {
@@ -224,103 +220,21 @@ self.addHero = function(name, type) {
       self.starting_y = Heroes.HEIGHT/hero_offset/2;
     }
   }
-
-  //
-  // Tell all the workspaces about this hero, so they can use her in their events.
-  // Simultaneously, tell this workspace about all the old heroes.
-  //
-
-  for (var hero in self.heroes)
-  {
-    if (name != hero)
-    {
-      self.heroes[hero].workspace.objects.push([name, name]);
-      self.heroes[name].workspace.objects.push([hero, hero]);
-    }
-  }
-
-  //
-  // Register callback for delete button.
-  //
-  $("#" + self.heroes[hero].dom_id + "-x").click(
-    function()
-    {
-      self.remove_hero(name);
-    }
-  )
-
-  connectPublisherWorkspace(self.username, name, self.heroes[name].char, self.heroes[name].workspace);
-  return self.heroes[name];
-};
+}
 
 self.remove_hero = function(name)
 {
-
-  //
-  // Remove from DOM.
-  //
-  self.heroes[name].remove();
-
   //
   // Forget the object.
   //
   delete self.heroes[name];
-
-  //
-  // Remove hero from collision list.
-  //
-  for (var hero in self.heroes)
-  {
-    // Iterate in reverse so the index isn't affected when we remove elements.
-    var i = self.heroes[hero].workspace.objects.length;
-    var item;
-    while (i--) {
-      if (self.heroes[hero].workspace.objects[i][0] == name)
-      {
-        self.heroes[hero].workspace.objects.splice(i, 1);
-      }
-    }
-  }
 
 
   //
   // Redraw without her.
   //
   self.display();
-
-  //
-  // Remove from wilddog
-  //
-  publishDeleteHero(self.username, name);
 };
-
-["lion", "eagle", "human"].forEach(function(animal)
-{
-  $("#" + username + "-hero-type").append($("<option></option>")
-                    .attr("value",animal)
-                    .text(animal));
-});
-$("#" + self.username + "-submit-hero").click(function()
-{
-  var name = $("#" + username + "-hero-name").val();
-  var type = $("#" + username + "-hero-type").val();
-
-  if (!name || !type)
-  {
-    console.log("Fill out the whole form: ", name, type);
-    return;
-  }
-
-  self.addHero(name, type);
-})
-
-// If the user hits enter, prevent the POST event and just add a hero.
-$('.tab-pane').keydown(function(event){
-  if(event.keyCode == 13) {
-    event.preventDefault();
-    $("#" + self.username + "-submit-hero").click();
-  }
-});
 
 /**
  * Start the event polling.

@@ -43,10 +43,9 @@ chars["human"].src = "heroes/andrew.png";
 var chars_per_line = 40;
 
 
-function Hero(name, char, radius, x, y, username, line_context) {
+function Hero(name, char, radius, x, y, line_context, sprite_ide) {
 
 var self = this;
-
 self.ctxLines = line_context;
 
 self.x = x || 0;
@@ -68,16 +67,7 @@ self.radius = radius;
 self.collision_events = {};
 self.collisions_in_progress = {};
 
-SpriteLike.call(self, username, name);
-
-
-//
-// Add sounds to our library.
-//
-Heroes.NOISES.forEach(function(el)
-{
-  self.workspace.loadAudio_(['heroes/' + el[1] + '.mp3'], el[1]);
-});
+SpriteLike.call(self, name, sprite_ide);
 
 
 // Draws this item to a given context.
@@ -140,7 +130,6 @@ self.reset = function()
 
   self.collision_events = {};
   self.key_events = {};
-  self.keys_down = {};
 
   self.end_process();
 }

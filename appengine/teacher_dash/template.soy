@@ -151,13 +151,17 @@
 {template .toolbox}
   <xml id="toolbox" style="display: none">
 
-  {call BlocklyGames.soy.heroes_tools /}
+    {call BlocklyGames.soy.heroes_tools /}
 
-  <category name="Maze">
-  {call BlocklyGames.soy.maze_tools /}
-  </category>
+    <category name="Maze">
+      {call BlocklyGames.soy.maze_tools /}
+    </category>
 
-  {call BlocklyGames.soy.turtle_tools /}
+    {call BlocklyGames.soy.turtle_tools /}
 
+  </xml>
+
+  <xml id="world_toolbox" style="display: none">
+    {call BlocklyGames.soy.heroes_world_tools /}
   </xml>
 {/template}

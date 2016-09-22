@@ -10,32 +10,14 @@ button.publish {
   border-color: #0b9d09 !important;
 }
 
-.blockly, .workspace {
-  height: 400px;
-}
-.workspace {
-  margin-top: 5px;
-}
 .blockly {
   margin-top: -42px;
 }
-.hero-tab {
-  font-weight:bold;
+
+#new_hero_button {
+  font-weight: bold;
 }
-.spinner
-{
-  visibility: hidden;
-  margin-left:5px
-}
-.true-hero-form
-{
-  display:none !important;
-}
-.username {
-  padding-left:20px;
-  font-family:Helvetica;
-  font-size:20px;
-}
+
 #student_dropdown {
   margin: 30px;
   margin-bottom: 15px;
@@ -47,18 +29,13 @@ button.publish {
   bottom: 11px;
 }
 
-.blockly, .visualization {
+.visualization {
   position: relative;
   min-height: 1px;
   padding-right: 15px;
   float: left;
-}
-.visualization {
   width: 600px !important;
   padding-left: 20px;
-}
-#new_hero_button {
-  font-weight: bold;
 }
 
 .read_only_true .blocklySvg {

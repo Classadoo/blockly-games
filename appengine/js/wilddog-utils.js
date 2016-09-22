@@ -36,7 +36,7 @@ window.onerror = function(errorMsg, url, lineNumber)
   var err_string = errorMsg + " - " + url + " - " + lineNumber;
   if (err_string != last_err_string)
   {
-    ref['update']({"error" : err_string});
+    ref['update']({error : err_string});
     last_err_string = err_string;
   }
 }
@@ -47,7 +47,6 @@ var sent_snapshots = {};
 
 var connectSubscriberWorkspace = function(username, game_ref, workspace, hero_name)
 {
-  console.log(hero_name, username);
   var workspace_ref = game_ref['child'](hero_name)['child']("workspace");
 
   workspace_ref['on']("value", function(code) {
@@ -84,7 +83,7 @@ var connectSubscriberWorkspace = function(username, game_ref, workspace, hero_na
 //
 // Connect to a remote game and apply all wilddog updates to our replica.
 //
-var connectSubscriber = function(username, game, saved_game)
+var connectSubscriber = function(username, ide, saved_game)
 {
 
   var snapshot_key = saved_game || "Untitled Heroes"
@@ -104,26 +103,22 @@ var connectSubscriber = function(username, game, saved_game)
     var workspace;
     if (name.toLowerCase() == "world")
     {
-      workspace = game.game_world.workspace;
+      workspace = ide.tabs["world"].workspace;
     }
     else
     {
-      var hero = game.addHero(name, child['val']()['type']);
-      if (!hero)
-      {
-        hero = game.heroes[name]
-      }
-      workspace = hero.workspace;
+      var tab = ide.new_hero_tab(name, child['val']()['type']);
+      workspace = tab.workspace;
     }
     connectSubscriberWorkspace(username, ref, workspace, name);
   });
 }
 
-var publishDeleteHero = function(username, hero_name, saved_game)
+var publishDeleteTab = function(username, tab_name, saved_game)
 {
   var snapshot_key = saved_game || "Untitled Heroes"
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + snapshot_key);
-  ref['child'](hero_name)['set'](null);
+  ref['child'](tab_name)['set'](null);
 }
 
 var connectPublisherWorkspace = function(username, hero_name, hero_type, workspace, saved_game)
@@ -168,7 +163,7 @@ var connectPublisherWorkspace = function(username, hero_name, hero_type, workspa
   });
 }
 
-var initStudentWilddog = function(game_name, level, game_object, saved_game){
+var initStudentWilddog = function(game_name, level, ide, saved_game){
   //
   // Give us a fresh start.
   //
@@ -184,5 +179,5 @@ var initStudentWilddog = function(game_name, level, game_object, saved_game){
   //
   // Subscribe to all our/teacher blockly changes.
   //
-  connectSubscriber(getUsername(), game_object, saved_game);
+  connectSubscriber(getUsername(), ide, saved_game);
 }

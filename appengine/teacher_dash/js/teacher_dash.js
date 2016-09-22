@@ -31,39 +31,57 @@ goog.require('BlocklyInterface');
 goog.require('Turtle_Collab.Blocks');
 
 goog.require('Heroes.Blocks');
+goog.require('HeroesIDE');
 goog.require('Maze.Blocks');
 goog.require('Teacher_Dash.soy');
 
 goog.require('WilddogUtils');
 
+// TODO(aheine): DRY
+Heroes.BLOCKLY_HTML =
+  '<div class="blockly" id="{user}_blockly">' +
+    '<ul class="nav nav-tabs" id="{user}-tabs" role="tablist">' +
+      '<li class="{read_only}-hero-form" role="presentation" id="{user}-new-hero-button"><a data-toggle="tab" role="tab" href="#{user}-add-hero" aria-controls="{user}-add-hero"> + New Hero</a></li>'  +
+    '</ul>' +
+    '<div class="tab-content" id="{user}-blockly">' +
+      '<form role="tabpanel" class="tab-pane" id="{user}-add-hero">' +
+        '<div class="form-group">' +
+          '<label for="hero-name">Name</label>' +
+          '<input type="text" class="form-control" id="{user}-hero-name" placeholder="Andrew">' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label for="hero-type">Type</label>' +
+          '<select class="form-control" id="{user}-hero-type"></select>' +
+        '</div>' +
+        '<button type="button" class="btn btn-default" id={user}-submit-hero>Submit</button>' +
+      '</form>' +
+    '</div>' +
+  '</div>';
+
+
 var newStudentBlockly = function(username)
 {
-  var new_student = document.createElement("div");
-  new_student.id = username + "_container";
-  new_student.innerHTML =
+  var new_student = $('<div class="container-fluid" id="' + username + '_container"></div>');
+  new_student.append(
+    '<div>' +
     '<span class="username">' + username + '</span>' +
     '<span class="user_level" id="' + username + '_level">Level ?</span>' +
     '<button type="button" class="user_clear" id="' + username + '_clear">Clear</button>' +
     '<span class="running_code" id="' + username + '_code_running"></span>' +
     '<span class="user_error" id="' + username + '_error"></span>' +
-    '<div class="blockly" id="' + username + '_blockly"></div>';
-  document.getElementById('students').appendChild(new_student);
+    '</div>');
+  new_student.append(Heroes.BLOCKLY_HTML.replace(/{user}/g, username)
+    .replace(/{read_only}/g, false));
 
-  document.getElementById(username + '_clear').addEventListener("click", function()
+
+  $('#students').append(new_student);
+
+  $('#' + username + '_clear').click(function()
   {
     var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username);
     ref['remove']();
   });
 
-  var toolbox = document.getElementById('toolbox');
-  return Blockly.inject(username + '_blockly',
-      {'media': 'third-party/blockly/media/',
-       'rtl': false,
-       'scrollbars':true,
-       'toolbox': toolbox,
-       'trashcan': true,
-       'zoom': {'controls': true, 'wheel': true, 'maxScale' : 1.3, 'minScale' : 0.7}
-     });
 }
 
 var received_snapshots = {};
@@ -71,31 +89,26 @@ var received_snapshots = {};
 var initStudent = function(username)
 {
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username);
-  //
-  // Inject a new blockly canvas into the list of canvases.
-  //
 
-  var workspace = newStudentBlockly(username);
+  //
+  // Add the HTML containers for the student
+  //
+  newStudentBlockly(username);
 
   //
   // Setup remote control of canvas.
   //
-
-  var events_in_progress = {};
-  connectPublisher(username, workspace, getSavedGame());
-
-  //
-  // Setup remote reading of canvas.
-  //
-
-  connectSubscriber(username, workspace, getSavedGame());
+  var ide = new IDE(username, null);
+  ide.new_world_tab();
+  connectSubscriber(username, ide);
 
   // Watch out for the user being deleted.
   ref['parent']()['on']('child_removed', function(old_snapshot)
   {
     if (old_snapshot['key']() == username)
     {
-      workspace.clear();
+      //TODO(aheine): make a clear method for the IDE and dispose of every workspace.
+      //workspace.clear();
       var new_student = document.getElementById(username + "_container");
       new_student.style.display = "none";
     }
@@ -116,7 +129,7 @@ var initStudent = function(username)
     var error_div = document.getElementById(username + "_error");
     if (error_div)
     {
-      error_div.innerHTML = err_string['val']() ? "ERROR: " + err_string : "";
+      error_div.innerHTML = err_string['val']() ? "ERROR: " + err_string['val']() : "";
     }
   });
 
@@ -181,7 +194,7 @@ BlocklyGames.NAME = 'TeacherDash';
 /**
  * Initialize Blockly and the turtle.  Called on page load.
  */
-Turtle_Collab.init = function() {
+Teacher_Dash.init = function() {
   // Render the Soy template.
   document.body.innerHTML = Teacher_Dash.soy.start({}, null,
       {lang: BlocklyGames.LANG,
@@ -212,4 +225,4 @@ Turtle_Collab.init = function() {
   }
 };
 
-window.addEventListener('load', Turtle_Collab.init);
+window.addEventListener('load', Teacher_Dash.init);
