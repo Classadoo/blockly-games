@@ -34,23 +34,37 @@ self.pidList = [];
 self.interpreter = null;
 
 self.keys_down = {};
+self.dom_id = username + "-" + sprite_name;
 
 //
 // Add the tab for this hero.
 //
-var id = username + "-" + sprite_name;
-
 var workspaces = $('#' + username + '-blockly');
-$('<li role="presentation">' +
-    '<a href="#' + id + '-container" aria-controls="' + id + '-container" data-toggle="tab" role="tab" class="hero-tab">' +
-      sprite_name + '<img id="' + id + '-spinner" class="spinner" src="heroes/loading.gif" height=15 width=15>' +
-    '</a>' +
+var li = $('<li role="presentation" id="' + self.dom_id + '-li">' +
   '</li>').insertBefore("#" + username + "-new-hero-button");
-$('<div role="tabpanel" class="tab-pane active" id="' + id + '-container"><div class="workspace" id="' + id + '"</div></div>').insertBefore("#" + username + "-add-hero");
+
+var a = $('<a href="#' + self.dom_id + '-container" aria-controls="' + self.dom_id + '-container" data-toggle="tab" role="tab" class="hero-tab">' +
+    sprite_name +
+    '<img id="' + self.dom_id + '-spinner" class="spinner" src="heroes/loading.gif" height=15 width=15>' +
+  '</a>');
+
+//
+// Show the delete button, if this is an optional sprite owned by this page's user.
+//
+if (sprite_name.toLowerCase() != "world" && username==getUsername())
+{
+  a.append('<img id="' + self.dom_id + '-x" src="heroes/x.png" height=15 width=15>');
+}
+li.append(a);
+
+
+$('<div role="tabpanel" class="tab-pane active" id="' + self.dom_id + '-container">' +
+    '<div class="workspace" id="' + self.dom_id + '"</div>' +
+  '</div>').insertBefore("#" + username + "-add-hero");
 
 
 var toolbox = document.getElementById(toolbox_id);
-self.workspace = Blockly.inject(id,
+self.workspace = Blockly.inject(self.dom_id,
    {'media': 'third-party/blockly/media/',
     'toolbox': toolbox,
     'readOnly' : false, //readOnly,
@@ -61,7 +75,7 @@ self.workspace = Blockly.inject(id,
 self.workspace.objects = [["item", "item"]];
 self.workspace.traceOn(true);
 
-var blocklyDiv = document.getElementById(id);
+var blocklyDiv = document.getElementById(self.dom_id);
 var onresize = function(e) {
   var width = window.innerWidth - 620;
   blocklyDiv.style.width = width + 'px';
@@ -83,11 +97,11 @@ $('#' + username + '-tabs a').click(function (e) {
   $(this).tab('show');
   onresize();
 })
-$('#' + username + '-tabs a[href="#' + id + '-container"]').click();
+$('#' + username + '-tabs a[href="#' + self.dom_id + '-container"]').click();
 
 self.execute = function()
 {
-  document.getElementById(id + '-spinner').style.visibility = 'visible';
+  document.getElementById(self.dom_id + '-spinner').style.visibility = 'visible';
   var code = Blockly.JavaScript.workspaceToCode(self.workspace);
   self.interpreter = new Interpreter(code, self.initInterpreter);
   self.pidList.push(setTimeout(function(){self.executeChunk_(self.interpreter)}, 100));
@@ -116,7 +130,7 @@ self.executeChunk_ = function(interpreter) {
 
   // Wrap up if complete.
   if (!self.pause || self.event_mode) {
-    document.getElementById(id + '-spinner').style.visibility = 'hidden';
+    document.getElementById(self.dom_id + '-spinner').style.visibility = 'hidden';
     self.workspace.highlightBlock(null);
   }
 };
@@ -171,7 +185,7 @@ self.end_process = function()
   self.pidList.length = 0;
   self.interpreter = null;
   self.event_mode = false;
-  document.getElementById(id + '-spinner').style.visibility = 'hidden';
+  document.getElementById(self.dom_id + '-spinner').style.visibility = 'hidden';
 }
 
 
@@ -189,5 +203,11 @@ self.animate = function(id) {
     var stepSpeed = 600 * Math.pow(1 - Heroes.speedSlider.getValue(), 2);
     self.pause = Math.max(1, stepSpeed);
   }
+};
+
+self.remove = function()
+{
+  $("#" + self.dom_id + "-li").remove();
+  $("#" + self.dom_id + "-container").remove();
 };
 }
