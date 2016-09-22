@@ -36,7 +36,7 @@ window.onerror = function(errorMsg, url, lineNumber)
   var err_string = errorMsg + " - " + url + " - " + lineNumber;
   if (err_string != last_err_string)
   {
-    ref['update']({error : err_string});
+    ref['update']({"error" : err_string});
     last_err_string = err_string;
   }
 }
@@ -48,7 +48,6 @@ var sent_snapshots = {};
 var connectSubscriberWorkspace = function(username, game_ref, workspace, hero_name)
 {
   var workspace_ref = game_ref['child'](hero_name)['child']("workspace");
-
   workspace_ref['on']("value", function(code) {
     code = code['val']();
     if (!code)
@@ -125,7 +124,7 @@ var connectPublisherWorkspace = function(username, hero_name, hero_type, workspa
 {
   var snapshot_key = saved_game || "Untitled Heroes"
   var game_ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + snapshot_key);
-  game_ref['child'](hero_name)["update"]({type: hero_type});
+  game_ref['child'](hero_name)["update"]({"type": hero_type});
 
   workspace.addChangeListener(function(change) {
     //
@@ -157,7 +156,7 @@ var connectPublisherWorkspace = function(username, hero_name, hero_type, workspa
     //
     // Send the code to wilddog.
     //
-    game_ref['child'](hero_name)['update']({workspace : current_code});
+    game_ref['child'](hero_name)['update']({"workspace" : current_code});
 
     return;
   });
@@ -168,7 +167,7 @@ var initStudentWilddog = function(game_name, level, ide, saved_game){
   // Give us a fresh start.
   //
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername());
-  ref['update']({error: ""});
+  ref['update']({"error": ""});
 
   //
   // Send current level.
