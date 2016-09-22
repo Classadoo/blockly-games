@@ -117,25 +117,21 @@ var connectSubscriber = function(username, game, saved_game)
     }
     connectSubscriberWorkspace(username, ref, workspace, name);
   });
-
 }
 
-var connectPublisher = function(username, game, saved_game)
+var publishDeleteHero = function(username, hero_name, saved_game)
 {
   var snapshot_key = saved_game || "Untitled Heroes"
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + snapshot_key);
-
-  game.register_new_hero_callback(function(hero_name, hero_type, workspace)
-  {
-    // Update the type of the hero.
-
-    ref['child'](hero_name)["update"]({type: hero_type});
-    connectPublisherWorkspace(username, ref, hero_name, workspace)
-  });
+  ref['child'](hero_name)['set'](null);
 }
 
-var connectPublisherWorkspace = function(username, game_ref, hero_name, workspace)
+var connectPublisherWorkspace = function(username, hero_name, hero_type, workspace, saved_game)
 {
+  var snapshot_key = saved_game || "Untitled Heroes"
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + snapshot_key);
+  ref['child'](hero_name)["update"]({type: hero_type});
+
   workspace.addChangeListener(function(change) {
     //
     // Ignore UI events.
@@ -184,10 +180,6 @@ var initStudentWilddog = function(game_name, level, game_object, saved_game){
   //
   ref['update']({"level": game_name + "-" + level});
 
-  //
-  // Send all our blockly changes.
-  //
-  connectPublisher(getUsername(), game_object, saved_game);
 
   //
   // Subscribe to all our/teacher blockly changes.
