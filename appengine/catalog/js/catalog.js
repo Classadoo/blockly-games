@@ -60,6 +60,10 @@ Catalog.init = function()
   {
     $("#join-lesson")['append']("<div>" + classroom['val']() + "</div>");
     $("#join-lesson")['show']();
+    $("#video-link")['attr']("href",
+        "https://classadoo.github.io/meetingcenter/cmc/student.html?meetingID=" + encodeURIComponent(classroom['val']()) + "&name=" + getUsername());
+    $("#video-link")['show']();
+
   });
 }
 
