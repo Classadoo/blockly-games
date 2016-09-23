@@ -225,7 +225,7 @@ self.workspace.traceOn(true);
 
 var blocklyDiv = document.getElementById(self.dom_id);
 var onresize = function(e) {
-  var width = window.innerWidth - 620;
+  var width = window.innerWidth - 635;
   blocklyDiv.style.width = width + 'px';
 
   // We may have loaded stuff when the canvas was hidden, which corrupts the blocks.
@@ -286,8 +286,7 @@ self.highlightBlock = function(id)
 
 //
 // HACK! Utility for grabbing all event code and moving it to the front of our code.
-// Functions MUST start with a specific string to be moved forward.
-// Also we're screwed if there is a random ( or ) in a string.
+// Functions MUST start be wrapped in <callback /> to be moved forward.
 //
 var prioritize_callbacks = function(code)
 {

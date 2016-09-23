@@ -156,7 +156,7 @@ self.reset = function()
 
 self.makeNoise = function(name, id)
 {
-  self.workspace.playAudio(name, 0.5);
+  sprite_ide.workspace.playAudio(name, 0.5);
   self.animate(id);
 }
 

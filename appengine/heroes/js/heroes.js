@@ -118,6 +118,7 @@ Heroes.init = function() {
     // Setup the games for us and our classmates.
     //
 
+    Heroes.loadBlockly();
     Heroes.setupGames();
 
     //
@@ -132,7 +133,10 @@ Heroes.init = function() {
       }
     });
   });
+};
 
+Heroes.loadBlockly = function()
+{
   //
   // Some global Blockly setup.
   //
@@ -176,7 +180,7 @@ Heroes.init = function() {
   setTimeout(BlocklyInterface.importInterpreter, 1);
   // Lazy-load the syntax-highlighting.
   setTimeout(BlocklyInterface.importPrettify, 1);
-};
+}
 
 Heroes.setupGames = function()
 {

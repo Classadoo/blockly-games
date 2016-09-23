@@ -17,7 +17,7 @@ var getUsername = function()
 {
   if (window.location.pathname.indexOf("teacher_dash") > -1)
   {
-    return "classadoo_instructor";
+    return "Classadoo_instructor";
   }
   var username = (getQueryParam("username") || "unknown");
   username = username.toLowerCase();
