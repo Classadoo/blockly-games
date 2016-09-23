@@ -33,7 +33,7 @@ Catalog.init = function()
   var project_list = document.getElementById("project_list");
 
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername());
-  ref['child']('snapshots')['on']("child_added", function(project)
+  ref['child']('games')['on']("child_added", function(project)
   {
     $('#no-projects')['hide']();
     project = project['key']();
@@ -50,7 +50,7 @@ Catalog.init = function()
     }
     else
     {
-      new_project.href = "/appengine/heroes.html?level=4&username=" + getUsername() + "&saved=" + encodeURIComponent(project);
+      new_project.href = "/appengine/heroes.html?level=&username=" + getUsername() + "&saved=" + encodeURIComponent(project);
     }
     li.appendChild(new_project);
     project_list.appendChild(li);

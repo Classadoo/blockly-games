@@ -79,7 +79,7 @@ self.new_hero_tab = function(new_tab_name, type)
     return self.tabs[new_tab_name]
   }
 
-  self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name);
+  self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name, type);
 
   //
   // Tell all the workspaces about this hero, so they can use her in their events.
@@ -150,7 +150,7 @@ self.remove_tab = function(tab_name)
 
 self.new_world_tab = function()
 {
-  self.tabs["world"] = new IDE_Tab(self.username, "world", "world_toolbox");
+  self.tabs["world"] = new IDE_Tab(self.username, "world", "world", "world_toolbox");
   if (self.game)
   {
     self.game.setup_game_world(self.tabs["world"]);
@@ -158,14 +158,14 @@ self.new_world_tab = function()
   connectPublisherWorkspace(self.username, "world", "world", self.tabs["world"].workspace);
   return self.tabs["world"];
 }
-
 }
 
 //
 // Tab containing one workspace for a world/hero.
-var IDE_Tab = function(username, tab_name, toolbox_id)
+var IDE_Tab = function(username, tab_name, hero_type, toolbox_id)
 {
 var self = this;
+self.hero_type = hero_type;
 toolbox_id = toolbox_id || 'toolbox';
 self.dom_id = username + "-" + tab_name;
 

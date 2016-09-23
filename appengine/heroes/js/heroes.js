@@ -54,7 +54,6 @@ Heroes.GAME_HTML =
           '<button id="{user}-resetButton" class="primary" style="display: none" title="Stop the program and reset the level.">' +
             '<img src="common/1x1.gif" class="stop icon21"> Reset' +
           '</button>' +
-          '{publish_button}' +
         '</td>' +
       '</tr>' +
     '</table>' +
@@ -79,12 +78,6 @@ Heroes.BLOCKLY_HTML =
     '</div>' +
   '</div>';
 
-
-
-Heroes.PUBLISH_HTML =
-'<td><button id="publishButton" class="primary publish" title="Save this program for viewing later.">' +
-  '<img src="common/1x1.gif" class="camera icon21"> Save Project</button></td>'
-
 Heroes.USER_DROPDOWN = '<select id="student_dropdown"></select>';
 
 
@@ -96,6 +89,49 @@ Heroes.init = function() {
   //
   // First, figure out if they are in viewing or editing mode.
   //
+
+
+  //
+  // What class are they registered for?
+  //
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/");
+  var classroom = ref['child']("users")['child'](getUsername())['child']("classroom");
+  var all_classrooms = ref['child']("classrooms");
+
+  classroom['on']("value", function(snapshot)
+  {
+    //
+    // If we're not in a class, or our username doesn't exist, do nothing.
+    //
+    if (!snapshot['val']())
+    {
+      return;
+    }
+
+    //
+    // Set header.
+    //
+    Heroes.classroom = snapshot['val']();
+    $('#username-header')['html'](getUsername() + " - " + Heroes.classroom);
+
+    //
+    // Setup the games for us and our classmates.
+    //
+
+    Heroes.setupGames();
+
+    //
+    // Register callback for the max level of this classroom.
+    //
+    all_classrooms["child"](Heroes.classroom)["on"]("value", function(room)
+    {
+      if (room['val']())
+      {
+        var level_allowed = room['val']()['level'] || 999;
+        Heroes.setMaxLevel(level_allowed);
+      }
+    });
+  });
 
   //
   // Some global Blockly setup.
@@ -123,7 +159,7 @@ Heroes.init = function() {
        level: BlocklyGames.LEVEL,
        maxLevel: 5,
        html: BlocklyGames.IS_HTML,
-       suffix: "&username="+getUsername()});
+       suffix: "&username=" + getUsername() + "&saved=" + getSavedGame()});
 
   BlocklyInterface.init();
 
@@ -140,6 +176,15 @@ Heroes.init = function() {
   setTimeout(BlocklyInterface.importInterpreter, 1);
   // Lazy-load the syntax-highlighting.
   setTimeout(BlocklyInterface.importPrettify, 1);
+};
+
+Heroes.setupGames = function()
+{
+  if (Heroes.games_initialized)
+  {
+    return;
+  }
+  Heroes.games_initialized = true;
 
   // Add a game
   var student_game = Heroes.addGame(false, getUsername());
@@ -151,65 +196,12 @@ Heroes.init = function() {
   if (getUsername() !== "Classadoo_instructor")
   {
     Heroes.add_remote_user("Classadoo_instructor");
-    var publish = function(e) {
-      var project_name = prompt("Choose a project name", getUsername() + "'s game");
-      if (project_name)
-      {
-        // TODO(aheine): Fix this.
-      }
-    };
-    BlocklyGames.bindClick('publishButton', publish);
   }
 
   var student_dropdown = $('#student_dropdown');
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/");
-  var users = ref['child']("users");
-  var classrooms = ref['child']("classrooms");
 
-  users['child'](getUsername())['on']("value", function(snapshot)
-  {
-    //
-    // Hide levels if we are in a class.
-    //
-    if (!snapshot['val']())
-    {
-      return;
-    }
-    if (!snapshot['val']()['classroom'])
-    {
-      return;
-    }
-    Heroes.classroom = snapshot['val']()['classroom'];
-    $('#username-header')['html'](getUsername() + " - " + Heroes.classroom);
-    classrooms["child"](Heroes.classroom)["on"]("value", function(snapshot)
-    {
-      var room = snapshot['val']();
-      if (room)
-      {
-        var level_allowed = room['level'] || 999;
 
-        //
-        // Now do something crazy - go through all the levels and hide the ones that aren't allowed.
-        //
-
-        var levels = document.getElementsByClassName("level_number");
-        for (var i=0; i < levels.length; i++)
-        {
-          var num = levels[i].id.replace("level", "");
-          num = parseInt(num);
-          if (num > level_allowed)
-          {
-            levels[i].style.display = "none";
-          }
-          else
-          {
-            levels[i].style.display = "inline";
-          }
-        }
-      }
-    })
-  });
-
+  var users = new Wilddog("https://blocklypipe.wilddogio.com/users");
   users['on']("child_added", function(user)
   {
     var username = user['key']();
@@ -259,9 +251,8 @@ Heroes.init = function() {
   {
     Heroes.add_remote_user($(this)['val']());
   });
+}
 
-
-};
 
 Heroes.addGame = function(readOnly, username)
 {
@@ -273,9 +264,7 @@ Heroes.addGame = function(readOnly, username)
   new_game.id = username + "_container";
   new_game.className = "row";
 
-  var publish_button = readOnly ? "" : Heroes.PUBLISH_HTML;
   var game_html = Heroes.GAME_HTML.replace(/{user}/g, username)
-    .replace("{publish_button}", publish_button);
 
   var blockly_html = Heroes.BLOCKLY_HTML.replace(/{user}/g, username)
     .replace(/{read_only}/g, readOnly)
@@ -324,10 +313,31 @@ Heroes.add_remote_user = function(username)
     var remote_game = Heroes.addGame(true, username);
     remote_game.ide.new_world_tab();
     remote_game.reset()
-    connectSubscriber(username, remote_game.ide, getSavedGame());
+    connectSubscriber(username, remote_game.ide);
   }
 }
 
+Heroes.setMaxLevel = function(level_allowed)
+{
+  //
+  // Go through all the levels and hide the ones that aren't allowed.
+  //
+
+  var levels = document.getElementsByClassName("level_number");
+  for (var i=0; i < levels.length; i++)
+  {
+    var num = levels[i].id.replace("level", "");
+    num = parseInt(num);
+    if (num > level_allowed)
+    {
+      levels[i].style.display = "none";
+    }
+    else
+    {
+      levels[i].style.display = "inline";
+    }
+  }
+}
 
 window.addEventListener('load', Heroes.init);
 

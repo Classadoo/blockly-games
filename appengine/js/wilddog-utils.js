@@ -22,7 +22,8 @@ var getUsername = function()
 
 var getSavedGame = function()
 {
-  return getQueryParam("saved");
+  // Fall back to the name of this classroom.
+  return getQueryParam("saved") || Heroes.classroom;
 }
 
 ///
@@ -82,11 +83,10 @@ var connectSubscriberWorkspace = function(username, game_ref, workspace, hero_na
 //
 // Connect to a remote game and apply all wilddog updates to our replica.
 //
-var connectSubscriber = function(username, ide, saved_game)
+var connectSubscriber = function(username, ide)
 {
 
-  var snapshot_key = saved_game || "Untitled Heroes"
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + snapshot_key);
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + getSavedGame());
 
   //
   // First listen for new workspaces.
@@ -113,28 +113,19 @@ var connectSubscriber = function(username, ide, saved_game)
   });
 }
 
-var publishDeleteTab = function(username, tab_name, saved_game)
+var publishDeleteTab = function(username, tab_name)
 {
-  var snapshot_key = saved_game || "Untitled Heroes"
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + snapshot_key);
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + getSavedGame());
   ref['child'](tab_name)['set'](null);
 }
 
-var connectPublisherWorkspace = function(username, hero_name, hero_type, workspace, saved_game)
+var publishWorkspace = function(username, hero_name, hero_type, workspace)
 {
-  var snapshot_key = saved_game || "Untitled Heroes"
-  var game_ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + snapshot_key);
+  var game_ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + getSavedGame());
   game_ref['child'](hero_name)["update"]({"type": hero_type});
 
-  workspace.addChangeListener(function(change) {
-    //
-    // Ignore UI events.
-    // Also ignore CREATE events, since they'll be automatically followed by a MOVE event.
-    //
-    if (change.type == Blockly.Events.UI) {
-      return;
-    }
-
+  if (workspace)
+  {
     //
     // Get the current code.
     //
@@ -157,12 +148,26 @@ var connectPublisherWorkspace = function(username, hero_name, hero_type, workspa
     // Send the code to wilddog.
     //
     game_ref['child'](hero_name)['update']({"workspace" : current_code});
-
-    return;
-  });
+  }
 }
 
-var initStudentWilddog = function(game_name, level, ide, saved_game){
+var connectPublisherWorkspace = function(username, hero_name, hero_type, workspace)
+{
+  workspace.addChangeListener(function(change)
+  {
+    //
+    // Ignore UI events.
+    // Also ignore CREATE events, since they'll be automatically followed by a MOVE event.
+    //
+    if (change.type == Blockly.Events.UI) {
+      return;
+    }
+    publishWorkspace(username, hero_name, hero_type, workspace);
+  });
+  publishWorkspace(username, hero_name, hero_type, null);
+}
+
+var initStudentWilddog = function(game_name, level, ide){
   //
   // Give us a fresh start.
   //
@@ -178,5 +183,5 @@ var initStudentWilddog = function(game_name, level, ide, saved_game){
   //
   // Subscribe to all our/teacher blockly changes.
   //
-  connectSubscriber(getUsername(), ide, saved_game);
+  connectSubscriber(getUsername(), ide);
 }
