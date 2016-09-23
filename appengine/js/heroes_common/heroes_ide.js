@@ -36,15 +36,14 @@ self.tabs = {};
 var character_types = ["lion", "eagle", "human"];
 character_types.forEach(function(animal)
 {
-  $("#" + username + "-hero-type")['append']($("<option></option>")
-                    ['attr']("value",animal)
-                    ['attr'](animal));
+  $("#" + username + "-hero-type")['append']($("<option></option>",
+      {"value": animal, "text": animal}));
 });
 
 $("#" + self.username + "-submit-hero")['click'](function()
 {
-  var name = $("#" + username + "-hero-name").val();
-  var type = $("#" + username + "-hero-type").val();
+  var name = $("#" + username + "-hero-name")['val']();
+  var type = $("#" + username + "-hero-type")['val']();
 
   if (!name || !type)
   {
