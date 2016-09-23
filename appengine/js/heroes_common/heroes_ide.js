@@ -45,6 +45,8 @@ $("#" + self.username + "-submit-hero")['click'](function()
   var name = $("#" + username + "-hero-name")['val']();
   var type = $("#" + username + "-hero-type")['val']();
 
+  name = name.replace(/[^a-zA-Z0-9]+/g, "");
+
   if (!name || !type)
   {
     console.log("Fill out the whole form: ", name, type);
