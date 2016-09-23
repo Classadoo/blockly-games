@@ -307,6 +307,11 @@ self.checkCollisions = function(other_heroes, items, item_radius)
     else
     {
       var other_hero = other_heroes[what];
+      if (!other_hero)
+      {
+        console.log("How'd we make an event with a non-existent hero?");
+        return;
+      }
       if (compute_distance(other_hero.x, other_hero.y, self.x, self.y) < (self.radius + other_hero.radius))
       {
         if (self.collisions_in_progress[what] == false)
