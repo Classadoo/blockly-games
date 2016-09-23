@@ -51,6 +51,7 @@ Heroes.NOISES = [["Play bow sound", "bow"], ["Play pop sound", "pop"],
  * Common HSV hue for all blocks in this category.
  */
 Heroes.Blocks.HUE = 160;
+Heroes.Blocks.MOVEMENT_HUE = 20;
 Heroes.Blocks.EVENT_HUE = 320;
 
 /**
@@ -78,7 +79,7 @@ Blockly.Blocks['heroes_turn'] = {
     // Append arrows to direction messages.
     DIRECTIONS[0][0] += Heroes.Blocks.RIGHT_TURN;
     DIRECTIONS[1][0] += Heroes.Blocks.LEFT_TURN;
-    this.setColour(Heroes.Blocks.HUE);
+    this.setColour(Heroes.Blocks.MOVEMENT_HUE);
     this.appendValueInput('VALUE')
         .setCheck('Number')
         .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR');
@@ -103,7 +104,7 @@ Blockly.Blocks['heroes_move_forward'] = {
    * @this Blockly.Block
    */
   init: function() {
-    this.setColour(Heroes.Blocks.HUE);
+    this.setColour(Heroes.Blocks.MOVEMENT_HUE);
     this.appendValueInput('VALUE')
         .setCheck('Number')
         .appendField('Move forward');
@@ -153,7 +154,7 @@ Blockly.Blocks['heroes_move'] = {
          [BlocklyGames.getMsg('Heroes_moveDown'), 'moveDown'],
           [BlocklyGames.getMsg('Heroes_moveLeft'), 'moveLeft'],
            [BlocklyGames.getMsg('Heroes_moveRight'), 'moveRight']];
-    this.setColour(Heroes.Blocks.HUE);
+    this.setColour(Heroes.Blocks.MOVEMENT_HUE);
     this.appendValueInput('VALUE')
         .setCheck('Number')
         .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR');
