@@ -15,6 +15,10 @@ var getQueryParam = function(param)
 
 var getUsername = function()
 {
+  if (window.location.pathname.indexOf("teacher_dash") > -1)
+  {
+    return "classadoo_instructor";
+  }
   var username = (getQueryParam("username") || "unknown");
   username = username.toLowerCase();
   return username.charAt(0).toUpperCase() + username.slice(1);

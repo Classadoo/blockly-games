@@ -188,7 +188,7 @@ Heroes.setupGames = function()
 
   // Add a game
   var student_game = Heroes.addGame(false, getUsername());
-  initStudentWilddog( "Heroes", BlocklyGames.LEVEL, student_game.ide, getSavedGame());
+
   student_game.ide.new_world_tab();
   student_game.ide.new_hero_tab(getUsername(), "human");
   student_game.reset();
@@ -251,6 +251,11 @@ Heroes.setupGames = function()
   {
     Heroes.add_remote_user($(this)['val']());
   });
+
+  //
+  // Now that our game is setup, subscribe to changes.
+  //
+  initStudentWilddog( "Heroes", BlocklyGames.LEVEL, student_game.ide, getSavedGame());
 }
 
 

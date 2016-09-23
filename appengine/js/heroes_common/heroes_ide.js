@@ -79,8 +79,14 @@ self.new_hero_tab = function(new_tab_name, type)
     return self.tabs[new_tab_name]
   }
 
-  self.tabs[new_tab_name] = true;
+
   self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name, type);
+
+  // Start pushing data.
+  if (!self.tabs[new_tab_name].read_only)
+  {
+    connectPublisherWorkspace(username, new_tab_name, type, self.tabs[new_tab_name].workspace);
+  }
 
   //
   // Tell all the workspaces about this hero, so they can use her in their events.
@@ -148,11 +154,23 @@ self.remove_tab = function(tab_name)
 
 self.new_world_tab = function()
 {
+  if (self.tabs["world"])
+  {
+    return self.tabs["world"];
+  }
+
   self.tabs["world"] = new IDE_Tab(self.username, "world", "world", "world_toolbox");
   if (self.game)
   {
     self.game.setup_game_world(self.tabs["world"]);
   }
+
+  // Start pushing data.
+  if (!self.tabs["world"].read_only)
+  {
+    connectPublisherWorkspace(username, "world", "world", self.tabs["world"].workspace);
+  }
+
   return self.tabs["world"];
 }
 }
@@ -200,12 +218,6 @@ self.workspace = Blockly.inject(self.dom_id,
     'readOnly' : self.read_only,
     'scrollbars':true,
     'zoom': {'controls': true, 'wheel': false, 'maxScale' : 1.0, 'minScale' : 0.7}});
-
-// Start pushing data.
-if (!self.read_only)
-{
-  connectPublisherWorkspace(username, tab_name, hero_type, self.workspace);
-}
 
 // Start a list of objects that we can interact with in this game.
 self.workspace.objects = [["item", "item"], ["edge", "edge"]];
