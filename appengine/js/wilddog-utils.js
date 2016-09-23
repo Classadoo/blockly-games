@@ -122,7 +122,6 @@ var publishDeleteTab = function(username, tab_name)
 var publishWorkspace = function(username, hero_name, hero_type, workspace)
 {
   var game_ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + getSavedGame());
-  game_ref['child'](hero_name)["update"]({"type": hero_type});
 
   if (workspace)
   {
@@ -149,6 +148,9 @@ var publishWorkspace = function(username, hero_name, hero_type, workspace)
     //
     game_ref['child'](hero_name)['update']({"workspace" : current_code});
   }
+
+  // Update the level, regardless.
+  game_ref['child'](hero_name)['update']({"type": hero_type});
 }
 
 var connectPublisherWorkspace = function(username, hero_name, hero_type, workspace)

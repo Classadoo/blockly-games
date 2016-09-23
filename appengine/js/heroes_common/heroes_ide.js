@@ -79,6 +79,7 @@ self.new_hero_tab = function(new_tab_name, type)
     return self.tabs[new_tab_name]
   }
 
+  self.tabs[new_tab_name] = true;
   self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name, type);
 
   //
@@ -109,9 +110,6 @@ self.new_hero_tab = function(new_tab_name, type)
       self.remove_tab(new_tab_name);
     }
   )
-
-  connectPublisherWorkspace(self.username, new_tab_name, type,
-    self.tabs[new_tab_name].workspace);
 
   return self.tabs[new_tab_name];
 }
@@ -155,7 +153,6 @@ self.new_world_tab = function()
   {
     self.game.setup_game_world(self.tabs["world"]);
   }
-  connectPublisherWorkspace(self.username, "world", "world", self.tabs["world"].workspace);
   return self.tabs["world"];
 }
 }
@@ -168,7 +165,8 @@ var self = this;
 self.hero_type = hero_type;
 toolbox_id = toolbox_id || 'toolbox';
 self.dom_id = username + "-" + tab_name;
-
+self.read_only = !(getUsername() == username ||
+                   getUsername().toLowerCase() == "classadoo_instructor");
 //
 // Add the tab for this hero.
 //
@@ -195,14 +193,19 @@ $('<div role="tabpanel" class="tab-pane active" id="' + self.dom_id + '-containe
     '<div class="workspace" id="' + self.dom_id + '"</div>' +
   '</div>')['insertBefore']("#" + username + "-add-hero");
 
-
 var toolbox = document.getElementById(toolbox_id);
 self.workspace = Blockly.inject(self.dom_id,
    {'media': 'third-party/blockly/media/',
     'toolbox': toolbox,
-    'readOnly' : false, //readOnly,
+    'readOnly' : self.read_only,
     'scrollbars':true,
     'zoom': {'controls': true, 'wheel': false, 'maxScale' : 1.0, 'minScale' : 0.7}});
+
+// Start pushing data.
+if (!self.read_only)
+{
+  connectPublisherWorkspace(username, tab_name, hero_type, self.workspace);
+}
 
 // Start a list of objects that we can interact with in this game.
 self.workspace.objects = [["item", "item"], ["edge", "edge"]];
@@ -225,7 +228,7 @@ var onresize = function(e) {
 };
 window.addEventListener('resize', onresize);
 
-$('#' + username + '-tabs a')['click'](function (e) {
+$('#' + self.dom_id + '-li a')['click'](function (e) {
   e['preventDefault']();
   $(this)['tab']('show');
   onresize();
