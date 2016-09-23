@@ -161,3 +161,9 @@ button:hover:not(:disabled) {
 .readonly .blocklyMainBackground {
   stroke: none;
 }
+#username-header {
+  font-weight:bold;
+  font-size:14px;
+  text-align:right;
+  padding-right:20px;
+}

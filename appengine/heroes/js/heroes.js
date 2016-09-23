@@ -180,8 +180,7 @@ Heroes.init = function() {
       return;
     }
     Heroes.classroom = snapshot['val']()['classroom'];
-    $('#username-header')['html'](getUsername());
-    $('#classroom-header')['html'](Heroes.classroom);
+    $('#username-header')['html'](getUsername() + " - " + Heroes.classroom);
     classrooms["child"](Heroes.classroom)["on"]("value", function(snapshot)
     {
       var room = snapshot['val']();
