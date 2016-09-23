@@ -9,13 +9,6 @@ body {
 	text-align: center;
 }
 
-.join-button {
-	background-color: lightblue;
-	border: 2px solid grey;
-	border-radius: 3px;
-	font-size: 22px;
-}
-
 .name-input, .input-label, .classroom-input {
 	font-size: 22px;
   margin: 5px;

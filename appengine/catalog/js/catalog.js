@@ -32,9 +32,10 @@ Catalog.init = function()
 
   var project_list = document.getElementById("project_list");
 
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/");
-  ref['child'](getUsername())['child']('snapshots')['on']("child_added", function(project)
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername());
+  ref['child']('snapshots')['on']("child_added", function(project)
   {
+    $('#no-projects')['hide']();
     project = project['key']();
     var li = document.createElement("li");
     var new_project = document.createElement("a");
@@ -53,7 +54,13 @@ Catalog.init = function()
     }
     li.appendChild(new_project);
     project_list.appendChild(li);
-  })
+  });
+
+  ref['child']('classroom')['on']("value", function(classroom)
+  {
+    $("#join-lesson")['append']("<div>" + classroom['val']() + "</div>");
+    $("#join-lesson")['show']();
+  });
 }
 
 

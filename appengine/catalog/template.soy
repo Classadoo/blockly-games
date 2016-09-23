@@ -17,36 +17,23 @@
 
 <div class="dashboard">
   <h1 class="title">
-    Classadoo Projects
+    {$ij.username}'s Code
   </h1>
   <div class="row">
-    <div class="col-md-3 col-md-offset-3">
-      <h2>
-        {$ij.username}'s Projects
-      </h2>
+
+    <div class="col-md-2 col-md-offset-4">
+      <h3> Saved Projects </h3>
+      <div id="no-projects">None yet...</div>
+      <ul id="project_list">
+      </ul>
     </div>
+
     <div class="col-md-3">
-      <h2>
-        Start a New Project
-      </h2>
+      <button class="btn btn-success btn-lg btn-block" id="join-lesson">Join Class</button>
     </div>
+
   </div>
-  <div class="row">
-    <div class="col-md-3 col-md-offset-3">
-      <ul id="project_list"></ul>
-    </div>
-    <div class="col-md-3">
-      <ul id="projects">
-        <li><a href="maze.html?level=1&lang=en&username={$ij.username}">Maze</a></li>
-      </ul>
-      <ul id="projects">
-        <li><a href="turtle_collab.html?level=1&lang=en&username={$ij.username}">Turtle</a></li>
-      </ul>
-      <ul id="projects">
-        <li><a href="heroes.html?level=1&lang=en&username={$ij.username}">Heroes</a></li>
-      </ul>
-    </div>
-  </div>
+
   <h3 class="title">
     <a target="_blank" href="https://serene-springs-34884.herokuapp.com/appengine/cmc/student.html?meetingID=20160917&name={$ij.username}">Start Video Chat</a>
   </h3>

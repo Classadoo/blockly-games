@@ -5,3 +5,8 @@
 .title {
   text-align: center;
 }
+
+#join-lesson {
+  display: none;
+  margin-top: 20px;
+}
