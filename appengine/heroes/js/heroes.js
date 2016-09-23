@@ -155,14 +155,7 @@ Heroes.init = function() {
       var project_name = prompt("Choose a project name", getUsername() + "'s game");
       if (project_name)
       {
-
-        snapshot_key = snapshot_key || "Untitled Heroes";
-        var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername() + "/snapshots");
-
-        var snapshot_obj = {};
-        snapshot_obj[snapshot_key] = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(student_workspace));
-        ref['update'](snapshot_obj);
-
+        // TODO(aheine): Fix this.
       }
     };
     BlocklyGames.bindClick('publishButton', publish);
@@ -187,6 +180,8 @@ Heroes.init = function() {
       return;
     }
     Heroes.classroom = snapshot['val']()['classroom'];
+    $('#username-header')['html'](getUsername());
+    $('#classroom-header')['html'](Heroes.classroom);
     classrooms["child"](Heroes.classroom)["on"]("value", function(snapshot)
     {
       var room = snapshot['val']();
