@@ -261,7 +261,9 @@ self.checkCollisions = function(other_heroes, items, item_radius)
 {
   for (var what in self.collision_events)
   {
-    // Assume WHAT is either an item or a hero.
+    //
+    // Assume WHAT is either an item, edge, or hero.
+    //
     if (what == "item")
     {
       // Iterate in reverse so the index isn't affected when we remove elements.
@@ -274,10 +276,32 @@ self.checkCollisions = function(other_heroes, items, item_radius)
           // Use anonymous function to put a closure around the temporary interpreter.
           (function() {
             var interpreter = new Interpreter(self.collision_events[what], self.initInterpreter);
-            setTimeout( function(){self.executeChunk_(interpreter);}, 1);
+            self.pidList.push(setTimeout( function(){self.executeChunk_(interpreter);}, 1));
           })();
           items.splice(i, 1);
         }
+      }
+    }
+    else if (what == "edge")
+    {
+      if (self.x < self.radius ||
+          self.y < self.radius ||
+          self.x + radius > Heroes.WIDTH ||
+          self.y + radius > Heroes.HEIGHT)
+      {
+        if (self.collisions_in_progress[what] == false)
+        {
+          // Use anonymous function to put a closure around the temporary interpreter.
+          (function() {
+            var interpreter = new Interpreter(self.collision_events[what], self.initInterpreter);
+            self.pidList.push(setTimeout( function(){self.executeChunk_(interpreter);}, 1));
+          })();
+        }
+        self.collisions_in_progress[what] = true;
+      }
+      else
+      {
+        self.collisions_in_progress[what] = false;
       }
     }
     else
@@ -287,8 +311,11 @@ self.checkCollisions = function(other_heroes, items, item_radius)
       {
         if (self.collisions_in_progress[what] == false)
         {
-          var interpreter = new Interpreter(self.collision_events[what], self.initInterpreter);
-          setTimeout( function(){self.executeChunk_(interpreter);}, 1);
+          // Use anonymous function to put a closure around the temporary interpreter.
+          (function() {
+            var interpreter = new Interpreter(self.collision_events[what], self.initInterpreter);
+            self.pidList.push(setTimeout( function(){self.executeChunk_(interpreter);}, 1));
+          })();
         }
         self.collisions_in_progress[what] = true;
       }

@@ -204,7 +204,7 @@ self.workspace = Blockly.inject(self.dom_id,
     'zoom': {'controls': true, 'wheel': false, 'maxScale' : 1.0, 'minScale' : 0.7}});
 
 // Start a list of objects that we can interact with in this game.
-self.workspace.objects = [["item", "item"]];
+self.workspace.objects = [["item", "item"], ["edge", "edge"]];
 self.workspace.traceOn(true);
 
 var blocklyDiv = document.getElementById(self.dom_id);

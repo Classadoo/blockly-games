@@ -112,7 +112,7 @@ self.checkKeyEvents = function()
       // Use anonymous function to put a closure around the temporary interpreter.
       (function() {
         var interpreter = new Interpreter(self.key_events[key], self.initInterpreter);
-        setTimeout( function(){self.executeChunk_(interpreter);}, 1);
+        self.pidList.push(setTimeout( function(){self.executeChunk_(interpreter);}, 1));
       })();
     }
   }

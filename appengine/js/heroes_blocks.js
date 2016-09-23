@@ -558,8 +558,8 @@ Blockly.Blocks['heroes_pen'] = {
    */
    init: function() {
      var PEN =
-         [["Bring pen up", 'penUp'],
-            ["Bring pen down", 'penDown']];
+         [["Stop Drawing", 'penUp'],
+            ["Start Drawing", 'penDown']];
      this.setColour(Heroes.Blocks.HUE);
      this.appendDummyInput()
          .appendField(new Blockly.FieldDropdown(PEN), 'PEN');
