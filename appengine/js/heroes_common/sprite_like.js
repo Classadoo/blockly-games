@@ -33,6 +33,8 @@ self.interpreter = null;
 self.keys_down = {};
 self.ide = sprite_ide;
 
+self.sleep = 0;
+
 self.execute = function()
 {
   self.ide.spinner(true);
