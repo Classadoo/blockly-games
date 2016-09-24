@@ -158,30 +158,29 @@ var initStudent = function(username)
 var initWildDog = function(){
   var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/");
 
-  var classroom = getQueryParam("classroom");
+  var classroom = getSavedGame();
   var new_student_callback = function(user) {
     var username = user['key']();
-    if (username != "classadoo_instructor")
+
+    var correct_class = !classroom || user['val']()['classroom'] == classroom;
+    if (correct_class)
     {
-      var correct_class = !classroom || user['val']()['classroom'] == classroom;
-      if (correct_class)
-      {
-        initStudent(username);
-      }
-      else
-      {
-      ref['child'](username)['on']("value", function(snapshot)
-      {
-        if (snapshot['val']())
-        {
-          if (snapshot['val']()['classroom'] == classroom)
-          {
-            initStudent(username);
-          }
-        }
-      })
-      }
+      initStudent(username);
     }
+    else
+    {
+    ref['child'](username)['on']("value", function(snapshot)
+    {
+      if (snapshot['val']())
+      {
+        if (snapshot['val']()['classroom'] == classroom)
+        {
+          initStudent(username);
+        }
+      }
+    })
+    }
+
   }
 
   ref['on']("child_added", new_student_callback);
