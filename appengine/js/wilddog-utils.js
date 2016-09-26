@@ -150,7 +150,8 @@ var publishWorkspace = function(username, hero_name, hero_type, workspace)
     //
     // Send the code to wilddog.
     //
-    game_ref['child'](hero_name)['update']({"workspace" : current_code});
+    game_ref['child'](hero_name)['update']({"workspace" : current_code,
+                                            "type": hero_type});
   }
 
   // Update the level, regardless.
