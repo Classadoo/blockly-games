@@ -263,7 +263,7 @@ BlocklyInterface.importInterpreter = function() {
   //  src="third-party/JS-Interpreter/compiled.js"></script>
   var script = document.createElement('script');
   script.setAttribute('type', 'text/javascript');
-  script.setAttribute('src', 'third-party/JS-Interpreter/compiled.js');
+  script.setAttribute('src', 'interpreter_compiled.js');
   document.head.appendChild(script);
 };
 

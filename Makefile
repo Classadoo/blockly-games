@@ -130,6 +130,8 @@ deps:
 	 --js appengine/third-party/JS-Interpreter/acorn.js\
 	 --js appengine/third-party/JS-Interpreter/interpreter.js\
 	 --js_output_file appengine/third-party/JS-Interpreter/compiled.js
+	 cp -r appengine/third-party/blockly/media appengine/
+	 cp -r appengine/third-party/blockly/JS-Interpreter/interpreter_compiled.js appengine/
 
 clean: clean-languages clean-deps
 

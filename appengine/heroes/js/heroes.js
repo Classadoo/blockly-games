@@ -29,8 +29,6 @@ goog.require('BlocklyGames');
 goog.require('BlocklyInterface');
 goog.require('Slider');
 goog.require('Heroes.Blocks');
-goog.require('Maze.Blocks');
-goog.require('Turtle_Collab.Blocks');
 goog.require('Heroes.soy');
 
 goog.require('WilddogUtils');
@@ -348,7 +346,7 @@ Heroes.setMaxLevel = function(level_allowed)
   }
 }
 
-window.addEventListener('load', Heroes.init);
+$(Heroes.init);
 
 var compute_distance = function(x1, y1, x2, y2)
 {

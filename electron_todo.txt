@@ -1,0 +1,9 @@
+electron todo:
+ - make icons for mac and windows
+ - verify mac works
+ - verify downloading from IE works. maybe sign it?
+ - Make an install script that deletes stuff from the repo and moves the media around.
+ - Make a loading prompt when wilddog is slow.
+ - consider "value" instead of "child_added" for classes. This should not be dynamic. maybe it will be faster.
+ - Fix the window size.
+ - Auto-updater (where to host stuff, etc)

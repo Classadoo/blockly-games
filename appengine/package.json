@@ -1,0 +1,11 @@
+{
+    "name": "NihaoClass",
+    "description": "Desktop app for live classes.",
+    "version": "0.0.1",
+    "author" : "Andrew Heine <andrew@classadoo.com>",
+    "dependencies": {
+      "socket.io-client": "1.4.8",
+      "electron-squirrel-startup": "1.0.0"
+    },
+    "main": "main.js"
+}

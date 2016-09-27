@@ -213,7 +213,7 @@ $('<div role="tabpanel" class="tab-pane active" id="' + self.dom_id + '-containe
 
 var toolbox = document.getElementById(toolbox_id);
 self.workspace = Blockly.inject(self.dom_id,
-   {'media': 'third-party/blockly/media/',
+   {'media': 'media/',
     'toolbox': toolbox,
     'readOnly' : self.read_only,
     'scrollbars':true,
