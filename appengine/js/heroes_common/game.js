@@ -154,11 +154,6 @@ self.execute = function() {
  * @param {!Event} e Mouse or touch event.
  */
 self.runButtonClick = function(e) {
-  // Prevent double-clicks or double-taps.
-  if (BlocklyInterface.eventSpam(e)) {
-    return;
-  }
-
   var runButton = document.getElementById(self.username + '-runButton');
   var resetButton = document.getElementById(self.username + '-resetButton');
   // Ensure that Reset button is at least as wide as Run button.
@@ -207,7 +202,7 @@ self.setup_game_world = function(ide_tab)
 self.addHero = function(name, type, ide_tab) {
 
   self.heroes[name] = new Hero(name, type, hero_radius, self.starting_x,
-    self.starting_y, self.ctxLines, self.ctxDisplay,ide_tab);
+    self.starting_y, self.ctxLines, self.ctxDisplay, ide_tab, self);
 
   //
   // Draw her.
@@ -252,9 +247,6 @@ self.remove_hero = function(name)
  * Start the event polling.
  */
 self.startGame = function(game_speed) {
-  var self = this;
-
-
   self.eventLoop = setInterval(function()
   {
     //

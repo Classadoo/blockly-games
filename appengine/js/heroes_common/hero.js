@@ -70,7 +70,7 @@ chars["human"].src = "heroes/andrew.png";
 var chars_per_line = 40;
 
 
-function Hero(name, char, radius, x, y, line_context, display_context, sprite_ide) {
+function Hero(name, char, radius, x, y, line_context, display_context, sprite_ide, game) {
 
 var self = this;
 self.ctxLines = line_context;
@@ -113,8 +113,12 @@ $(display_context.canvas)['mousemove']( function(e) {
   {
     self.x += e.clientX - self.drag_event_x;
     self.y += e.clientY - self.drag_event_y;
+    self.starting_x = self.x;
+    self.starting_y = self.y;
+
     self.drag_event_x = e.clientX;
     self.drag_event_y = e.clientY;
+    game.display();
   }
 });
 
