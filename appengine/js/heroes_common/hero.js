@@ -32,6 +32,13 @@ function getRandomColor() {
   return color;
 }
 
+function getCursorPosition(canvas, event) {
+  var rect = canvas.getBoundingClientRect();
+  var x = event.clientX - rect.left;
+  var y = event.clientY - rect.top;
+  return {x :x, y: y};
+}
+
 function draw_rotated_image(context, image, x, y, width, height, angle)
 {
     // save the current co-ordinate system
@@ -63,7 +70,7 @@ chars["human"].src = "heroes/andrew.png";
 var chars_per_line = 40;
 
 
-function Hero(name, char, radius, x, y, line_context, sprite_ide) {
+function Hero(name, char, radius, x, y, line_context, display_context, sprite_ide) {
 
 var self = this;
 self.ctxLines = line_context;
@@ -88,6 +95,28 @@ self.collision_events = {};
 self.collisions_in_progress = {};
 
 SpriteLike.call(self, name, sprite_ide);
+
+self.dragging = false;
+$(display_context.canvas)['mousedown']( function(e)
+{
+  var pos = getCursorPosition(this, e)
+  if (compute_distance(pos.x, pos.y, self.x, self.y) < self.radius)
+  {
+    self.dragging = true;
+    self.drag_event_x = e.clientX;
+    self.drag_event_y = e.clientY;
+  }
+})
+$(display_context.canvas)['mouseup']( function(e) { self.dragging = false});
+$(display_context.canvas)['mousemove']( function(e) {
+  if (self.dragging)
+  {
+    self.x += e.clientX - self.drag_event_x;
+    self.y += e.clientY - self.drag_event_y;
+    self.drag_event_x = e.clientX;
+    self.drag_event_y = e.clientY;
+  }
+});
 
 
 // Draws this item to a given context.
