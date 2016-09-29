@@ -10,10 +10,6 @@ button.publish {
   border-color: #0b9d09 !important;
 }
 
-.blockly {
-  margin-top: -42px;
-}
-
 #new_hero_button {
   font-weight: bold;
 }
@@ -28,19 +24,22 @@ button.publish {
   display:inline;
   bottom: 11px;
 }
-
-.visualization {
-  position: relative;
-  min-height: 1px;
-  padding-right: 15px;
-  float: left;
-  width: 600px !important;
-  padding-left: 20px;
+.col-md-6.no-padding {
+  padding: 0px;
+  height: 100%;
 }
 
-.read_only_true .blocklySvg {
-  background-color: #666 !important;
+#classadoo-header
+{
+  height:70px;
+  text-align: right;
 }
+
+#games
+{
+  height: calc(100% - 70px);
+}
+
 #display {
   border: 1px solid #ccc;
 }

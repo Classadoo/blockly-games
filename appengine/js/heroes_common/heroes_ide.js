@@ -188,7 +188,6 @@ self.read_only = !(getUsername() == username ||
 //
 // Add the tab for this hero.
 //
-var workspaces = $('#' + username + '-blockly');
 var li = $('<li role="presentation" id="' + self.dom_id + '-li">' +
   '</li>')['insertBefore']("#" + username + "-new-hero-button");
 
@@ -207,8 +206,8 @@ if (tab_name.toLowerCase() != "world" && username==getUsername())
 li['append'](a);
 
 
-$('<div role="tabpanel" class="tab-pane active" id="' + self.dom_id + '-container">' +
-    '<div class="workspace" id="' + self.dom_id + '"</div>' +
+$('<div role="tabpanel" class="tab-pane active" id="' + self.dom_id + '-container"  style="width:100%">' +
+    '<div class="workspace" id="' + self.dom_id + '" style="width:100%"></div>' +
   '</div>')['insertBefore']("#" + username + "-add-hero");
 
 var toolbox = document.getElementById(toolbox_id);
@@ -225,8 +224,6 @@ self.workspace.traceOn(true);
 
 var blocklyDiv = document.getElementById(self.dom_id);
 var onresize = function(e) {
-  var width = window.innerWidth - 635;
-  blocklyDiv.style.width = width + 'px';
 
   // We may have loaded stuff when the canvas was hidden, which corrupts the blocks.
   // We have to clear and reload everything...

@@ -1,15 +1,9 @@
 
 .workspace {
-  height: 400px;
+  height: 100%;
   margin-top: 5px;
 }
 
-.blockly {
-  height: 450px;
-  min-height: 1px;
-  padding-right: 15px;
-  float: left;
-}
 .hero-tab {
   font-weight:bold;
 }
@@ -27,3 +21,19 @@
   font-family:Helvetica;
   font-size:20px;
 }
+
+.tab-content {
+  height: 100%;
+}
+
+.tab-pane {
+  height: 100%;
+}
+
+.read_only_true .blocklySvg {
+  background-color: #666 !important;
+}
+ .ide
+ {
+   margin-top:-47px;
+ }

@@ -143,7 +143,7 @@ self.animate = function(id, skip_pause) {
       id = m[1];
     }
     self.ide.highlightBlock(id);
-    var stepSpeed = 600 * Math.pow(1 - Heroes.speedSlider.getValue(), 2);
+    var stepSpeed = 600 * Math.pow(1 - .5, 2);
     self.pause = skip_pause ? self.pause : Math.max(1, stepSpeed);
   }
 };

@@ -27,7 +27,6 @@ goog.require('HeroesGame');
 goog.require('BlocklyDialogs');
 goog.require('BlocklyGames');
 goog.require('BlocklyInterface');
-goog.require('Slider');
 goog.require('Heroes.Blocks');
 goog.require('Maze.Blocks');
 goog.require('Turtle_Collab.Blocks');
@@ -41,29 +40,23 @@ BlocklyGames.NAME = 'heroes';
 
 // TODO(aheine): use jquery instead of a string of HTML. Also move this to a new file.
 Heroes.GAME_HTML =
-  '<div class="visualization">' +
-    '<canvas id="{user}-scratch" width="570" height="400" style="display: none"></canvas>' +
-    '<canvas id="{user}-display" width="570" height="400"></canvas>' +
-    '<canvas id="{user}-lines" width="570" height="400" style="display: none"></canvas>' +
-    '<table style="padding-top: 1em;">' +
-      '<tr>' +
-        '<td style="width: 190px; text-align: center">' +
-          '<button id="{user}-runButton" class="primary" title="Run the program you wrote.">' +
-            '<img src="common/1x1.gif" class="run icon21"> Run Program' +
-          '</button>' +
-          '<button id="{user}-resetButton" class="primary" style="display: none" title="Stop the program and reset the level.">' +
-            '<img src="common/1x1.gif" class="stop icon21"> Reset' +
-          '</button>' +
-        '</td>' +
-      '</tr>' +
-    '</table>' +
+  '<div class="col-md-6 no-padding">' +
+    '<canvas id="{user}-scratch" style="display: none"></canvas>' +
+    '<canvas id="{user}-display"></canvas>' +
+    '<canvas id="{user}-lines" style="display: none"></canvas>' +
+    '<button id="{user}-runButton" class="primary" title="Run the program you wrote." style="height:40px">' +
+      '<img src="common/1x1.gif" class="run icon21"> Run Program' +
+    '</button>' +
+    '<button id="{user}-resetButton" class="primary" style="display: none" title="Stop the program and reset the level." style="height:40px">' +
+      '<img src="common/1x1.gif" class="stop icon21"> Reset' +
+    '</button>' +
   '</div>'
 Heroes.BLOCKLY_HTML =
-  '<div class="blockly">' +
+  '<div class="col-md-6 no-padding ide">' +
     '<ul class="nav nav-tabs" id="{user}-tabs" role="tablist">' +
       '<li class="{read_only}-hero-form" role="presentation" id="{user}-new-hero-button"><a data-toggle="tab" role="tab" href="#{user}-add-hero" aria-controls="{user}-add-hero"> + New Hero</a></li>'  +
     '</ul>' +
-    '<div class="tab-content" id="{user}-blockly">' +
+    '<div class="tab-content" id="{user}-blockly" style="width:100%">' +
       '<form role="tabpanel" class="tab-pane" id="{user}-add-hero">' +
         '<div class="form-group">' +
           '<label for="hero-name">Name</label>' +
@@ -142,9 +135,6 @@ Heroes.loadBlockly = function()
   //
   Blockly.SOUND_LIMIT = 50;
 
-  Heroes.HEIGHT = 400;
-  Heroes.WIDTH = 570;
-
   Heroes.backgrounds = {};
   Heroes.backgrounds["castle"] = new Image();
   Heroes.backgrounds["castle"].src = "heroes/castle.jpg";
@@ -171,10 +161,6 @@ Heroes.loadBlockly = function()
   Blockly.JavaScript.addReservedWords('moveForward,moveBackward,' +
       'turnRight,turnLeft,penUp,penDown,penWidth,penColour,' +
       'hideHeroes,showHeroes,print,font');
-
-  // Initialize the slider.
-  var sliderSvg = document.getElementById('slider');
-  Heroes.speedSlider = new Slider(10, 35, 130, sliderSvg);
 
   // Lazy-load the JavaScript interpreter.
   setTimeout(BlocklyInterface.importInterpreter, 1);
@@ -221,14 +207,6 @@ Heroes.setupGames = function()
       {
         student_dropdown['val'](username);
       }
-
-      //
-      // If this is the first user to show up, trigger the change event manually.
-      //
-      if (!Heroes.remote_user)
-      {
-        Heroes.add_remote_user(username);
-      }
     }
 
     var correct_class = !Heroes.classroom || user['val']()['classroom'] == Heroes.classroom;
@@ -269,26 +247,17 @@ Heroes.addGame = function(readOnly, username)
   // Set up the HTML.
   //
 
-  var new_game = document.createElement("div");
-  new_game.id = username + "_container";
-  new_game.className = "row";
+  var new_game = $('<div class="row" id="' + username + '_container" style="height:100%"></div>');
 
-  var game_html = Heroes.GAME_HTML.replace(/{user}/g, username)
+  var game_html = $(Heroes.GAME_HTML.replace(/{user}/g, username));
 
-  var blockly_html = Heroes.BLOCKLY_HTML.replace(/{user}/g, username)
-    .replace(/{read_only}/g, readOnly)
+  var blockly_html = $(Heroes.BLOCKLY_HTML.replace(/{user}/g, username)
+    .replace(/{read_only}/g, readOnly));
 
-  new_game.innerHTML = game_html + blockly_html;
+  new_game.append(blockly_html).append(game_html);
 
-  var games_div = document.getElementById('games');
-  games_div.appendChild(new_game);
-
-  if (!readOnly)
-  {
-    var dropdown = document.createElement("div");
-    dropdown.innerHTML = Heroes.USER_DROPDOWN;
-    games_div.appendChild(dropdown);
-  }
+  var games_div = $('#games');
+  games_div.append(new_game);
 
 
   var game = new Game(username);
@@ -301,29 +270,18 @@ Heroes.addGame = function(readOnly, username)
 
 Heroes.add_remote_user = function(username)
 {
-  //
-  // Hide the old remote user.
-  //
-  if (Heroes.remote_user)
-  {
-    document.getElementById(Heroes.remote_user + "_container").style.display = "none";
-  }
   Heroes.remote_user = username;
   //
   // Create or show the new remote user.
   //
-  var container = document.getElementById(username + "_container");
-  if (container)
-  {
-    container.style.display = "block";
-  }
-  else
-  {
-    var remote_game = Heroes.addGame(true, username);
-    remote_game.ide.new_world_tab();
-    remote_game.reset()
-    connectSubscriber(username, remote_game.ide);
-  }
+  var remote_game = Heroes.addGame(true, username);
+  remote_game.ide.new_world_tab();
+  remote_game.reset()
+
+  var container = $("#" + username + "_container");
+  container.hide();
+
+  connectSubscriber(username, remote_game.ide);
 }
 
 Heroes.setMaxLevel = function(level_allowed)

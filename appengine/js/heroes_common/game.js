@@ -38,6 +38,8 @@ self.pidList = [];
 self.ctxDisplay = document.getElementById(self.username + '-display').getContext('2d');
 self.ctxScratch = document.getElementById(self.username + '-scratch').getContext('2d');
 self.ctxLines = document.getElementById(self.username + '-lines').getContext('2d');
+Heroes.HEIGHT = self.ctxDisplay.canvas.parentElement.clientHeight - 45;
+Heroes.WIDTH = self.ctxDisplay.canvas.parentElement.clientWidth;
 
 var hero_radius = 32;
 
@@ -76,8 +78,6 @@ self.reset = function() {
   self.ctxScratch.font = 'normal 18pt Arial';
   self.display();
 
-
-
   // Kill the game event loop.
   clearInterval(self.eventLoop);
 
@@ -87,15 +87,26 @@ self.reset = function() {
   ref['update'](code_obj);
 };
 
-/**
- * Copy the scratch canvas to the display canvas.
- */
 self.display = function() {
   //
-  // Clear the display
+  // Resize and clear the display
   //
-  self.ctxScratch.clearRect(0, 0, self.ctxDisplay.canvas.clientWidth, self.ctxDisplay.canvas.clientHeight);
-  self.ctxDisplay.clearRect(0, 0, self.ctxDisplay.canvas.clientWidth, self.ctxDisplay.canvas.clientHeight);
+
+  var display_canvas = self.ctxDisplay.canvas;
+  var scratch_canvas = self.ctxScratch.canvas;
+  var lines_canvas = self.ctxLines.canvas
+
+  Heroes.HEIGHT = display_canvas.parentElement.clientHeight - 45;
+  Heroes.WIDTH = display_canvas.parentElement.clientWidth;
+  display_canvas.width = Heroes.WIDTH;
+  display_canvas.height = Heroes.HEIGHT;
+  scratch_canvas.width = Heroes.WIDTH;
+  scratch_canvas.height = Heroes.HEIGHT;
+  lines_canvas.width = Heroes.WIDTH;
+  lines_canvas.height = Heroes.HEIGHT;
+
+  self.ctxScratch.clearRect(0, 0, display_canvas.clientWidth, display_canvas.clientHeight);
+  self.ctxDisplay.clearRect(0, 0, display_canvas.clientWidth, display_canvas.clientHeight);
 
   if (self.game_world)
   {
@@ -126,7 +137,7 @@ self.execute = function() {
     return;
   }
 
-  var game_speed = 60 - Heroes.speedSlider.getValue() * 50
+  var game_speed = 30
   self.reset();
   self.startGame(game_speed);
 
@@ -258,4 +269,6 @@ self.startGame = function(game_speed) {
     self.display();
   }, game_speed);
 };
+
+window.addEventListener('resize', self.display);
 }
