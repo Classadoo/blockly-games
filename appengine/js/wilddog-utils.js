@@ -103,17 +103,16 @@ var connectSubscriber = function(username, ide)
     // New workspace! Add a world/hero for it, and connect the new workspace.
     //
     var name = child['key']();
-    var workspace;
+    var tab;
     if (name.toLowerCase() == "world")
     {
-      workspace = ide.tabs["world"].workspace;
+      tab = ide.new_world_tab("world", "world");
     }
     else
     {
-      var tab = ide.new_hero_tab(name, child['val']()['type']);
-      workspace = tab.workspace;
+      tab = ide.new_hero_tab(name, child['val']()['type']);
     }
-    connectSubscriberWorkspace(username, ref, workspace, name);
+    connectSubscriberWorkspace(username, ref, tab.workspace, name);
   });
 }
 
@@ -153,7 +152,7 @@ var publishWorkspace = function(username, hero_name, hero_type, workspace)
     game_ref['child'](hero_name)['update']({"workspace" : current_code});
   }
 
-  // Update the level, regardless.
+  // Update the type, regardless.
   game_ref['child'](hero_name)['update']({"type": hero_type});
 }
 
@@ -170,7 +169,6 @@ var connectPublisherWorkspace = function(username, hero_name, hero_type, workspa
     }
     publishWorkspace(username, hero_name, hero_type, workspace);
   });
-  publishWorkspace(username, hero_name, hero_type, null);
 }
 
 var initStudentWilddog = function(game_name, level, ide){

@@ -179,8 +179,8 @@ Heroes.setupGames = function()
   // Add a game
   var student_game = Heroes.addGame(false, getUsername());
 
-  student_game.ide.new_world_tab();
-  student_game.ide.new_hero_tab(getUsername(), "human");
+  publishWorkspace(getUsername(), "world", "world", null);
+  publishWorkspace(getUsername(), getUsername(), "human", null);
   student_game.reset();
 
   if (getUsername() !== "Classadoo_instructor")
@@ -275,7 +275,6 @@ Heroes.add_remote_user = function(username)
   // Create or show the new remote user.
   //
   var remote_game = Heroes.addGame(true, username);
-  remote_game.ide.new_world_tab();
   remote_game.reset()
 
   var container = $("#" + username + "_container");

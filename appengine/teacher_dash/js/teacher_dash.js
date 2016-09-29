@@ -99,8 +99,6 @@ var initStudent = function(username)
   // Setup remote control of canvas.
   //
   var ide = new IDE(username, null);
-  ide.new_world_tab();
-
   connectSubscriber(username, ide);
 
   // Watch out for the user being deleted.

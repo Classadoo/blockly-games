@@ -53,7 +53,13 @@ $("#" + self.username + "-submit-hero")['click'](function()
     return;
   }
 
-  self.new_hero_tab(name, type);
+  if (self.tabs[name])
+  {
+    console.log("This hero already exists: ", name);
+    return;
+  }
+
+  publishWorkspace(self.username, name, type, null);
 })
 
 // If the user hits enter, prevent the POST event and just add a hero.
@@ -69,17 +75,6 @@ $('.tab-pane')['keydown'](function(event){
 //
 self.new_hero_tab = function(new_tab_name, type)
 {
-  //
-  // Register the hero.
-  //
-
-  if (self.tabs[new_tab_name])
-  {
-    console.log("This hero already exists: ", new_tab_name);
-    return self.tabs[new_tab_name]
-  }
-
-
   self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name, type);
 
   // Start pushing data.

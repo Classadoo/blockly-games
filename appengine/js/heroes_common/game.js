@@ -201,6 +201,7 @@ self.starting_y = Heroes.HEIGHT - Heroes.HEIGHT/hero_offset;
 self.setup_game_world = function(ide_tab)
 {
   self.game_world = new GameWorld(username, ide_tab);
+  self.reset();
 }
 
 self.addHero = function(name, type, ide_tab) {
