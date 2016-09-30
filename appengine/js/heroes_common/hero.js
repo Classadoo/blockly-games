@@ -36,7 +36,7 @@ function getCursorPosition(canvas, event) {
   var rect = canvas.getBoundingClientRect();
   var x = event.clientX - rect.left;
   var y = event.clientY - rect.top;
-  return {x :x, y: y};
+  return {x: x, y: y};
 }
 
 function draw_rotated_image(context, image, x, y, width, height, angle)
@@ -77,6 +77,15 @@ self.ctxLines = line_context;
 
 self.x = x || 0;
 self.y = y || 0;
+
+//
+// Create a list of xs and ys so we can draw a slithery tail.
+//
+
+self.tail_length = 1;
+self.xs = [self.x];
+self.ys = [self.y];
+
 self.starting_x = self.x;
 self.starting_y = self.y;
 
@@ -111,8 +120,7 @@ $(display_context.canvas)['mouseup']( function(e) { self.dragging = false});
 $(display_context.canvas)['mousemove']( function(e) {
   if (self.dragging)
   {
-    self.x += e.clientX - self.drag_event_x;
-    self.y += e.clientY - self.drag_event_y;
+    self.set_pos(self.x + e.clientX - self.drag_event_x, self.y + e.clientY - self.drag_event_y);
     self.starting_x = self.x;
     self.starting_y = self.y;
 
@@ -126,11 +134,48 @@ $(display_context.canvas)['mousemove']( function(e) {
 // Draws this item to a given context.
 self.draw = function(ctx)
 {
-  draw_rotated_image(ctx, self.image, self.x,
-    self.y, self.radius * 2, self.radius * 2, self.heading);
+  //
+  // Clear any extra tails we shouldn't have.
+  //
+
+  while (self.xs.length > self.tail_length)
+  {
+    self.xs.shift();
+    self.ys.shift();
+  }
+
+  for (var i = 0; i < self.xs.length; i++)
+  {
+    draw_rotated_image(ctx, self.image, self.xs[i],
+      self.ys[i], self.radius * 2, self.radius * 2, self.heading);
+  }
+
   self.draw_speech(ctx);
 }
 
+self.set_pos = function(x, y)
+{
+  self.x = x;
+  self.y = y;
+  self.xs.push(x);
+  self.ys.push(y);
+
+  //
+  // Clear any extra tails we shouldn't have.
+  //
+
+  while (self.xs.length > self.tail_length)
+  {
+    self.xs.shift();
+    self.ys.shift();
+  }
+}
+
+self.extend_tail = function(amt, id)
+{
+  self.tail_length = Math.max(1, self.tail_length + amt);
+  self.animate(id);
+}
 
 self.draw_speech = function(ctx)
 {
@@ -179,7 +224,12 @@ self.reset = function()
 
   self.x = self.starting_x;
   self.y = self.starting_y;
+  self.xs = [self.x];
+  self.ys = [self.y];
+  self.tail_length = 1;
   self.heading = 0;
+
+  self.colour = null;
 
   self.collision_events = {};
   self.key_events = {};
@@ -261,7 +311,8 @@ self.move_forward = function(distance, id)
 // Move in an absolute direction.
 //
 self.move = function(x, y, id) {
-  if (self.pen) {
+  if (self.pen)
+  {
     self.ctxLines.strokeStyle = self.colour || getRandomColor();
     self.ctxLines.fillStyle = self.colour;
     self.ctxLines.lineWidth = self.width;
@@ -269,10 +320,10 @@ self.move = function(x, y, id) {
     self.ctxLines.moveTo(self.x, self.y);
   }
 
-  self.x += x;
-  self.y -= y;
+  self.set_pos(self.x + x, self.y - y);
 
-  if (self.pen) {
+  if (self.pen)
+  {
     self.ctxLines.lineTo(self.x, self.y);
     self.ctxLines.stroke();
   }
@@ -466,7 +517,23 @@ self.initInterpreter = function(interpreter, scope) {
   };
   interpreter.setProperty(scope, 'set_sleep',
       interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(amt, id) {
+    self.extend_tail(amt.valueOf(), id.toString());
+  };
+  interpreter.setProperty(scope, 'extend_tail',
+      interpreter.createNativeFunction(wrapper));
 };
+
+setInterval(function()
+{
+  for (var i=self.xs.length-2; i>=0; i--)
+  {
+    var distance = compute_distance(self.xs[i], self.ys[i], self.xs[i+1], self.ys[i+1]);
+    self.xs[i] += (self.xs[i + 1] - self.xs[i]) / Math.max(distance, 0.000001);
+    self.ys[i] += (self.ys[i + 1] - self.ys[i]) / Math.max(distance, 0.000001);
+  }
+}, 10);
 }
 
 Hero.prototype = Object.create(SpriteLike.prototype);

@@ -143,6 +143,44 @@ Blockly.JavaScript['heroes_sleep'] = function(block) {
   return 'set_sleep('+ value + ', \'block_id_' + block.id + '\');\n';
 };
 
+Blockly.Blocks['heroes_grow'] = {
+  /**
+   * Block for growing a tail.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(Heroes.Blocks.HUE);
+    this.appendDummyInput()
+        .appendField('Grow');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+  }
+};
+
+Blockly.JavaScript['heroes_grow'] = function(block) {
+  // Generate JavaScript for growing a tail.
+  return 'extend_tail(1, \'block_id_' + block.id + '\');\n';
+};
+
+Blockly.Blocks['heroes_shrink'] = {
+  /**
+   * Block for growing a tail.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(Heroes.Blocks.HUE);
+    this.appendDummyInput()
+        .appendField('Shrink');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+  }
+};
+
+Blockly.JavaScript['heroes_shrink'] = function(block) {
+  // Generate JavaScript for growing a tail.
+  return 'extend_tail(-1, \'block_id_' + block.id + '\');\n';
+};
+
 Blockly.Blocks['heroes_move'] = {
   /**
    * Block for moving forward.

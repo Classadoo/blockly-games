@@ -41,6 +41,11 @@ self.ctxLines = document.getElementById(self.username + '-lines').getContext('2d
 Heroes.HEIGHT = self.ctxDisplay.canvas.parentElement.clientHeight - 45;
 Heroes.WIDTH = self.ctxDisplay.canvas.parentElement.clientWidth;
 
+// HACK! We never want to clear the lines (because we dn't store them). So we can't resize this later.
+self.ctxLines.canvas.width = 3000;
+self.ctxLines.canvas.height = 3000;
+
+
 var hero_radius = 32;
 
 self.heroes = {};
@@ -94,7 +99,6 @@ self.display = function() {
 
   var display_canvas = self.ctxDisplay.canvas;
   var scratch_canvas = self.ctxScratch.canvas;
-  var lines_canvas = self.ctxLines.canvas
 
   Heroes.HEIGHT = display_canvas.parentElement.clientHeight - 45;
   Heroes.WIDTH = display_canvas.parentElement.clientWidth;
@@ -102,8 +106,6 @@ self.display = function() {
   display_canvas.height = Heroes.HEIGHT;
   scratch_canvas.width = Heroes.WIDTH;
   scratch_canvas.height = Heroes.HEIGHT;
-  lines_canvas.width = Heroes.WIDTH;
-  lines_canvas.height = Heroes.HEIGHT;
 
   self.ctxScratch.clearRect(0, 0, display_canvas.clientWidth, display_canvas.clientHeight);
   self.ctxDisplay.clearRect(0, 0, display_canvas.clientWidth, display_canvas.clientHeight);

@@ -41,7 +41,7 @@ window.onerror = function(errorMsg, url, lineNumber)
   var err_string = errorMsg + " - " + url + " - " + lineNumber;
   if (err_string != last_err_string)
   {
-    ref['update']({"error" : err_string});
+    var promise = ref['update']({"error" : err_string});
     last_err_string = err_string;
   }
 }
