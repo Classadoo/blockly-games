@@ -128,7 +128,9 @@ self.setTitle = function(title, id)
  * @param {!Object} scope Global scope.
  * @param {!Interpreter} interpreter The JS interpreter.
  */
-self.initInterpreter = function(interpreter, scope) {
+self.initInterpreter = function(interpreter, scope)
+{
+  self.initBasicInterpreter(interpreter, scope);
 
   wrapper = function(x, y, vx, vy, id) {
     self.addItem(x.data, y.data, vx.data, vy.data, id.toString());
@@ -136,28 +138,10 @@ self.initInterpreter = function(interpreter, scope) {
   interpreter.setProperty(scope, 'addItem',
       interpreter.createNativeFunction(wrapper));
 
-  wrapper = function(which, fn, id) {
-    self.setButtonCallback(which.data, fn.toString(), id.toString());
-  };
-  interpreter.setProperty(scope, 'setButtonCallback',
-      interpreter.createNativeFunction(wrapper));
-
   wrapper = function(image, id) {
     self.setBackground(image.toString(), id.toString());
   };
   interpreter.setProperty(scope, 'setBackground',
-      interpreter.createNativeFunction(wrapper));
-
-  wrapper = function(noise, id) {
-    self.makeNoise(noise.toString(), id.toString());
-  };
-  interpreter.setProperty(scope, 'makeNoise',
-      interpreter.createNativeFunction(wrapper));
-
-  wrapper = function(num, id) {
-    self.addPoints(num.data, id.toString());
-  };
-  interpreter.setProperty(scope, 'addPoints',
       interpreter.createNativeFunction(wrapper));
 
   wrapper = function(title, id) {

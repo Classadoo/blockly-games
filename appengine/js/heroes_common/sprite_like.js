@@ -26,6 +26,7 @@ goog.provide('SpriteLike');
 var SpriteLike = function(sprite_name, sprite_ide)
 {
 var self = this;
+self.speed = .5;
 
 self.pidList = [];
 self.interpreter = null;
@@ -104,6 +105,14 @@ self.setButtonCallback = function(which, fn, id)
   self.animate(id);
 }
 
+// Speed should be between 0 and 1.
+self.setSpeed = function(speed, id)
+{
+  self.speed = Math.min(1, speed);
+  self.speed = Math.max(0, speed);
+
+  self.animate(id);
+}
 
 self.checkKeyEvents = function()
 {
@@ -143,8 +152,41 @@ self.animate = function(id, skip_pause) {
       id = m[1];
     }
     self.ide.highlightBlock(id);
-    var stepSpeed = 600 * Math.pow(1 - .5, 2);
+    var stepSpeed = 600 * Math.pow(1 - self.speed, 2);
     self.pause = skip_pause ? self.pause : Math.max(1, stepSpeed);
   }
 };
+
+/**
+ * Inject the Heroes API into a JavaScript interpreter.
+ * @param {!Object} scope Global scope.
+ * @param {!Interpreter} interpreter The JS interpreter.
+ */
+self.initBasicInterpreter = function(interpreter, scope)
+{
+  wrapper = function(which, fn, id) {
+    self.setButtonCallback(which.data, fn.toString(), id.toString());
+  };
+  interpreter.setProperty(scope, 'setButtonCallback',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(noise, id) {
+    self.makeNoise(noise.toString(), id.toString());
+  };
+  interpreter.setProperty(scope, 'makeNoise',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(duration, id) {
+    self.set_sleep(duration.valueOf(), id.toString());
+  };
+  interpreter.setProperty(scope, 'set_sleep',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(num, id) {
+    self.addPoints(num.data, id.toString());
+  };
+  interpreter.setProperty(scope, 'addPoints',
+      interpreter.createNativeFunction(wrapper));
+}
+
 }

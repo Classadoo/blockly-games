@@ -421,8 +421,10 @@ self.checkCollisions = function(other_heroes, items, item_radius)
  * @param {!Object} scope Global scope.
  * @param {!Interpreter} interpreter The JS interpreter.
  */
-self.initInterpreter = function(interpreter, scope) {
-  // API
+self.initInterpreter = function(interpreter, scope)
+{
+  self.initBasicInterpreter(interpreter, scope);
+
   var wrapper = function(degrees, id) {
     self.rotate(false, degrees.valueOf(), id.toString());
   };
@@ -465,22 +467,10 @@ self.initInterpreter = function(interpreter, scope) {
   interpreter.setProperty(scope, 'moveRight',
       interpreter.createNativeFunction(wrapper));
 
-  wrapper = function(which, fn, id) {
-    self.setButtonCallback(which.data, fn.toString(), id.toString());
-  };
-  interpreter.setProperty(scope, 'setButtonCallback',
-      interpreter.createNativeFunction(wrapper));
-
   wrapper = function(what, fn, id) {
     self.setCollisionCallback(what.toString(), fn.toString(), id.toString());
   };
   interpreter.setProperty(scope, 'setCollisionCallback',
-      interpreter.createNativeFunction(wrapper));
-
-  wrapper = function(noise, id) {
-    self.makeNoise(noise.toString(), id.toString());
-  };
-  interpreter.setProperty(scope, 'makeNoise',
       interpreter.createNativeFunction(wrapper));
 
   wrapper = function(what, seconds, id) {
@@ -510,12 +500,6 @@ self.initInterpreter = function(interpreter, scope) {
     self.penColour(colour.toString(), id.toString());
   };
   interpreter.setProperty(scope, 'penColour',
-      interpreter.createNativeFunction(wrapper));
-
-  wrapper = function(duration, id) {
-    self.set_sleep(duration.valueOf(), id.toString());
-  };
-  interpreter.setProperty(scope, 'set_sleep',
       interpreter.createNativeFunction(wrapper));
 
   wrapper = function(amt, id) {
