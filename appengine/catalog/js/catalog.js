@@ -32,39 +32,48 @@ Catalog.init = function()
 
   var project_list = document.getElementById("project_list");
 
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername());
-  ref['child']('games')['on']("child_added", function(project)
+  var ref = new Wilddog("https://blocklypipe.wilddogio.com");
+  var user_ref = ref['child']("users")['child'](getUsername());
+  var user_games_ref = user_ref['child']("games");
+  var games_ref = ref['child']("games");
+
+  user_games_ref['on']("child_added", function(project)
   {
     $('#no-projects')['hide']();
-    project = project['key']();
+    var project_name = project['key']();
     var li = document.createElement("li");
     var new_project = document.createElement("a");
-    new_project.innerHTML = project;
+    new_project.innerHTML = project_name;
 
-    if (project == "turtle")
+    if (project_name == "turtle")
     {
-      new_project.href = "/appengine/turtle_collab.html?level=10&username=" + getUsername() + "&saved=" + encodeURIComponent(project);
+      new_project.href = "/appengine/turtle_collab.html?level=10&username=" + getUsername() + "&saved=" + encodeURIComponent(project['val']()['game_id']);
     }
-    else if (project == "maze") {
+    else if (project_name == "maze") {
       return;
     }
     else
     {
-      new_project.href = "/appengine/heroes.html?level=&username=" + getUsername() + "&saved=" + encodeURIComponent(project);
+      new_project.href = "/appengine/heroes.html?level=&username=" + getUsername() + "&saved=" + encodeURIComponent(project['val']()['game_id']);
     }
     li.appendChild(new_project);
     project_list.appendChild(li);
   });
 
-  ref['child']('classroom')['on']("value", function(classroom)
+  user_ref['child']('classroom')['on']("value", function(classroom)
   {
-    $("#join-lesson")['append']("<div>" + classroom['val']() + "</div>");
+    var class_name = classroom['val']();
+    $("#join-lesson-button")['append']("<div>" + class_name + "</div>");
     $("#join-lesson")['show']();
     $("#video-link")['attr']("href",
-        "https://classadoo.github.io/meetingcenter/cmc/student.html?meetingID=" + encodeURIComponent(classroom['val']()) + "&name=" + getUsername());
+        "https://classadoo.github.io/meetingcenter/cmc/student.html?meetingID=" + encodeURIComponent(class_name) + "&name=" + getUsername());
     $("#video-link")['show']();
+    $("#join-lesson")['attr']("href",
+        "heroes.html?level=1&lang=en&username=" + getUsername() + "&classroom=" + encodeURIComponent(class_name));
 
   });
+
+
 }
 
 

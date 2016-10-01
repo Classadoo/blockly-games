@@ -37,13 +37,17 @@ goog.require('Teacher_Dash.soy');
 
 goog.require('WilddogUtils');
 
-// TODO(aheine): DRY
+BlocklyGames.NAME = 'TeacherDash';
+
+
+// TODO(aheine): DRY this out.
 Heroes.BLOCKLY_HTML =
-  '<div class="blockly" id="{user}_blockly">' +
+'<div class="row"' +
+  '<div class="col-md-6 no-padding ide">' +
     '<ul class="nav nav-tabs" id="{user}-tabs" role="tablist">' +
       '<li class="{read_only}-hero-form" role="presentation" id="{user}-new-hero-button"><a data-toggle="tab" role="tab" href="#{user}-add-hero" aria-controls="{user}-add-hero"> + New Hero</a></li>'  +
     '</ul>' +
-    '<div class="tab-content" id="{user}-blockly">' +
+    '<div class="tab-content" id="{user}-blockly" style="width:100%">' +
       '<form role="tabpanel" class="tab-pane" id="{user}-add-hero">' +
         '<div class="form-group">' +
           '<label for="hero-name">Name</label>' +
@@ -56,10 +60,11 @@ Heroes.BLOCKLY_HTML =
         '<button type="button" class="btn btn-default" id={user}-submit-hero>Submit</button>' +
       '</form>' +
     '</div>' +
-  '</div>';
+  '</div>' +
+'</div>';
 
 
-var newStudentBlockly = function(username)
+Teacher_Dash.newStudentBlockly = function(username)
 {
   var new_student = $('<div class="container-fluid" id="' + username + '_container"></div>');
   new_student.append(
@@ -75,46 +80,57 @@ var newStudentBlockly = function(username)
 
 
   $('#students').append(new_student);
-
-  $('#' + username + '_clear').click(function()
-  {
-    var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username);
-    ref['remove']();
-  });
-
 }
 
 var received_snapshots = {};
-/// Initialize a two-way collaborative canvas with a new student.
-var initStudent = function(username)
+/// Initialize a two-way collaborative canvas with a new game.
+Teacher_Dash.initGame = function(username, game_id)
 {
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username);
-
   //
   // Add the HTML containers for the student
   //
-  newStudentBlockly(username);
+  Teacher_Dash.newStudentBlockly(username);
 
   //
   // Setup remote control of canvas.
   //
-  var ide = new IDE(username, null);
-  connectSubscriber(username, ide);
 
-  // Watch out for the user being deleted.
-  ref['parent']()['on']('child_removed', function(old_snapshot)
+  var ide = new IDE(username, null, Teacher_Dash.wilddog);
+  Teacher_Dash.wilddog.connectSubscriberGame(game_id, ide);
+
+  //
+  // Delete EVERY reference to and from this game. Scary.
+  //
+  $('#' + username + '_clear').click(function()
   {
-    if (old_snapshot['key']() == username)
+    if (confirm("Are you sure?"))
     {
-      //TODO(aheine): make a clear method for the IDE and dispose of every workspace.
+      Teacher_Dash.wilddog.removeGame(username, game_id, ide, ide_tabs);
+    }
+  });
+
+  // Watch out for the game being deleted.
+  var game_ref = Teacher_Dash.wilddog.ref['child']("games")['child'](game_id);
+  game_ref['parent']()['on']('child_removed', function(old_snapshot)
+  {
+    if (old_snapshot['key']() == game_id)
+    {
+      //TODO(aheine): make a clear method for the IDE and dispose of every workspace from memory.
       //workspace.clear();
       var new_student = document.getElementById(username + "_container");
       new_student.style.display = "none";
     }
   });
 
+  // Watch out for the hero being deleted.
+  game_ref['child']("heroes")['on']('child_removed', function(deleted_hero)
+  {
+    ide.remove_tab(deleted_hero['val']().name);
+  });
 
-  ref['child']("level")['on']("value",  function(level)
+  // Watch out for the user changing levels.
+  var user_ref = Teacher_Dash.wilddog.ref['child']("users")['child'](username);
+  user_ref['child']("level")['on']("value",  function(level)
   {
     var level_div = document.getElementById(username + "_level");
     if (level_div)
@@ -123,7 +139,8 @@ var initStudent = function(username)
     }
   });
 
-  ref['child']("error")['on']("value",  function(err_string)
+  // Watch out for user javascript errors.
+  user_ref['child']("error")['on']("value",  function(err_string)
   {
     var error_div = document.getElementById(username + "_error");
     if (error_div)
@@ -133,7 +150,7 @@ var initStudent = function(username)
   });
 
   var code_running_div = document.getElementById(username + "_code_running");
-  ref['child']("code_running")['on']("value",  function(canvases)
+  user_ref['child']("code_running")['on']("value",  function(canvases)
   {
     canvases = canvases['val']();
     if (!canvases)
@@ -152,42 +169,6 @@ var initStudent = function(username)
   });
 }
 
-/// Initialize listener for new students and publisher for teacher updates.
-var initWildDog = function(){
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/");
-
-  var classroom = getSavedGame();
-  var new_student_callback = function(user) {
-    var username = user['key']();
-
-    var correct_class = !classroom || user['val']()['classroom'] == classroom;
-    if (correct_class)
-    {
-      initStudent(username);
-    }
-    else
-    {
-    ref['child'](username)['on']("value", function(snapshot)
-    {
-      if (snapshot['val']())
-      {
-        if (snapshot['val']()['classroom'] == classroom)
-        {
-          initStudent(username);
-        }
-      }
-    })
-    }
-
-  }
-
-  ref['on']("child_added", new_student_callback);
-}
-
-//myao end of the code to enable wilddog.
-
-
-BlocklyGames.NAME = 'TeacherDash';
 
 /**
  * Initialize Blockly and the turtle.  Called on page load.
@@ -197,30 +178,12 @@ Teacher_Dash.init = function() {
   document.body.innerHTML = Teacher_Dash.soy.start({}, null,
       {lang: BlocklyGames.LANG,
        level: BlocklyGames.LEVEL,
-       maxLevel: BlocklyGames.MAX_LEVEL,
        html: BlocklyGames.IS_HTML});
-
   BlocklyInterface.init();
 
+  Teacher_Dash.wilddog = new WilddogInterface(getClassroom());
 
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com");
-
-  var clearStudents = document.getElementById('clearStudents');
-  clearStudents.addEventListener("click", function()
-  {
-    ref['child']('users')['set']({"classadoo_instructor" : {}});
-  });
-
-  initWildDog();
-
-  //
-  // Create a class if it doesn't already exist.
-  //
-  var classroom = getQueryParam("classroom");
-  if (classroom)
-  {
-    ref['child']('classes')['child'](classroom)['update']({});
-  }
+  Teacher_Dash.wilddog.connectSubscriberClassroom(Teacher_Dash.initGame);
 };
 
 window.addEventListener('load', Teacher_Dash.init);

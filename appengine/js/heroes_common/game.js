@@ -27,12 +27,13 @@ goog.require('HeroesIDE');
 //
 // Constructor for a new game object.
 //
-var Game = function(username)
+var Game = function(username, wilddog, id)
 {
 var self = this;
 
+self.id = id;
 self.username = username;
-self.ide = new IDE(username, self);
+self.ide = new IDE(username, self, wilddog);
 self.pidList = [];
 
 self.ctxDisplay = document.getElementById(self.username + '-display').getContext('2d');

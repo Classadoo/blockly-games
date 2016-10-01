@@ -27,32 +27,59 @@ var getUsername = function()
 var getSavedGame = function()
 {
   // Fall back to the name of this classroom.
-  return getQueryParam("saved") || Heroes.classroom;
+  return getQueryParam("saved");
+}
+
+var getClassroom = function()
+{
+  return getQueryParam("classroom") || "none";
 }
 
 ///
 /// If we're using wilddog, we should send our errors to the teacher.
 ///
-var last_err_string = 0;
-window.onerror = function(errorMsg, url, lineNumber)
-{
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername());
 
-  var err_string = errorMsg + " - " + url + " - " + lineNumber;
-  if (err_string != last_err_string)
-  {
-    var promise = ref['update']({"error" : err_string});
-    last_err_string = err_string;
-  }
+
+
+function WilddogInterface(classroom)
+{
+var self = this;
+self.ref = new Wilddog("https://blocklypipe.wilddogio.com");
+
+var classroom_ref = self.ref['child']("classrooms")['child'](classroom);
+
+self.setError = function(username, err_string)
+{
+  var user_ref = self.ref['child']("users")['child'](username);
+  user_ref['update']({"error" : err_string});
+  last_err_string = err_string;
+}
+
+self.publishNewGame = function(username)
+{
+  var key = self.ref['child']("games").push()['key']();
+  game_object = {"game_id": key};
+
+  var user_ref = self.ref['child']("users")['child'](username);
+  user_ref['child']("games")['child'](classroom)['update'](game_object);
+  classroom_ref['child']("games")['child'](username)['update'](game_object);
+  return key;
+}
+
+
+self.publishNewHero = function(game_id, name, type, index)
+{
+  var key = self.ref['child']("heroes").push()['key']();
+  hero_object = {"type": type, "name": name, "index": index};
+
+  self.ref['child']("games")['child'](game_id)['child']("heroes")['child'](key)['update'](hero_object);
 }
 
 var received_snapshots = {};
 var sent_snapshots = {};
-
-
-var connectSubscriberWorkspace = function(username, game_ref, workspace, hero_name)
+self.connectSubscriberWorkspace = function(hero_id, workspace)
 {
-  var workspace_ref = game_ref['child'](hero_name)['child']("workspace");
+  var workspace_ref = self.ref['child']("heroes")['child'](hero_id)['child']("workspace");
   workspace_ref['on']("value", function(code) {
     code = code['val']();
     if (!code)
@@ -63,13 +90,13 @@ var connectSubscriberWorkspace = function(username, game_ref, workspace, hero_na
     //
     // Ignore updates from our own transmission..
     //
-    if (code == sent_snapshots[username + hero_name])
+    if (code == sent_snapshots[hero_id])
     {
       return;
     }
     workspace.clear();
 
-    received_snapshots[username + hero_name] = code;
+    received_snapshots[hero_id] = code;
     var xml = Blockly.Xml.textToDom(code);
     Blockly.Xml.domToWorkspace(xml, workspace);
     workspace.clearUndo();
@@ -87,44 +114,49 @@ var connectSubscriberWorkspace = function(username, game_ref, workspace, hero_na
 //
 // Connect to a remote game and apply all wilddog updates to our replica.
 //
-var connectSubscriber = function(username, ide)
+self.connectSubscriberGame = function(game_id, ide)
 {
 
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + getSavedGame());
+  var game_heroes_ref = self.ref['child']("games")['child'](game_id)['child']("heroes");
 
   //
-  // First listen for new workspaces.
+  // First listen for new heroes.
   //
 
-  ref['on']("child_added", function(child)
+  game_heroes_ref["orderByChild"]("index")['on']("child_added", function(child)
   {
-
     //
     // New workspace! Add a world/hero for it, and connect the new workspace.
     //
-    var name = child['key']();
+    var id = child['key']();
+    var name = child['val']()['name'];
+    var type = child['val']()['type'];
+
     var tab;
     if (name.toLowerCase() == "world")
     {
-      tab = ide.new_world_tab("world", "world");
+      tab = ide.new_world_tab(id);
     }
     else
     {
-      tab = ide.new_hero_tab(name, child['val']()['type']);
+      tab = ide.new_hero_tab(name, type, id);
     }
-    connectSubscriberWorkspace(username, ref, tab.workspace, name);
+    self.connectSubscriberWorkspace(id, tab.workspace);
   });
 }
 
-var publishDeleteTab = function(username, tab_name)
+self.publishDeleteTab = function(hero_id, game_id)
 {
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + getSavedGame());
-  ref['child'](tab_name)['set'](null);
+  var heroes_ref = self.ref['child']("heroes");
+  var game_heroes_ref = self.ref['child']("games")['child'](game_id)['child']("heroes");
+  game_heroes_ref['child'](hero_id)['remove']();
+  heroes_ref['child'](hero_id)['remove']();
 }
 
-var publishWorkspace = function(username, hero_name, hero_type, workspace)
+
+self.publishWorkspace = function(hero_id, hero_type, workspace)
 {
-  var game_ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + username + "/games/" + getSavedGame());
+  var hero_ref = self.ref['child']("heroes")['child'](hero_id);
 
   if (workspace)
   {
@@ -136,27 +168,27 @@ var publishWorkspace = function(username, hero_name, hero_type, workspace)
     //
     // If we just sent or received this code, we can ignore it.
     //
-    if (current_code === received_snapshots[username + hero_name])
+    if (current_code === received_snapshots[hero_id])
     {
       return;
     }
-    if (current_code === sent_snapshots[username + hero_name])
+    if (current_code === sent_snapshots[hero_id])
     {
       return;
     }
-    sent_snapshots[username + hero_name] = current_code;
+    sent_snapshots[hero_id] = current_code;
 
     //
     // Send the code to wilddog.
     //
-    game_ref['child'](hero_name)['update']({"workspace" : current_code});
+    hero_ref['update']({"workspace" : current_code, "type": hero_type});
   }
 
   // Update the type, regardless.
-  game_ref['child'](hero_name)['update']({"type": hero_type});
+  hero_ref['update']({"type": hero_type});
 }
 
-var connectPublisherWorkspace = function(username, hero_name, hero_type, workspace)
+self.connectPublisherWorkspace = function(hero_id, hero_type, workspace)
 {
   workspace.addChangeListener(function(change)
   {
@@ -167,25 +199,60 @@ var connectPublisherWorkspace = function(username, hero_name, hero_type, workspa
     if (change.type == Blockly.Events.UI) {
       return;
     }
-    publishWorkspace(username, hero_name, hero_type, workspace);
+    self.publishWorkspace(hero_id, hero_type, workspace);
+  });
+  self.publishWorkspace(hero_id, hero_type, null);
+}
+
+self.setLevel = function(username, level)
+{
+  var user_ref = self.ref['child']("users")['child'](username);
+  user_ref['update']({"level": "" + level});
+}
+
+self.removeGame = function(username, game_id, ide_tabs)
+{
+  var game_ref = self.ref['child']('games')['child'](game_id);
+  var user_ref = self.ref['child']('users')['child'](username);
+  var heroes_ref = self.ref['child']('heroes');
+
+
+  game_ref['remove']();
+  user_ref['child']("games")['child'](classroom)['remove']();
+  classroom_ref['child']("games")['child'](username)['remove']();
+
+  for (var tab in ide_tabs)
+  {
+    heroes_ref['child'](ide_tabs[tab].hero_id)['remove']();
+  }
+}
+
+self.connectSubscriberClassroom = function(new_game_callback, max_level_callback)
+{
+  //
+  // Register callback for the max level of this classroom.
+  //
+  if (max_level_callback)
+  {
+    classroom_ref['child']('level')["on"]("value", function(level)
+    {
+      if (level['val']())
+      {
+        var level_allowed = level['val']() || 999;
+        max_level_callback(level_allowed);
+      }
+    });
+  }
+
+  //
+  // Register callback for new students.
+  //
+  classroom_ref['child']("games")['on']("child_added", function(game)
+  {
+    var username = game['key']();
+    var game_id = game['val']()['game_id'];
+    new_game_callback(username, game_id);
   });
 }
 
-var initStudentWilddog = function(game_name, level, ide){
-  //
-  // Give us a fresh start.
-  //
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername());
-  ref['update']({"error": ""});
-
-  //
-  // Send current level.
-  //
-  ref['update']({"level": game_name + "-" + level});
-
-
-  //
-  // Subscribe to all our/teacher blockly changes.
-  //
-  connectSubscriber(getUsername(), ide);
 }

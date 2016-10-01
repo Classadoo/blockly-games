@@ -23,7 +23,7 @@ goog.provide('HeroesIDE');
 //
 // An object that displays several blockly workspaces to produce hero code.
 //
-var IDE = function(username, game)
+var IDE = function(username, game, wilddog)
 {
 var self = this;
 self.username = username;
@@ -59,7 +59,7 @@ $("#" + self.username + "-submit-hero")['click'](function()
     return;
   }
 
-  publishWorkspace(self.username, name, type, null);
+  wilddog.publishNewHero(game.id, name, type, Object.keys(self.tabs).length);
 })
 
 // If the user hits enter, prevent the POST event and just add a hero.
@@ -73,14 +73,14 @@ $('.tab-pane')['keydown'](function(event){
 //
 // When a new hero is created.
 //
-self.new_hero_tab = function(new_tab_name, type)
+self.new_hero_tab = function(new_tab_name, type, hero_id)
 {
-  self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name, type);
+  self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name, type, hero_id);
 
   // Start pushing data.
   if (!self.tabs[new_tab_name].read_only)
   {
-    connectPublisherWorkspace(username, new_tab_name, type, self.tabs[new_tab_name].workspace);
+    wilddog.connectPublisherWorkspace(hero_id, type, self.tabs[new_tab_name].workspace);
   }
 
   //
@@ -108,7 +108,10 @@ self.new_hero_tab = function(new_tab_name, type)
   $("#" + self.tabs[new_tab_name].dom_id + "-x")['click'](
     function()
     {
-      self.remove_tab(new_tab_name);
+      if (confirm("DELETE this hero? Are you sure?"))
+      {
+        self.remove_tab(new_tab_name);
+      }
     }
   )
 
@@ -118,8 +121,12 @@ self.new_hero_tab = function(new_tab_name, type)
 self.remove_tab = function(tab_name)
 {
   //
-  // Remove from DOM, self, game, and wilddog.
+  // Remove from wilddog, DOM, self, and game..
   //
+  if (self.game)
+  {
+    wilddog.publishDeleteTab(self.tabs[tab_name].hero_id, game.id);
+  }
 
   self.tabs[tab_name].remove();
   delete self.tabs[tab_name];
@@ -128,7 +135,6 @@ self.remove_tab = function(tab_name)
   {
     self.game.remove_hero(tab_name);
   }
-  publishDeleteTab(self.username, tab_name);
 
   //
   // Remove from collision list.
@@ -147,14 +153,14 @@ self.remove_tab = function(tab_name)
   }
 }
 
-self.new_world_tab = function()
+self.new_world_tab = function(world_id)
 {
   if (self.tabs["world"])
   {
     return self.tabs["world"];
   }
 
-  self.tabs["world"] = new IDE_Tab(self.username, "world", "world", "world_toolbox");
+  self.tabs["world"] = new IDE_Tab(self.username, "world", "world", world_id, "world_toolbox");
   if (self.game)
   {
     self.game.setup_game_world(self.tabs["world"]);
@@ -163,7 +169,7 @@ self.new_world_tab = function()
   // Start pushing data.
   if (!self.tabs["world"].read_only)
   {
-    connectPublisherWorkspace(username, "world", "world", self.tabs["world"].workspace);
+    wilddog.connectPublisherWorkspace(world_id, "world", self.tabs["world"].workspace);
   }
 
   return self.tabs["world"];
@@ -172,9 +178,10 @@ self.new_world_tab = function()
 
 //
 // Tab containing one workspace for a world/hero.
-var IDE_Tab = function(username, tab_name, hero_type, toolbox_id)
+var IDE_Tab = function(username, tab_name, hero_type, hero_id, toolbox_id)
 {
 var self = this;
+self.hero_id = hero_id;
 self.hero_type = hero_type;
 toolbox_id = toolbox_id || 'toolbox';
 self.dom_id = username + "-" + tab_name;
