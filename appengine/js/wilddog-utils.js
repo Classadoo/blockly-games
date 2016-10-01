@@ -63,13 +63,14 @@ self.publishNewGame = function(username)
   return key;
 }
 
-
-self.publishNewHero = function(game_id, name, type, index)
+self.publishNewHero = function(game_id, name, type, index, x, y)
 {
-  var key = self.ref['child']("heroes").push()['key']();
+  var hero_ref = self.ref['child']("heroes").push();
+  hero_ref['update']({"x" : x, "y" : y});
+
   hero_object = {"type": type, "name": name, "index": index};
 
-  self.ref['child']("games")['child'](game_id)['child']("heroes")['child'](key)['update'](hero_object);
+  self.ref['child']("games")['child'](game_id)['child']("heroes")['child'](hero_ref['key']())['update'](hero_object);
 }
 
 var received_snapshots = {};
@@ -139,7 +140,29 @@ self.connectSubscriberGame = function(game_id, ide)
       tab = ide.new_hero_tab(name, type, id);
     }
     self.connectSubscriberWorkspace(id, tab.workspace);
+
+    //
+    // Subscribe to changes to this hero metadata.
+    //
+    var hero_ref = self.ref['child']("heroes")['child'](id);
+    hero_ref['on']('value', function(hero)
+    {
+      hero = hero['val']();
+      if (hero)
+      {
+        if (hero.x && hero.y && (name.toLowerCase() != "world"))
+        {
+          ide.update_pos(name, hero.x, hero.y);
+        }
+      }
+    })
   });
+}
+
+self.publish_pos = function(id, x, y)
+{
+  var hero_ref = self.ref['child']("heroes")['child'](id);
+  hero_ref['update']({"x" : x, "y" : y});
 }
 
 self.publishDeleteTab = function(hero_id, game_id)

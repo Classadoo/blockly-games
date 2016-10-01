@@ -116,7 +116,10 @@ $(display_context.canvas)['mousedown']( function(e)
     self.drag_event_y = e.clientY;
   }
 })
-$(display_context.canvas)['mouseup']( function(e) { self.dragging = false});
+$(display_context.canvas)['mouseup']( function(e) {
+  self.dragging = false;
+  sprite_ide.publish_pos(self.starting_x, self.starting_y);
+});
 $(display_context.canvas)['mousemove']( function(e) {
   if (self.dragging)
   {

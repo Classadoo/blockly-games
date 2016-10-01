@@ -33,19 +33,20 @@ var self = this;
 
 self.id = id;
 self.username = username;
-self.ide = new IDE(username, self, wilddog);
 self.pidList = [];
 
 self.ctxDisplay = document.getElementById(self.username + '-display').getContext('2d');
 self.ctxScratch = document.getElementById(self.username + '-scratch').getContext('2d');
 self.ctxLines = document.getElementById(self.username + '-lines').getContext('2d');
-Heroes.HEIGHT = self.ctxDisplay.canvas.parentElement.clientHeight - 45;
-Heroes.WIDTH = self.ctxDisplay.canvas.parentElement.clientWidth;
 
 // HACK! We never want to clear the lines (because we dn't store them). So we can't resize this later.
 self.ctxLines.canvas.width = 3000;
 self.ctxLines.canvas.height = 3000;
 
+Heroes.HEIGHT = self.ctxDisplay.canvas.parentElement.clientHeight - 45 || Heroes.HEIGHT;
+Heroes.WIDTH = self.ctxDisplay.canvas.parentElement.clientWidth || Heroes.WIDTH;
+
+self.ide = new IDE(username, self, wilddog);
 
 var hero_radius = 32;
 
@@ -101,8 +102,12 @@ self.display = function() {
   var display_canvas = self.ctxDisplay.canvas;
   var scratch_canvas = self.ctxScratch.canvas;
 
-  Heroes.HEIGHT = display_canvas.parentElement.clientHeight - 45;
-  Heroes.WIDTH = display_canvas.parentElement.clientWidth;
+  if (self.active)
+  {
+    Heroes.HEIGHT = display_canvas.parentElement.clientHeight - 45;
+    Heroes.WIDTH = display_canvas.parentElement.clientWidth;
+  }
+
   display_canvas.width = Heroes.WIDTH;
   display_canvas.height = Heroes.HEIGHT;
   scratch_canvas.width = Heroes.WIDTH;
@@ -129,6 +134,15 @@ self.display = function() {
   self.ctxDisplay.drawImage(self.ctxScratch.canvas, 0, 0);
 };
 
+self.update_pos = function(hero, x, y)
+{
+  self.heroes[hero].starting_x = x;
+  self.heroes[hero].starting_y = y;
+  if (self.pidList.length == 0)
+  {
+    self.reset();
+  }
+}
 
 /**
  * Execute the user's code.  Heaven help us...
@@ -188,49 +202,24 @@ self.resetButtonClick = function(e) {
   self.reset();
 };
 
-
-//
-// Each new hero should be offset from the last.
-//
-var hero_offset = 4;
-self.starting_x = Heroes.WIDTH/hero_offset/2;
-self.starting_y = Heroes.HEIGHT - Heroes.HEIGHT/hero_offset;
-
 self.setup_game_world = function(ide_tab)
 {
   self.game_world = new GameWorld(username, ide_tab);
   self.reset();
 }
 
-self.addHero = function(name, type, ide_tab) {
+self.addHero = function(name, type, ide_tab, x, y) {
 
-  self.heroes[name] = new Hero(name, type, hero_radius, self.starting_x,
-    self.starting_y, self.ctxLines, self.ctxDisplay, ide_tab, self);
+  self.heroes[name] = new Hero(name, type, hero_radius, x, y, self.ctxLines,
+    self.ctxDisplay, ide_tab, self);
 
   //
   // Draw her.
   //
 
   self.display();
-  self.cycle_starting_locations();
-
   return self.heroes[name];
 };
-
-self.cycle_starting_locations = function()
-{
-  self.starting_x += Heroes.WIDTH/hero_offset;
-  if (self.starting_x > Heroes.WIDTH)
-  {
-    self.starting_x = Heroes.WIDTH/hero_offset/2;
-    self.starting_y -= Heroes.HEIGHT/hero_offset;
-
-    if (self.starting_y < 0)
-    {
-      self.starting_y = Heroes.HEIGHT/hero_offset/2;
-    }
-  }
-}
 
 self.remove_hero = function(name)
 {
@@ -272,12 +261,15 @@ self.hide = function()
 {
   var container = $("#" + username + "_container");
   container['hide']();
+  self.active = false;
 }
 
 self.show = function()
 {
   var container = $("#" + username + "_container");
   container['show']();
+
+  self.active = true;
 
   self.ide.display();
   self.display();

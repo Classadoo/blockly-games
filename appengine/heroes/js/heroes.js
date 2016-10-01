@@ -189,9 +189,8 @@ Heroes.setupGames = function()
 
   if (!getSavedGame())
   {
+    Heroes.new_game = true;
     var game_id = Heroes.wilddog.publishNewGame(getUsername());
-    Heroes.wilddog.publishNewHero(game_id, "world", "world", 0);
-    Heroes.wilddog.publishNewHero(game_id, getUsername(), "human", 1);
     var newurl = window.location.href + '&saved=' + encodeURIComponent(game_id);
     window.history.replaceState({path:newurl},'',newurl);
   }
@@ -218,6 +217,13 @@ Heroes.addGame = function(readOnly, username, game_id)
 
   var game = new Game(username, Heroes.wilddog, game_id);
 
+  // Initialize the world, if this is a fresh game.
+  if (Heroes.new_game && username == getUsername())
+  {
+    game.ide.publishHero("world", "world");
+    game.ide.publishHero(getUsername(), "human");
+  }
+
   BlocklyGames.bindClick(username + '-runButton', game.runButtonClick);
   BlocklyGames.bindClick(username + '-resetButton', game.resetButtonClick);
 
@@ -237,6 +243,9 @@ Heroes.add_user = function(username, game_id)
   if (username != Heroes.displayed_ide)
   {
     game.hide();
+  }
+  else {
+    game.show();
   }
 
   Heroes.wilddog.connectSubscriberGame(game_id, game.ide);

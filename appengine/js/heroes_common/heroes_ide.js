@@ -31,6 +31,13 @@ self.game = game;
 self.tabs = {};
 
 //
+// Each new hero should be offset from the last.
+//
+var hero_offset = 3;
+self.starting_x = Heroes.WIDTH/hero_offset;
+self.starting_y = Heroes.HEIGHT/2;
+
+//
 // Setup the tab for creating a new hero.
 //
 var character_types = ["lion", "eagle", "human"];
@@ -58,10 +65,8 @@ $("#" + self.username + "-submit-hero")['click'](function()
     console.log("This hero already exists: ", name);
     return;
   }
-
-  wilddog.publishNewHero(game.id, name, type, Object.keys(self.tabs).length);
+  self.publishHero(name, type);
 })
-
 // If the user hits enter, prevent the POST event and just add a hero.
 $('.tab-pane')['keydown'](function(event){
   if(event.keyCode == 13) {
@@ -70,12 +75,30 @@ $('.tab-pane')['keydown'](function(event){
   }
 });
 
+self.publishHero = function(name, type)
+{
+  wilddog.publishNewHero(game.id, name, type, Object.keys(self.tabs).length,
+    self.starting_x, self.starting_y);
+}
+
+self.cycle_starting_locations = function()
+{
+  self.starting_x += Heroes.WIDTH/hero_offset;
+  if (self.starting_x > Heroes.WIDTH)
+  {
+    self.starting_x = Heroes.WIDTH/hero_offset/2;
+  }
+}
+
 //
 // When a new hero is created.
 //
 self.new_hero_tab = function(new_tab_name, type, hero_id)
 {
-  self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name, type, hero_id);
+  self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name, type, hero_id, self);
+
+  // Subscribe to changes.
+
 
   // Start pushing data.
   if (!self.tabs[new_tab_name].read_only)
@@ -99,7 +122,9 @@ self.new_hero_tab = function(new_tab_name, type, hero_id)
 
   if (self.game)
   {
-    self.game.addHero(new_tab_name, type, self.tabs[new_tab_name]);
+    self.game.addHero(new_tab_name, type, self.tabs[new_tab_name], self.starting_x, self.starting_y);
+    self.cycle_starting_locations();
+
   }
 
   //
@@ -116,6 +141,11 @@ self.new_hero_tab = function(new_tab_name, type, hero_id)
   )
 
   return self.tabs[new_tab_name];
+}
+
+self.update_pos = function(hero_name, x, y)
+{
+  game.update_pos(hero_name, x, y);
 }
 
 self.remove_tab = function(tab_name)
@@ -155,12 +185,7 @@ self.remove_tab = function(tab_name)
 
 self.new_world_tab = function(world_id)
 {
-  if (self.tabs["world"])
-  {
-    return self.tabs["world"];
-  }
-
-  self.tabs["world"] = new IDE_Tab(self.username, "world", "world", world_id, "world_toolbox");
+  self.tabs["world"] = new IDE_Tab(self.username, "world", "world", world_id, self, "world_toolbox");
   if (self.game)
   {
     self.game.setup_game_world(self.tabs["world"]);
@@ -182,11 +207,18 @@ self.display = function()
     self.tabs[tab].display();
   }
 }
+
+//
+// Tell wilddog about a hero's new position.
+self.publish_pos = function(id, x, y)
+{
+  wilddog.publish_pos(id, x, y);
+}
 }
 
 //
 // Tab containing one workspace for a world/hero.
-var IDE_Tab = function(username, tab_name, hero_type, hero_id, toolbox_id)
+var IDE_Tab = function(username, tab_name, hero_type, hero_id, parent, toolbox_id)
 {
 var self = this;
 self.hero_id = hero_id;
@@ -285,6 +317,11 @@ self.spinner = function(spinning)
 self.highlightBlock = function(id)
 {
   self.workspace.highlightBlock(id);
+}
+
+self.publish_pos = function(x, y)
+{
+  parent.publish_pos(hero_id, x, y);
 }
 }
 
