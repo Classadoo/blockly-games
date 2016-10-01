@@ -126,12 +126,6 @@ Heroes.init = function() {
     Heroes.displayed_ide = ide_name;
   })
 
-
-  //
-  // Set header.
-  //
-  $('#username-header')['html'](getUsername() + " - " + Heroes.classroom);
-
   //
   // Setup the games for us and our classmates.
   //
@@ -166,6 +160,11 @@ Heroes.loadBlockly = function()
        maxLevel: 5,
        html: BlocklyGames.IS_HTML,
        suffix: "&username=" + getUsername() + "&saved=" + getSavedGame()});
+
+  //
+  // Set header.
+  //
+  $('#username-header')['html'](getUsername() + " - " + Heroes.classroom);
 
   BlocklyInterface.init();
 
