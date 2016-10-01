@@ -95,7 +95,7 @@ Catalog.init = function()
     // Link to a previous save if there is one.
     if (saved_games[Catalog.class_name])
     {
-      href += saved_games[Catalog.class_name];
+      href += "&saved=" + saved_games[Catalog.class_name];
     }
     $("#join-lesson")['attr']("href", href);
     $("#join-lesson")['show']();
