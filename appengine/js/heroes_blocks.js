@@ -358,6 +358,7 @@ Blockly.JavaScript['heroes_speak'] = function(block) {
   // Generate JavaScript for printing text.
   var what = String(Blockly.JavaScript.valueToCode(block, 'TEXT',
       Blockly.JavaScript.ORDER_NONE) || '\'\'');
+  what = what.replace(/[^a-zA-Z0-9]+/g, "");
   var seconds = String(Blockly.JavaScript.valueToCode(block, 'SECONDS',
       Blockly.JavaScript.ORDER_NONE) || '\'\'');
   return 'speak(' + what + ',' + seconds + ',\'block_id_' + block.id + '\');\n';
