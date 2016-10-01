@@ -56,7 +56,7 @@ Heroes.BLOCKLY_HTML =
     '<ul class="nav nav-tabs" id="{user}-tabs" role="tablist">' +
       '<li class="{read_only}-hero-form" role="presentation" id="{user}-new-hero-button"><a data-toggle="tab" role="tab" href="#{user}-add-hero" aria-controls="{user}-add-hero"> + New Hero</a></li>'  +
     '</ul>' +
-    '<div class="tab-content" id="{user}-blockly" style="width:100%">' +
+    '<div class="tab-content read_only_{read_only}" id="{user}-blockly" style="width:100%">' +
       '<form role="tabpanel" class="tab-pane" id="{user}-add-hero">' +
         '<div class="form-group">' +
           '<label for="hero-name">Name</label>' +
@@ -209,10 +209,11 @@ Heroes.add_user = function(username, game_id)
   //
   // Create the new remote user.
   //
-  var game = Heroes.addGame(username != getUsername(), username, game_id);
+  var read_only = username != getUsername();
+  var game = Heroes.addGame(read_only, username, game_id);
   game.reset()
 
-  if (username != getUsername())
+  if (read_only)
   {
     var container = $("#" + username + "_container");
     container['hide']();
