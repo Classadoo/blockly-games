@@ -16,3 +16,8 @@
 .username, .user_level {
   padding: 4px
 }
+
+.workspace
+{
+  height: 300px;
+}
