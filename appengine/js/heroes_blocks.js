@@ -591,6 +591,29 @@ Blockly.JavaScript['heroes_width'] = function(block) {
   return 'penWidth(' + width + ', \'block_id_' + block.id + '\');\n';
 };
 
+Blockly.Blocks['heroes_game_speed'] = {
+  /**
+   * Block for setting the width.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(Heroes.Blocks.HUE);
+    var HEROES =
+        [["Set speed slow", 'slow'],
+         ["Set speed medium", 'med'],
+          ["Set speed fast", "fast"]];
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldDropdown(HEROES), 'SPEED');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+  }
+};
+
+Blockly.JavaScript['heroes_game_speed'] = function(block) {
+  // Generate JavaScript for setting the width.
+  return 'setSpeed(\'' + block.getFieldValue('SPEED') + '\', \'block_id_' + block.id + '\');\n';
+};
+
 Blockly.Blocks['heroes_pen'] = {
   /**
    * Block for pen up/down.

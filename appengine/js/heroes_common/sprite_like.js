@@ -106,10 +106,20 @@ self.setButtonCallback = function(which, fn, id)
 }
 
 // Speed should be between 0 and 1.
-self.setSpeed = function(speed, id)
+self.setSpeed = function(speed_string, id)
 {
-  self.speed = Math.min(1, speed);
-  self.speed = Math.max(0, speed);
+  switch (speed_string)
+  {
+    case "slow":
+      self.speed = .1;
+      break;
+    case "med":
+      self.speed = .5;
+      break;
+    case "fast":
+      self.speed = 1.0;
+      break;
+  }
 
   self.animate(id);
 }
@@ -186,6 +196,12 @@ self.initBasicInterpreter = function(interpreter, scope)
     self.addPoints(num.data, id.toString());
   };
   interpreter.setProperty(scope, 'addPoints',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(speed, id) {
+    self.setSpeed(speed.toString(), id.toString());
+  };
+  interpreter.setProperty(scope, 'setSpeed',
       interpreter.createNativeFunction(wrapper));
 }
 
