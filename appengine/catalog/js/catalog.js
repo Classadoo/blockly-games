@@ -93,9 +93,9 @@ Catalog.init = function()
     var href = "heroes.html?level=1&username=" + getUsername() + "&classroom=" + encodeURIComponent(Catalog.class_name);
 
     // Link to a previous save if there is one.
-    if (saved_projects[Catalog.class_name])
+    if (saved_games[Catalog.class_name])
     {
-      href += saved_projects[Catalog.class_name];
+      href += saved_games[Catalog.class_name];
     }
     $("#join-lesson")['attr']("href", href);
     $("#join-lesson")['show']();
