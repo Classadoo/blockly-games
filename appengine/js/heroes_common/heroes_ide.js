@@ -226,7 +226,7 @@ self.hero_type = hero_type;
 toolbox_id = toolbox_id || 'toolbox';
 self.dom_id = username + "-" + tab_name;
 self.read_only = !(getUsername() == username ||
-                   getUsername().toLowerCase() == "classadoo_instructor");
+                   getUsername().toLowerCase() == "Teacher");
 //
 // Add the tab for this hero.
 //

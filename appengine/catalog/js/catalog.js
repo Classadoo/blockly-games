@@ -37,6 +37,11 @@ Catalog.init = function()
   var user_games_ref = user_ref['child']("games");
   var games_ref = ref['child']("games");
 
+  var saved_games = {};
+
+  //
+  // Get saved game.
+  //
   user_games_ref['on']("child_added", function(project)
   {
     $('#no-projects')['hide']();
@@ -58,22 +63,43 @@ Catalog.init = function()
     }
     li.appendChild(new_project);
     project_list.appendChild(li);
+
+    saved_games[project_name] = encodeURIComponent(project['val']()['game_id']);
+
+    // If the classroom link already exists
+    if (project_name == Catalog.class_name)
+    {
+      var _href = $("#join-lesson")['attr']("href");
+      $("#join-lesson")['attr']("href", _href + '&saved=' + saved_games[project_name]);
+    }
   });
 
+  //
+  // Get link to classroom.
+  //
   user_ref['child']('classroom')['on']("value", function(classroom)
   {
-    var class_name = classroom['val']();
-    $("#join-lesson-button")['append']("<div>" + class_name + "</div>");
-    $("#join-lesson")['show']();
+
+    Catalog.class_name = classroom['val']();
+
+    // Create video chat link.
     $("#video-link")['attr']("href",
-        "https://classadoo.github.io/meetingcenter/cmc/student.html?meetingID=" + encodeURIComponent(class_name) + "&name=" + getUsername());
+        "https://classadoo.github.io/meetingcenter/cmc/student.html?meetingID=" + encodeURIComponent(Catalog.class_name) + "&name=" + getUsername());
     $("#video-link")['show']();
-    $("#join-lesson")['attr']("href",
-        "heroes.html?level=1&lang=en&username=" + getUsername() + "&classroom=" + encodeURIComponent(class_name));
 
+    // Create classroom link.
+    $("#join-lesson-button")['append']("<div>" + Catalog.class_name + "</div>");
+
+    var href = "heroes.html?level=1&username=" + getUsername() + "&classroom=" + encodeURIComponent(Catalog.class_name);
+
+    // Link to a previous save if there is one.
+    if (saved_projects[Catalog.class_name])
+    {
+      href += saved_projects[Catalog.class_name];
+    }
+    $("#join-lesson")['attr']("href", href);
+    $("#join-lesson")['show']();
   });
-
-
 }
 
 

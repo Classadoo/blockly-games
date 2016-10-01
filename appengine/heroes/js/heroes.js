@@ -159,7 +159,7 @@ Heroes.loadBlockly = function()
        level: BlocklyGames.LEVEL,
        maxLevel: 5,
        html: BlocklyGames.IS_HTML,
-       suffix: "&username=" + getUsername() + "&saved=" + getSavedGame()});
+       suffix: "&username=" + getUsername() + "&saved=" + getSavedGame() + "&classroom=" + getClassroom()});
 
   //
   // Set header.
@@ -202,11 +202,9 @@ Heroes.addGame = function(readOnly, username, game_id)
   //
   // Set up the HTML.
   //
-
   var new_game = $('<div class="row" id="' + username + '_container" style="height:100%"></div>');
 
   var game_html = $(Heroes.GAME_HTML.replace(/{user}/g, username));
-
   var blockly_html = $(Heroes.BLOCKLY_HTML.replace(/{user}/g, username)
     .replace(/{read_only}/g, readOnly));
 
