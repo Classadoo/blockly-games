@@ -62,13 +62,23 @@ self.draw = function(ctx)
   self.drawBackground(ctx);
   self.drawHUD(ctx);
 
+  // Draw watermark.
+  if (username != getUsername())
+  {
+    var watermark = username + "'s Code";
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.font="36px Arial";
+
+    var pos = Heroes.WIDTH/2 - ctx.measureText(watermark).width/2;
+    ctx.fillText(watermark, pos, Heroes.HEIGHT/2);
+  }
+
   // Draw the items.
   for (var i=0; i<self.items.length; i++)
   {
     self.items[i].draw(ctx, self.item_radius);
     self.items[i].processEvents();
   }
-
 
   // Draw title.
   if (self.title)
