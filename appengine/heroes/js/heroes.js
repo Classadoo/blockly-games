@@ -40,7 +40,7 @@ BlocklyGames.NAME = 'heroes';
 
 // TODO(aheine): use jquery instead of a string of HTML. Also move this to a new file.
 Heroes.GAME_HTML =
-  '<div class="col-md-6 no-padding">' +
+  '<div class="col-xs-6 no-padding">' +
     '<canvas id="{user}-scratch" style="display: none"></canvas>' +
     '<canvas id="{user}-display"></canvas>' +
     '<canvas id="{user}-lines" style="display: none"></canvas>' +
@@ -52,7 +52,7 @@ Heroes.GAME_HTML =
     '</button>' +
   '</div>'
 Heroes.BLOCKLY_HTML =
-  '<div class="col-md-6 no-padding ide">' +
+  '<div class="col-xs-6 no-padding ide">' +
     '<ul class="nav nav-tabs" id="{user}-tabs" role="tablist">' +
       '<li class="{read_only}-hero-form" role="presentation" id="{user}-new-hero-button"><a data-toggle="tab" role="tab" href="#{user}-add-hero" aria-controls="{user}-add-hero"> + New Hero</a></li>'  +
     '</ul>' +
@@ -91,8 +91,10 @@ Heroes.init = function() {
   Heroes.classroom = getClassroom();
   Heroes.wilddog = new WilddogInterface(Heroes.classroom);
 
-  Heroes.wilddog.setLevel(getUsername(), BlocklyGames.LEVEL);
-  Heroes.wilddog.setError(getUsername(), "");
+  var username = getUsername();
+  Heroes.wilddog.setIDE(username, username);
+  Heroes.wilddog.setLevel(username, BlocklyGames.LEVEL);
+  Heroes.wilddog.setError(username, "");
   var last_err_string = "";
   window.onerror = function(errorMsg, url, lineNumber)
   {
@@ -103,8 +105,27 @@ Heroes.init = function() {
     }
   }
 
-
+  //
+  // Listen for new users, and for when to show their IDEs.
+  //
+  Heroes.games = {};
   Heroes.wilddog.connectSubscriberClassroom(Heroes.add_user, Heroes.setMaxLevel);
+  Heroes.wilddog.subscribeToIDE(username, function(ide_name)
+  {
+    // Hide other IDEs
+    for (var game in Heroes.games)
+    {
+      Heroes.games[game].hide();
+    }
+
+    // Show this one.
+    if (Heroes.games[ide_name])
+    {
+      Heroes.games[ide_name].show()
+    }
+    Heroes.displayed_ide = ide_name;
+  })
+
 
   //
   // Set header.
@@ -201,6 +222,7 @@ Heroes.addGame = function(readOnly, username, game_id)
   BlocklyGames.bindClick(username + '-runButton', game.runButtonClick);
   BlocklyGames.bindClick(username + '-resetButton', game.resetButtonClick);
 
+  Heroes.games[username] = game;
   return game;
 }
 
@@ -213,10 +235,9 @@ Heroes.add_user = function(username, game_id)
   var game = Heroes.addGame(read_only, username, game_id);
   game.reset()
 
-  if (read_only)
+  if (username != Heroes.displayed_ide)
   {
-    var container = $("#" + username + "_container");
-    container['hide']();
+    game.hide();
   }
 
   Heroes.wilddog.connectSubscriberGame(game_id, game.ide);

@@ -28,7 +28,7 @@ button.publish {
   display:inline;
   bottom: 11px;
 }
-.col-md-6.no-padding {
+.col-xs-6.no-padding {
   padding: 0px;
   height: 100%;
 }

@@ -266,5 +266,22 @@ self.startGame = function(game_speed) {
   }, game_speed);
 };
 
+
+
+self.hide = function()
+{
+  var container = $("#" + username + "_container");
+  container['hide']();
+}
+
+self.show = function()
+{
+  var container = $("#" + username + "_container");
+  container['show']();
+
+  self.ide.display();
+  self.display();
+}
+
 window.addEventListener('resize', self.display);
 }

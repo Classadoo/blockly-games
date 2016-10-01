@@ -35,12 +35,9 @@ var getClassroom = function()
   return getQueryParam("classroom") || "none";
 }
 
-///
-/// If we're using wilddog, we should send our errors to the teacher.
-///
-
-
-
+//
+// Helper functions for connecting wilddog with a local IDE.
+//
 function WilddogInterface(classroom)
 {
 var self = this;
@@ -255,4 +252,21 @@ self.connectSubscriberClassroom = function(new_game_callback, max_level_callback
   });
 }
 
+self.setIDE = function(username, ide_username)
+{
+  var user_ref = self.ref['child']('users')['child'](username);
+  user_ref['update']({"ide_username" : ide_username});
+}
+
+self.subscribeToIDE = function(username, ide_callback)
+{
+  var ide_ref = self.ref['child']('users')['child'](username)['child']("ide_username");
+  ide_ref['on']("value", function(ide_ref)
+  {
+    if (ide_ref['val']())
+    {
+      ide_callback(ide_ref['val']());
+    }
+  });
+}
 }

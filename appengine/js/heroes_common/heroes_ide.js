@@ -174,6 +174,14 @@ self.new_world_tab = function(world_id)
 
   return self.tabs["world"];
 }
+
+self.display = function()
+{
+  for (var tab in self.tabs)
+  {
+    self.tabs[tab].display();
+  }
+}
 }
 
 //
@@ -224,8 +232,7 @@ self.workspace = Blockly.inject(self.dom_id,
 self.workspace.objects = [["item", "item"], ["edge", "edge"]];
 self.workspace.traceOn(true);
 
-var blocklyDiv = document.getElementById(self.dom_id);
-var onresize = function(e) {
+self.display = function() {
 
   // We may have loaded stuff when the canvas was hidden, which corrupts the blocks.
   // We have to clear and reload everything...
@@ -237,12 +244,12 @@ var onresize = function(e) {
 
   Blockly.svgResize(self.workspace);
 };
-window.addEventListener('resize', onresize);
+window.addEventListener('resize', self.display);
 
 $('#' + self.dom_id + '-li a')['click'](function (e) {
   e['preventDefault']();
   $(this)['tab']('show');
-  onresize();
+  self.display();
   self.workspace.zoomToFit();
   self.workspace.zoomCenter(-1);
 })

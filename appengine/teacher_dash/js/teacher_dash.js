@@ -72,6 +72,8 @@ Teacher_Dash.newStudentBlockly = function(username)
     '<span class="username">' + username + '</span>' +
     '<span class="user_level" id="' + username + '_level">Level ?</span>' +
     '<button type="button" class="user_clear" id="' + username + '_clear">Clear</button>' +
+    '<input type="text" id="' + username + '-pick-id" />' +
+    '<button type="button" class="send-pick-id" id="' + username + '-send-pick-id">Send IDE</button>' +
     '<span class="running_code" id="' + username + '_code_running"></span>' +
     '<span class="user_error" id="' + username + '_error"></span>' +
     '</div>');
@@ -101,12 +103,18 @@ Teacher_Dash.initGame = function(username, game_id)
   //
   // Delete EVERY reference to and from this game. Scary.
   //
-  $('#' + username + '_clear').click(function()
+  $('#' + username + '_clear')['click'](function()
   {
     if (confirm("Are you sure?"))
     {
       Teacher_Dash.wilddog.removeGame(username, game_id, ide, ide_tabs);
     }
+  });
+
+  $('#' + username + '-send-pick-id')['click'](function()
+  {
+    var ide = $('#' + username + '-pick-id')['val']() || username;
+    Teacher_Dash.wilddog.setIDE(username, ide);
   });
 
   // Watch out for the game being deleted.
@@ -167,6 +175,8 @@ Teacher_Dash.initGame = function(username, game_id)
       }
     }
   });
+
+  Teacher_Dash.users.push(username);
 }
 
 
@@ -181,9 +191,23 @@ Teacher_Dash.init = function() {
        html: BlocklyGames.IS_HTML});
   BlocklyInterface.init();
 
+  Teacher_Dash.users = [];
+
   Teacher_Dash.wilddog = new WilddogInterface(getClassroom());
 
   Teacher_Dash.wilddog.connectSubscriberClassroom(Teacher_Dash.initGame);
+
+  $('#send-pick-ide')['click'](function()
+  {
+    if (confirm("Are you sure?"))
+    {
+      var ide = $("#pick-ide")['val']();
+      Teacher_Dash.users.forEach(function(username)
+      {
+        Teacher_Dash.wilddog.setIDE(username, ide || username);
+      })
+    }
+  });
 };
 
 window.addEventListener('load', Teacher_Dash.init);
