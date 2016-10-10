@@ -226,7 +226,7 @@ self.hero_type = hero_type;
 toolbox_id = toolbox_id || 'toolbox';
 self.dom_id = username + "-" + tab_name;
 self.read_only = !(getUsername() == username ||
-                   getUsername().toLowerCase() == "Teacher");
+                   getUsername().toLowerCase() == "teacher");
 //
 // Add the tab for this hero.
 //
