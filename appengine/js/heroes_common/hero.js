@@ -66,6 +66,8 @@ chars["lion"] = new Image();
 chars["lion"].src = "heroes/lion.png";
 chars["human"] = new Image();
 chars["human"].src = "heroes/andrew.png";
+chars["smiley"] = new Image();
+chars["smiley"].src = "heroes/smiley.png";
 
 var chars_per_line = 40;
 
