@@ -39,11 +39,11 @@ self.ctxDisplay = document.getElementById(self.username + '-display').getContext
 self.ctxScratch = document.getElementById(self.username + '-scratch').getContext('2d');
 self.ctxLines = document.getElementById(self.username + '-lines').getContext('2d');
 
-// HACK! We never want to clear the lines (because we dn't store them). So we can't resize this later.
+// HACK! We never want to clear the lines (because we don't store them). So we can't resize this later.
 self.ctxLines.canvas.width = 3000;
 self.ctxLines.canvas.height = 3000;
 
-Heroes.HEIGHT = self.ctxDisplay.canvas.parentElement.clientHeight - 45 || Heroes.HEIGHT;
+Heroes.HEIGHT = self.ctxDisplay.canvas.parentElement.clientHeight - 68 || Heroes.HEIGHT;
 Heroes.WIDTH = self.ctxDisplay.canvas.parentElement.clientWidth || Heroes.WIDTH;
 
 self.ide = new IDE(username, self, wilddog);
@@ -104,7 +104,7 @@ self.display = function() {
 
   if (self.active)
   {
-    Heroes.HEIGHT = display_canvas.parentElement.clientHeight - 45;
+    Heroes.HEIGHT = display_canvas.parentElement.clientHeight - 68;
     Heroes.WIDTH = display_canvas.parentElement.clientWidth;
   }
 
