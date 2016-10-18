@@ -50,10 +50,11 @@ self.setBackground = function(style, id)
   self.animate(id);
 }
 
-self.addPoints = function(delta)
+self.addPoints = function(delta, id)
 {
   self.points = self.points || 0;
   self.points += delta;
+  self.animate(id);
 }
 
 
