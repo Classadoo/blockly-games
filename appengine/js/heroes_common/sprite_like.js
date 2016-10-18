@@ -111,13 +111,13 @@ self.setSpeed = function(speed_string, id)
   switch (speed_string)
   {
     case "slow":
-      self.speed = .1;
+      self.speed = 0.2;
       break;
     case "med":
-      self.speed = .5;
+      self.speed = 0.5;
       break;
     case "fast":
-      self.speed = 1.0;
+      self.speed = 0.9;
       break;
   }
 
