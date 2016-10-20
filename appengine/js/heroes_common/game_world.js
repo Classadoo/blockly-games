@@ -30,7 +30,7 @@ SpriteLike.call(self, "World", sprite_ide);
 
 
 self.items = [];
-self.item_radius = 5;
+self.item_radius = 10;
 self.radius = 32;
 
 self.reset = function()
@@ -115,7 +115,7 @@ self.drawHUD = function(ctx)
   if (self.points !== null)
   {
     ctx.fillStyle = "#FFFFFF";
-    ctx.font = "15px Arial";
+    ctx.font = "24px Arial";
     ctx.fillText("Points: " + self.points, 30, 30);
   }
 }

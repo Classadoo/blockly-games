@@ -68,6 +68,14 @@ chars["human"] = new Image();
 chars["human"].src = "heroes/andrew.png";
 chars["smiley"] = new Image();
 chars["smiley"].src = "heroes/smiley.png";
+chars["king"] = new Image();
+chars["king"].src = "heroes/king.png";
+chars["knight"] = new Image();
+chars["knight"].src = "heroes/knight.png";
+chars["dancer"] = new Image();
+chars["dancer"].src = "heroes/dancer.png";
+chars["turtle"] = new Image();
+chars["turtle"].src = "heroes/turtle.png";
 
 var chars_per_line = 40;
 
@@ -514,15 +522,16 @@ self.initInterpreter = function(interpreter, scope)
       interpreter.createNativeFunction(wrapper));
 };
 
+// Setup a loop so our old tails chase our head.
 setInterval(function()
 {
   for (var i=self.xs.length-2; i>=0; i--)
   {
     var distance = compute_distance(self.xs[i], self.ys[i], self.xs[i+1], self.ys[i+1]);
-    self.xs[i] += (self.xs[i + 1] - self.xs[i]) / Math.max(distance, 0.000001);
-    self.ys[i] += (self.ys[i + 1] - self.ys[i]) / Math.max(distance, 0.000001);
+    self.xs[i] += (self.xs[i + 1] - self.xs[i]) / Math.max(distance, 0.000001) / 10;
+    self.ys[i] += (self.ys[i + 1] - self.ys[i]) / Math.max(distance, 0.000001) / 10;
   }
-}, 10);
+}, 20);
 }
 
 Hero.prototype = Object.create(SpriteLike.prototype);

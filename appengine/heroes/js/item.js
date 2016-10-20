@@ -30,11 +30,12 @@ function Item(x, y, vx, vy) {
 
 // Draws this item to a given context.
 Item.prototype.draw = function(ctx, rad) {
-  ctx.fillStyle = "#AA3333";
+  rad = rad + (Math.random() - 1) * 9;
+  ctx.fillStyle = Math.round(Math.random() + .1) ? "#0000CC" : "#AA3333";
   ctx.fillRect(this.x - rad, this.y - rad, rad * 2, rad * 2);
 
   var inner_rad = rad/2;
-  ctx.fillStyle = "#CCCC00";
+  ctx.fillStyle = "#FFFF00";
   ctx.fillRect(this.x - inner_rad, this.y - inner_rad, inner_rad * 2, inner_rad * 2);
 }
 

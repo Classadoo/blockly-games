@@ -40,7 +40,7 @@ self.starting_y = Heroes.HEIGHT/2;
 //
 // Setup the tab for creating a new hero.
 //
-var character_types = ["lion", "eagle", "human"];
+var character_types = ["lion", "eagle", "human", "smiley", "king", "knight", "dancer", "turtle"];
 character_types.forEach(function(animal)
 {
   $("#" + username + "-hero-type")['append']($("<option></option>",

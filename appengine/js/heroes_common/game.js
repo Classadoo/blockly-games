@@ -48,7 +48,7 @@ Heroes.WIDTH = self.ctxDisplay.canvas.parentElement.clientWidth || Heroes.WIDTH;
 
 self.ide = new IDE(username, self, wilddog);
 
-var hero_radius = 32;
+var hero_radius = 40;
 
 self.heroes = {};
 
