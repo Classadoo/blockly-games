@@ -19,6 +19,8 @@
 
 goog.provide('HeroesIDE');
 
+goog.require('HeroesEditor');
+
 
 //
 // An object that displays several blockly workspaces to produce hero code.
@@ -37,57 +39,17 @@ var hero_offset = 3;
 self.starting_x = Heroes.WIDTH/hero_offset;
 self.starting_y = Heroes.HEIGHT/2;
 
-//
-// Setup the tab for creating a new hero.
-//
-var character_types = ["lion", "eagle", "human", "smiley", "king", "knight", "dancer", "turtle", "custom"];
-character_types.forEach(function(animal)
-{
-  $("#" + username + "-hero-type")['append']($("<option></option>",
-      {"value": animal, "text": animal}));
-  $("#" + username + "-hero-type")['on']('change', function() {
-    window.lc.clear();
-    if (chars[this.value])
-    {
-      window.lc.saveShape(LC.createShape('Image', {"image": chars[this.value]}));
-    }
-  });
-  
-});
-
-$("#" + self.username + "-submit-hero")['click'](function()
-{
-  var name = $("#" + username + "-hero-name")['val']();
-  var type = $("#" + username + "-hero-type")['val']();
-  var image = window.lc.getImage().toDataURL("image/png");
-
-  name = name.replace(/[^a-zA-Z0-9]+/g, "");
-
-  if (!name || !type)
-  {
-    console.log("Fill out the whole form: ", name, type);
-    return;
-  }
-
-  if (self.tabs[name])
-  {
-    console.log("This hero already exists: ", name);
-    return;
-  }
-  self.publishHero(name, type, image);
-})
-// If the user hits enter, prevent the POST event and just add a hero.
-$('.tab-pane')['keydown'](function(event){
-  if(event.keyCode == 13) {
-    event.preventDefault();
-    $("#" + self.username + "-submit-hero")['click']();
-  }
-});
-
 self.publishHero = function(name, type, image)
 {
-  wilddog.publishNewHero(game.id, name, type, Object.keys(self.tabs).length,
-    self.starting_x, self.starting_y, image);
+  if (self.tabs[name])
+  {
+    wilddog.publish_image(self.tabs[name].hero_id, image);
+  }
+  else
+  {
+    wilddog.publishHero(game.id, name, type, Object.keys(self.tabs).length,
+      self.starting_x, self.starting_y, image);
+  }
 }
 
 self.cycle_starting_locations = function()
@@ -149,9 +111,9 @@ self.new_hero_tab = function(new_tab_name, type, hero_id, image)
   return self.tabs[new_tab_name];
 }
 
-self.update_pos = function(hero_name, x, y)
+self.update_hero = function(hero_name, x, y, image)
 {
-  game.update_pos(hero_name, x, y);
+  game.update_hero(hero_name, x, y, image);
 }
 
 self.remove_tab = function(tab_name)
@@ -220,10 +182,33 @@ self.publish_pos = function(id, x, y)
 {
   wilddog.publish_pos(id, x, y);
 }
+
+//
+// Setup the UI for creating/editing characters.
+self.show_character_editor = function(character)
+{
+  new HeroEditor(self, self.username, character);
 }
+$('#' + self.username + '-new-hero-button')['click']( function() {
+  self.show_character_editor(null);
+})
+//
+// Setup the dropdown for hero templates.
+//
+var character_types = ["custom", "lion", "eagle", "human", "smiley", "king", "knight", "dancer", "turtle"];
+character_types.forEach(function(animal)
+{
+  $("#" + self.username + "-hero-type")['append']($("<option></option>",
+      {"value": animal, "text": animal}));
+});
+
+}
+
 
 //
 // Tab containing one workspace for a world/hero.
+//
+
 var IDE_Tab = function(username, tab_name, hero_type, hero_id, parent, toolbox_id, image)
 {
 var self = this;

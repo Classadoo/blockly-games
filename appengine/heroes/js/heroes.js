@@ -54,23 +54,26 @@ Heroes.GAME_HTML =
 Heroes.BLOCKLY_HTML =
   '<div class="col-xs-6 no-padding ide">' +
     '<ul class="nav nav-tabs" id="{user}-tabs" role="tablist">' +
-      '<li class="{read_only}-hero-form active" role="presentation" id="{user}-new-hero-button"><a data-toggle="tab" role="tab" href="#{user}-add-hero" aria-controls="{user}-add-hero"> + New Hero</a></li>'  +
+      '<li style="display:none"><a data-toggle="tab" role="tab" href="#{user}-add-hero" aria-controls="{user}-add-hero"></a></li>'  +
+      '<li class="{read_only}-hero-form" role="presentation" id="{user}-new-hero-button"><a href="#"> + New Hero</a></li>'  +
     '</ul>' +
     '<div class="tab-content read_only_{read_only}" id="{user}-blockly" style="width:100%">' +
-      '<form role="tabpanel" class="tab-pane active" id="{user}-add-hero">' +
-        '<div class="form-group">' +
-          '<label for="hero-name">Name</label>' +
-          '<input type="text" class="form-control" id="{user}-hero-name" placeholder="Andrew">' +
-        '</div>' +
-        '<div class="form-group">' +
-          '<label for="hero-type">Type</label>' +
-          '<select class="form-control" id="{user}-hero-type"></select>' +
-        '</div>' +
+      '<div role="tabpanel" class="tab-pane" id="{user}-add-hero">' +
+        '<form class="form-inline">' +
+          '<div class="form-group">' +
+            '<label for="hero-name">Name</label>' +
+            '<input type="text" class="form-control" id="{user}-hero-name" placeholder="Andrew">' +
+          '</div>' +
+          '<div class="form-group">' +
+            '<label for="hero-type">Type</label>' +
+            '<select class="form-control" id="{user}-hero-type"></select>' +
+          '</div>' +
+          '<button type="button" class="btn btn-default" id={user}-submit-hero>Submit</button>' +
+        '</form>' +
         '<div class="form-group">' +
           '<div id="paint-{user}"></div>' +
         '</div>' +
-        '<button type="button" class="btn btn-default" id={user}-submit-hero>Submit</button>' +
-      '</form>' +
+      '</div>' +
     '</div>' +
   '</div>';
 
@@ -238,15 +241,7 @@ Heroes.add_user = function(username, game_id)
   //
   var read_only = username != getUsername();
   var game = Heroes.addGame(read_only, username, game_id);
-  if (!read_only)
-  {
-    window.lc = LC['init'](
-      document.getElementById('paint-' + username),
-      {imageURLPrefix: 'common/literally_canvas_img'}
-    );
-    window.lc.clear();
-    window.lc.saveShape(LC.createShape('Image', {"image": chars[$("#" + username + "-hero-type").val()]}))
-  }
+
   game.reset()
 
   if (username != Heroes.displayed_ide)

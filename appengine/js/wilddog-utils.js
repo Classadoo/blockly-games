@@ -63,14 +63,17 @@ self.publishNewGame = function(username)
   return key;
 }
 
-self.publishNewHero = function(game_id, name, type, index, x, y, image)
+self.publishHero = function(game_id, name, type, index, x, y, image)
 {
   var hero_ref = self.ref['child']("heroes").push();
   hero_ref['update']({"x" : x, "y" : y});
+  var hero_id = hero_ref['key']();
 
   hero_object = {"type": type, "name": name, "index": index, "image" : image};
 
-  self.ref['child']("games")['child'](game_id)['child']("heroes")['child'](hero_ref['key']())['update'](hero_object);
+  self.ref['child']("games")['child'](game_id)['child']("heroes")['child'](hero_id)['update'](hero_object);
+  
+  return hero_id;
 }
 
 var received_snapshots = {};
@@ -153,7 +156,7 @@ self.connectSubscriberGame = function(game_id, ide)
       {
         if (hero.x && hero.y && (name.toLowerCase() != "world"))
         {
-          ide.update_pos(name, hero.x, hero.y);
+          ide.update_hero(name, hero.x, hero.y, hero.image);
         }
       }
     })
@@ -164,6 +167,11 @@ self.publish_pos = function(id, x, y)
 {
   var hero_ref = self.ref['child']("heroes")['child'](id);
   hero_ref['update']({"x" : x, "y" : y});
+}
+self.publish_image = function(id, image)
+{
+  var hero_ref = self.ref['child']("heroes")['child'](id);
+  hero_ref['update']({"image" : image});
 }
 
 self.publishDeleteTab = function(hero_id, game_id)

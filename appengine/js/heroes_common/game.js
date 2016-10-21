@@ -134,10 +134,17 @@ self.display = function() {
   self.ctxDisplay.drawImage(self.ctxScratch.canvas, 0, 0);
 };
 
-self.update_pos = function(hero, x, y)
+self.update_hero = function(hero, x, y, image)
 {
   self.heroes[hero].starting_x = x;
   self.heroes[hero].starting_y = y;
+  
+  if (image)
+  {
+    var img = new Image();
+    img.src = image;
+    self.heroes[hero].image = img;
+  }
   if (self.pidList.length == 0)
   {
     self.reset();
