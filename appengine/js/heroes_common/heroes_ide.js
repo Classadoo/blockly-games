@@ -41,15 +41,18 @@ self.starting_y = Heroes.HEIGHT/2;
 
 self.publishHero = function(name, type, image)
 {
+  var index, hero_id, x, y;
   if (self.tabs[name])
   {
-    wilddog.publish_image(self.tabs[name].hero_id, image);
+    hero_id = self.tabs[name].hero_id;
   }
   else
   {
-    wilddog.publishHero(game.id, name, type, Object.keys(self.tabs).length,
-      self.starting_x, self.starting_y, image);
+    x = self.starting_x;
+    y = self.starting_y;
+    index = Object.keys(self.tabs).length;
   }
+  wilddog.publishHero(game.id, name, type, index, x, y, image, hero_id);
 }
 
 self.cycle_starting_locations = function()
@@ -114,6 +117,7 @@ self.new_hero_tab = function(new_tab_name, type, hero_id, image)
 self.update_hero = function(hero_name, x, y, image)
 {
   game.update_hero(hero_name, x, y, image);
+  self.tabs[hero_name].update_thumbnail(image);
 }
 
 self.remove_tab = function(tab_name)
@@ -180,7 +184,7 @@ self.display = function()
 // Tell wilddog about a hero's new position.
 self.publish_pos = function(id, x, y)
 {
-  wilddog.publish_pos(id, x, y);
+  wilddog.publishHero(game.id, null, null, null, x, y, null, id);
 }
 
 //
@@ -214,6 +218,8 @@ var IDE_Tab = function(username, tab_name, hero_type, hero_id, parent, toolbox_i
 var self = this;
 self.hero_id = hero_id;
 self.hero_type = hero_type;
+self.tab_name = tab_name;
+self.image = image;
 toolbox_id = toolbox_id || 'toolbox';
 self.dom_id = username + "-" + tab_name;
 self.read_only = !(getUsername() == username ||
@@ -235,7 +241,14 @@ if (image)
 {
   var thumbnail = new Image(20, 20);
   thumbnail.src = image;
+  thumbnail.id = self.dom_id + '-thumbnail';
   a.append(thumbnail);
+}
+
+self.update_thumbnail = function(image)
+{
+  this.image = image;
+  $("#" + self.dom_id + '-thumbnail').attr('src', image);
 }
 
 //
@@ -332,6 +345,11 @@ self.highlightBlock = function(id)
 self.publish_pos = function(x, y)
 {
   parent.publish_pos(hero_id, x, y);
+}
+
+self.edit = function()
+{
+  parent.show_character_editor(self);
 }
 }
 

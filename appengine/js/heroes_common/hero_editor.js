@@ -48,6 +48,7 @@ var HeroEditor = function(ide, username, hero)
     }
   });
 
+
   //
   // Setup LiterallyCanvas.
   //
@@ -57,14 +58,22 @@ var HeroEditor = function(ide, username, hero)
     {imageURLPrefix: 'common/literally_canvas_img'}
   );
   lc.clear();
+  
+  var load_image = function(src)
+  {
+    if (!src)
+    {
+      return;
+    }
+    var img = new Image();
+    img.src = src;
+    lc.saveShape(LC.createShape('Image', {"image": img}));
+  }
+
   $("#" + username + "-hero-type")['on']('change', function() {
     lc.clear();
-    if (chars[this.value])
-    {
-      lc.saveShape(LC.createShape('Image', {"image": chars[this.value]}));
-    }
+    load_image(chars[this.value]);
   });
-
 
   //
   // Show a template/existing hero to edit.
@@ -72,12 +81,9 @@ var HeroEditor = function(ide, username, hero)
 
   if (hero)
   {
-    $('#' + username + '-hero-name').val(hero.name);
-    $('#' + username + '-hero-type').val(hero.type);
-    if (hero.image)
-    {
-      lc.saveShape(LC.createShape('Image', {"image": hero.image}));
-    }
+    $('#' + username + '-hero-name').val(hero.tab_name);
+    $('#' + username + '-hero-type').val(hero.hero_type);
+    load_image(hero.image);
   }
   
   //

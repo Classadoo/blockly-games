@@ -60,22 +60,15 @@ function draw_rotated_image(context, image, x, y, width, height, angle)
 }
 
 var chars = {};
-chars["eagle"] = new Image();
-chars["eagle"].src = "heroes/eagle.png";
-chars["lion"] = new Image();
-chars["lion"].src = "heroes/lion.png";
-chars["human"] = new Image();
-chars["human"].src = "heroes/andrew.png";
-chars["smiley"] = new Image();
-chars["smiley"].src = "heroes/smiley.png";
-chars["king"] = new Image();
-chars["king"].src = "heroes/king.png";
-chars["knight"] = new Image();
-chars["knight"].src = "heroes/knight.png";
-chars["dancer"] = new Image();
-chars["dancer"].src = "heroes/dancer.png";
-chars["turtle"] = new Image();
-chars["turtle"].src = "heroes/turtle.png";
+chars["eagle"] = "heroes/eagle.png";
+chars["lion"] = "heroes/lion.png";
+chars["human"] = "heroes/andrew.png";
+chars["smiley"] =  "heroes/smiley.png";
+chars["king"] = "heroes/king.png";
+chars["knight"] =  "heroes/knight.png";
+chars["dancer"] =  "heroes/dancer.png";
+chars["turtle"] =  "heroes/turtle.png";
+chars["world"] = "heroes/world.png";
 
 var chars_per_line = 40;
 
@@ -108,14 +101,15 @@ self.width = 5;
 
 self.char = char;
 
+self.image = new Image();
+
 if (image)
 {
-  self.image = new Image();
   self.image.src = image;
 }
 else
 {
-  self.image = chars[char] || chars["andrew"];
+  self.image.src = chars[char] || chars["andrew"];
 }
 
 self.radius = radius;

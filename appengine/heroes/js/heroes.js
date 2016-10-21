@@ -223,8 +223,9 @@ Heroes.addGame = function(readOnly, username, game_id)
   // Initialize the world, if this is a fresh game.
   if (Heroes.new_game && username == getUsername())
   {
-    game.ide.publishHero("world", "world");
-    game.ide.publishHero(getUsername(), "human");
+    //TODO(aheine): it's pointless to preload these now. Just store the data url.
+    game.ide.publishHero("world", "world", chars["world"]);
+    game.ide.publishHero(getUsername(), "human", chars["human"]);
   }
 
   BlocklyGames.bindClick(username + '-runButton', game.runButtonClick);

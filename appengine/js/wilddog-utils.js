@@ -63,17 +63,37 @@ self.publishNewGame = function(username)
   return key;
 }
 
-self.publishHero = function(game_id, name, type, index, x, y, image)
+self.publishHero = function(game_id, name, type, index, x, y, image, hero_id)
 {
-  var hero_ref = self.ref['child']("heroes").push();
-  hero_ref['update']({"x" : x, "y" : y});
-  var hero_id = hero_ref['key']();
+  var hero_ref;
+  if (!hero_id)
+  {
+    hero_ref = self.ref['child']("heroes").push();
+    var hero_id = hero_ref['key']();
 
-  hero_object = {"type": type, "name": name, "index": index, "image" : image};
-
-  self.ref['child']("games")['child'](game_id)['child']("heroes")['child'](hero_id)['update'](hero_object);
+    hero_object = {"index": index};
+    self.ref['child']("games")['child'](game_id)['child']("heroes")['child'](hero_id)['update'](hero_object);
+  }
+  else
+  {
+    hero_ref = self.ref['child']("heroes")['child'](hero_id);
+  }
   
-  return hero_id;
+  //
+  // Update whatever qualities were provided.
+  //
+  if (x && y)
+  {
+    hero_ref['update']({"x" : x, "y" : y});
+  }
+  if (image)
+  {
+    hero_ref['update']({"image": image});
+  }
+  if (name && type)
+  {
+    hero_ref['update']({"name": name, "type": type});
+  }
 }
 
 var received_snapshots = {};
@@ -130,30 +150,36 @@ self.connectSubscriberGame = function(game_id, ide)
     // New workspace! Add a world/hero for it, and connect the new workspace.
     //
     var id = child['key']();
-    var name = child['val']()['name'];
-    var type = child['val']()['type'];
-    var image = child['val']()['image'];
-
-    var tab;
-    if (name.toLowerCase() == "world")
-    {
-      tab = ide.new_world_tab(id);
-    }
-    else
-    {
-      tab = ide.new_hero_tab(name, type, id, image);
-    }
-    self.connectSubscriberWorkspace(id, tab.workspace);
 
     //
     // Subscribe to changes to this hero metadata.
     //
+    var first_call = true;
     var hero_ref = self.ref['child']("heroes")['child'](id);
     hero_ref['on']('value', function(hero)
     {
       hero = hero['val']();
       if (hero)
       {
+        var name = hero.name || "foo" + hero.x;
+        var type = hero.type || "human";
+        var image = hero.image;
+
+        if (first_call)
+        {
+          var tab;
+          if (name.toLowerCase() == "world")
+          {
+            tab = ide.new_world_tab(id);
+          }
+          else
+          {
+            tab = ide.new_hero_tab(name, type, id, image);
+          }
+          self.connectSubscriberWorkspace(id, tab.workspace);
+        }
+        first_call = false;
+
         if (hero.x && hero.y && (name.toLowerCase() != "world"))
         {
           ide.update_hero(name, hero.x, hero.y, hero.image);
@@ -161,17 +187,6 @@ self.connectSubscriberGame = function(game_id, ide)
       }
     })
   });
-}
-
-self.publish_pos = function(id, x, y)
-{
-  var hero_ref = self.ref['child']("heroes")['child'](id);
-  hero_ref['update']({"x" : x, "y" : y});
-}
-self.publish_image = function(id, image)
-{
-  var hero_ref = self.ref['child']("heroes")['child'](id);
-  hero_ref['update']({"image" : image});
 }
 
 self.publishDeleteTab = function(hero_id, game_id)
