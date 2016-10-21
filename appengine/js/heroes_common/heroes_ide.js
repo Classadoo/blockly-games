@@ -47,7 +47,10 @@ character_types.forEach(function(animal)
       {"value": animal, "text": animal}));
   $("#" + username + "-hero-type")['on']('change', function() {
     window.lc.clear();
-    window.lc.saveShape(LC.createShape('Image', {"image": chars[this.value]}))
+    if (chars[this.value])
+    {
+      window.lc.saveShape(LC.createShape('Image', {"image": chars[this.value]}));
+    }
   });
   
 });
@@ -101,10 +104,7 @@ self.cycle_starting_locations = function()
 //
 self.new_hero_tab = function(new_tab_name, type, hero_id, image)
 {
-  self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name, type, hero_id, self);
-
-  // Subscribe to changes.
-
+  self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name, type, hero_id, self, null, image);
 
   // Start pushing data.
   if (!self.tabs[new_tab_name].read_only)
@@ -224,7 +224,7 @@ self.publish_pos = function(id, x, y)
 
 //
 // Tab containing one workspace for a world/hero.
-var IDE_Tab = function(username, tab_name, hero_type, hero_id, parent, toolbox_id)
+var IDE_Tab = function(username, tab_name, hero_type, hero_id, parent, toolbox_id, image)
 {
 var self = this;
 self.hero_id = hero_id;
@@ -241,11 +241,30 @@ var li = $('<li role="presentation" id="' + self.dom_id + '-li">' +
 
 var a = $('<a href="#' + self.dom_id + '-container" aria-controls="' + self.dom_id + '-container" data-toggle="tab" role="tab" class="hero-tab">' +
     tab_name +
-    '<img id="' + self.dom_id + '-spinner" class="spinner" src="heroes/loading.gif" height=15 width=15>' +
   '</a>');
 
 //
-// Show the delete button, if this is an optional sprite owned by this page's user.
+// Insert thumbnail of the hero.
+//
+if (image)
+{
+  var thumbnail = new Image(20, 20);
+  thumbnail.src = image;
+  a.append(thumbnail);
+}
+
+//
+// Add the spinner for when code is running.
+//
+
+var spinner = new Image(15, 15);
+spinner.src = "heroes/loading.gif";
+spinner.className = "spinner";
+spinner.id = self.dom_id + "-spinner";
+a.append(spinner);
+
+//
+// Show the delete button if this is an optional sprite owned by this page's user.
 //
 if (tab_name.toLowerCase() != "world" && username==getUsername())
 {
