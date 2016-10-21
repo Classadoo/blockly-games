@@ -40,7 +40,6 @@ var HeroEditor = function(ide, username, hero)
   //
   // Show the tab.
   //
-
   $('.nav-tabs a[href="#' + username + '-add-hero"]').tab('show')['keydown'](function(event){
     if(event.keyCode == 13) {
       event.preventDefault();
@@ -113,6 +112,22 @@ var HeroEditor = function(ide, username, hero)
       console.log("This hero already exists: ", name);
       return;
     }
-  })
+  });
+  
+  var x_button = $("#" + username + "-x")['show']()['off']('click');
+  if (hero && hero.tab_name)
+  {
+    x_button['click'](function()
+    {
+      if (confirm("DELETE this hero?"))
+      {
+        ide.remove_tab(hero.tab_name);
+      }
+    });
+  }
+  else
+  {
+    x_button['hide']();
+  }
 
 }

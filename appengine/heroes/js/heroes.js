@@ -60,18 +60,22 @@ Heroes.BLOCKLY_HTML =
     '<div class="tab-content read_only_{read_only}" id="{user}-blockly" style="width:100%">' +
       '<div role="tabpanel" class="tab-pane" id="{user}-add-hero">' +
         '<form class="form-inline">' +
-          '<div class="form-group">' +
+          '<div class="form-group form-item">' +
             '<label for="hero-name">Name</label>' +
             '<input type="text" class="form-control" id="{user}-hero-name" placeholder="Andrew">' +
           '</div>' +
-          '<div class="form-group">' +
+          '<div class="form-group form-item">' +
             '<label for="hero-type">Type</label>' +
             '<select class="form-control" id="{user}-hero-type"></select>' +
           '</div>' +
-          '<button type="button" class="btn btn-default" id={user}-submit-hero>Submit</button>' +
+          '<button type="button" class="btn btn-default form-item" id={user}-submit-hero>Submit</button>' +
+          '<a id="{user}-x" class="form-item"><img width="15px" height="15px" src="heroes/x.png"></a>' +
         '</form>' +
-        '<div class="form-group">' +
-          '<div id="paint-{user}"></div>' +
+        '<div class="row">' +
+          '<div class="col-xs-3 thumbnails" id={user}-thumbnails></div>' +
+          '<div class="col-xs-9 literally-canvas">' +
+            '<div id="paint-{user}"></div>' +
+          '</div>' +
         '</div>' +
       '</div>' +
     '</div>' +

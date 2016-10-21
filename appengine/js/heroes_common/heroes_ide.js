@@ -98,19 +98,6 @@ self.new_hero_tab = function(new_tab_name, type, hero_id, image)
 
   }
 
-  //
-  // Setup the delete click event.
-  //
-  $("#" + self.tabs[new_tab_name].dom_id + "-x")['click'](
-    function()
-    {
-      if (confirm("DELETE this hero? Are you sure?"))
-      {
-        self.remove_tab(new_tab_name);
-      }
-    }
-  )
-
   return self.tabs[new_tab_name];
 }
 
@@ -182,6 +169,8 @@ self.display = function()
 
 //
 // Tell wilddog about a hero's new position.
+//
+
 self.publish_pos = function(id, x, y)
 {
   wilddog.publishHero(game.id, null, null, null, x, y, null, id);
@@ -189,6 +178,8 @@ self.publish_pos = function(id, x, y)
 
 //
 // Setup the UI for creating/editing characters.
+//
+
 self.show_character_editor = function(character)
 {
   new HeroEditor(self, self.username, character);
@@ -196,9 +187,11 @@ self.show_character_editor = function(character)
 $('#' + self.username + '-new-hero-button')['click']( function() {
   self.show_character_editor(null);
 })
+
 //
 // Setup the dropdown for hero templates.
 //
+
 var character_types = ["custom", "lion", "eagle", "human", "smiley", "king", "knight", "dancer", "turtle"];
 character_types.forEach(function(animal)
 {
@@ -264,9 +257,9 @@ a.append(spinner);
 //
 // Show the delete button if this is an optional sprite owned by this page's user.
 //
-if (tab_name.toLowerCase() != "world" && username==getUsername())
+if (tab_name.toLowerCase() != "world" && !self.read_only)
 {
-  a['append']('<img id="' + self.dom_id + '-x" src="heroes/x.png" height=15 width=15>');
+  a['append']('<img id="' + self.dom_id + '-edit" src="heroes/edit.png" height=15 width=15>');
 }
 li['append'](a);
 
@@ -351,6 +344,10 @@ self.edit = function()
 {
   parent.show_character_editor(self);
 }
+$("#" + self.dom_id + "-edit")['click'](function()
+{
+  setTimeout(function(){self.edit();}, 1);
+});
 }
 
 
