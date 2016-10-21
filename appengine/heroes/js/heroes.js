@@ -44,10 +44,10 @@ Heroes.GAME_HTML =
     '<canvas id="{user}-scratch" style="display: none"></canvas>' +
     '<canvas id="{user}-display"></canvas>' +
     '<canvas id="{user}-lines" style="display: none"></canvas>' +
-    '<button id="{user}-runButton" class="primary" title="Run the program you wrote." style="height:40px">' +
+    '<button id="{user}-runButton" class="primary" title="Run the program you wrote." style="height:42px;">' +
       '<img src="common/1x1.gif" class="run icon21"> Run Program' +
     '</button>' +
-    '<button id="{user}-resetButton" class="primary" style="display: none" title="Stop the program and reset the level." style="height:40px">' +
+    '<button id="{user}-resetButton" class="primary" style="display: none; height:42px;" title="Stop the program and reset the level.">' +
       '<img src="common/1x1.gif" class="stop icon21"> Reset' +
     '</button>' +
   '</div>'
