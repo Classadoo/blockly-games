@@ -95,7 +95,6 @@ self.new_hero_tab = function(new_tab_name, type, hero_id, images)
   {
     self.game.addHero(new_tab_name, type, self.tabs[new_tab_name], self.starting_x, self.starting_y, images);
     self.cycle_starting_locations();
-
   }
 
   return self.tabs[new_tab_name];
@@ -103,7 +102,10 @@ self.new_hero_tab = function(new_tab_name, type, hero_id, images)
 
 self.update_hero = function(hero_name, x, y, images)
 {
-  game.update_hero(hero_name, x, y, images);
+  if (self.game)
+  {
+    game.update_hero(hero_name, x, y, images);
+  }
   self.tabs[hero_name].update_images(images);
 }
 
@@ -142,9 +144,9 @@ self.remove_tab = function(tab_name)
   }
 }
 
-self.new_world_tab = function(world_id)
+self.new_world_tab = function(world_id, images)
 {
-  self.tabs["world"] = new IDE_Tab(self.username, "world", "world", world_id, self, "world_toolbox");
+  self.tabs["world"] = new IDE_Tab(self.username, "world", "world", world_id, self, "world_toolbox", images);
   if (self.game)
   {
     self.game.setup_game_world(self.tabs["world"]);
@@ -283,7 +285,7 @@ self.update_images = function(images)
   });
 
   
-  $("#" + self.dom_id + '-thumbnail').attr('src', images[0]);
+  $("#" + self.dom_id + '-thumbnail')['attr']('src', images[0]);
 }
 
 self.display = function() {

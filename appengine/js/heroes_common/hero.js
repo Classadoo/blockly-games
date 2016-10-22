@@ -74,7 +74,6 @@ var chars_per_line = 40;
 
 
 function Hero(name, char, radius, x, y, line_context, display_context, sprite_ide, game, images) {
-
 var self = this;
 self.ctxLines = line_context;
 
@@ -245,6 +244,7 @@ self.reset = function()
 {
   self.words = "";
   self.word_timeouts = 0;
+  self.image_index = 0;
 
   self.x = self.starting_x;
   self.y = self.starting_y;

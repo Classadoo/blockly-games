@@ -31,19 +31,19 @@ var HeroEditor = function(ide, username, hero)
   var self = this;
   var edited_image_index = 0;
   var canvas_images = {};
-  $(".costumes").remove();
+  $(".costumes")['remove']();
 
   //
   // Clear the forms.
   //
 
-  $('#' + username + '-hero-name').val("");
-  $('#' + username + '-hero-type').val("custom");
+  $('#' + username + '-hero-name')['val']("");
+  $('#' + username + '-hero-type')['val']("custom");
   
   //
   // Show the tab.
   //
-  $('.nav-tabs a[href="#' + username + '-add-hero"]').tab('show')['keydown'](function(event){
+  $('.nav-tabs a[href="#' + username + '-add-hero"]')['tab']('show')['keydown'](function(event){
     if(event.keyCode == 13) {
       event.preventDefault();
       $("#" + self.username + "-submit-hero")['click']();
@@ -57,9 +57,9 @@ var HeroEditor = function(ide, username, hero)
 
   var lc = LC['init'](
     document.getElementById('paint-' + username),
-    {imageURLPrefix: 'common/literally_canvas_img'}
+    {"imageURLPrefix": 'common/literally_canvas_img'}
   );
-  lc.clear();
+  lc['clear']();
   
   var load_image = function(src)
   {
@@ -69,11 +69,11 @@ var HeroEditor = function(ide, username, hero)
     }
     var img = new Image();
     img.src = src;
-    lc.saveShape(LC.createShape('Image', {"image": img}));
+    lc['saveShape'](LC['createShape']('Image', {"image": img}));
   }
 
   $("#" + username + "-hero-type")['on']('change', function() {
-    lc.clear();
+    lc['clear']();
     load_image(chars[this.value]);
   });
 
@@ -103,18 +103,18 @@ var HeroEditor = function(ide, username, hero)
     //
     $("#" + username + "-costume-" + index)['click'](function ()
     {
-      var edited_image = lc.getImage();
+      var edited_image = lc['getImage']();
       if (edited_image)
       {
         set_thumbnail(edited_image_index, edited_image.toDataURL("image/png"));
       }
       edited_image_index = index;
-      lc.clear();
+      lc['clear']();
       load_image(image);
     })
   }
-  lc.on('drawingChange', function() {
-    var img = lc.getImage();
+  lc['on']('drawingChange', function() {
+    var img = lc['getImage']();
     if (img)
     {
       set_thumbnail(edited_image_index, img.toDataURL("image/png"));
@@ -123,8 +123,8 @@ var HeroEditor = function(ide, username, hero)
 
   if (hero)
   {
-    $('#' + username + '-hero-name').val(hero.tab_name);
-    $('#' + username + '-hero-type').val(hero.hero_type);
+    $('#' + username + '-hero-name')['val'](hero.tab_name);
+    $('#' + username + '-hero-type')['val'](hero.hero_type);
     load_image(hero.images[0]);    
     hero.images.forEach( function(el, i)
     {
@@ -141,7 +141,7 @@ var HeroEditor = function(ide, username, hero)
     var name = $("#" + username + "-hero-name")['val']();
     var type = $("#" + username + "-hero-type")['val']();
     
-    var image = lc.getImage();
+    var image = lc['getImage']();
     if (image)
     {
       canvas_images[edited_image_index] = image.toDataURL("image/png");
@@ -192,7 +192,7 @@ var HeroEditor = function(ide, username, hero)
     // Save current image.
     //
 
-    var image = lc.getImage().toDataURL("image/png");
+    var image = lc['getImage']().toDataURL("image/png");
     set_thumbnail(edited_image_index, image);
     
     //
@@ -200,13 +200,13 @@ var HeroEditor = function(ide, username, hero)
     //
 
     edited_image_index = Object.keys(canvas_images).length;
-    lc.clear();    
+    lc['clear']();    
   }
 
   
   var costume_button = $("#" + username + "-add-costume")['off']('click')['click'](function()
   {
-    if (lc.getImage())
+    if (lc['getImage']())
     {
       new_costume();
     }

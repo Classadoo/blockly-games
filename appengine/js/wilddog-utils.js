@@ -161,16 +161,16 @@ self.connectSubscriberGame = function(game_id, ide)
       hero = hero['val']();
       if (hero)
       {
-        var name = hero.name || "foo" + hero.x;
+        var name = hero.name;
         var type = hero.type || "human";
         var images = hero.images || [];
-
+        console.log(first_call, name);
         if (first_call)
         {
           var tab;
           if (name.toLowerCase() == "world")
           {
-            tab = ide.new_world_tab(id);
+            tab = ide.new_world_tab(id, images);
           }
           else
           {
