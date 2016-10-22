@@ -281,6 +281,19 @@ self.speak = function(what, seconds, id)
   self.animate(id);
 }
 
+//
+// Change the image for this hero.
+//
+self.choose_image = function(index, id)
+{
+  self.image_index = index;
+  self.animate(id);
+}
+self.next_image = function(id)
+{
+  self.choose_image((self.image_index + 1) % self.images.length, id);
+}
+
 
 /**
  * Lift or lower the pen.
@@ -530,6 +543,18 @@ self.initInterpreter = function(interpreter, scope)
     self.extend_tail(amt.valueOf(), id.toString());
   };
   interpreter.setProperty(scope, 'extend_tail',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(id) {
+    self.next_image(id.toString());
+  };
+  interpreter.setProperty(scope, 'next_image',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(index, id) {
+    self.choose_image(index.valueOf(), id.toString());
+  };
+  interpreter.setProperty(scope, 'choose_image',
       interpreter.createNativeFunction(wrapper));
 };
 

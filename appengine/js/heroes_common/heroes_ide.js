@@ -238,12 +238,6 @@ if (self.images.length)
   a.append(thumbnail);
 }
 
-self.update_images = function(images)
-{
-  this.images = images;
-  $("#" + self.dom_id + '-thumbnail').attr('src', images[0]);
-}
-
 //
 // Add the spinner for when code is running.
 //
@@ -279,6 +273,18 @@ self.workspace = Blockly.inject(self.dom_id,
 // Start a list of objects that we can interact with in this game.
 self.workspace.objects = [["item", "item"], ["edge", "edge"]];
 self.workspace.traceOn(true);
+self.update_images = function(images)
+{
+  self.images = images;
+  self.workspace.hero_images = [];
+  Object.keys(images).forEach( function(el)
+  {
+    self.workspace.hero_images.push([el.toString(), el]);
+  });
+
+  
+  $("#" + self.dom_id + '-thumbnail').attr('src', images[0]);
+}
 
 self.display = function() {
 

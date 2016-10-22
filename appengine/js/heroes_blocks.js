@@ -181,6 +181,54 @@ Blockly.JavaScript['heroes_shrink'] = function(block) {
   return 'extend_tail(-1, \'block_id_' + block.id + '\');\n';
 };
 
+Blockly.Blocks['heroes_next_image'] = {
+  /**
+   * Block for cycling hero images.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(Heroes.Blocks.HUE);
+    this.appendDummyInput()
+        .appendField('Next Image');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+  }
+};
+
+Blockly.JavaScript['heroes_next_image'] = function(block) {
+  // Generate JavaScript for cycling hero images.
+  return 'next_image(\'block_id_' + block.id + '\');\n';
+};
+
+
+Blockly.Blocks['heroes_choose_image'] = {
+  /**
+   * Block for if/elseif/else condition.
+   * @this Blockly.Block
+   */
+
+   init: function() {
+     this.setColour(Heroes.Blocks.HUE);
+
+     var workspace = this.workspace.targetWorkspace || this.workspace;
+     var images = workspace.hero_images;
+     if (!images || !images.length)
+     {
+       images = [["0", 0]];
+     }
+     this.appendDummyInput()
+         .appendField('Choose Image')
+         .appendField(new Blockly.FieldDropdown(images), 'IMAGE');
+     this.setPreviousStatement(true);
+     this.setNextStatement(true);
+   }
+};
+
+Blockly.JavaScript['heroes_choose_image'] = function(block) {
+  // Generate JavaScript for cycling hero images.
+  return 'choose_image(' + block.getFieldValue('IMAGE') + ',\'block_id_' + block.id + '\');\n';
+};
+
 Blockly.Blocks['heroes_move'] = {
   /**
    * Block for moving forward.
