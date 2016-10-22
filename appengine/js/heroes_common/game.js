@@ -134,16 +134,14 @@ self.display = function() {
   self.ctxDisplay.drawImage(self.ctxScratch.canvas, 0, 0);
 };
 
-self.update_hero = function(hero, x, y, image)
+self.update_hero = function(hero, x, y, images)
 {
   self.heroes[hero].starting_x = x;
   self.heroes[hero].starting_y = y;
   
-  if (image)
+  if (images)
   {
-    var img = new Image();
-    img.src = image;
-    self.heroes[hero].image = img;
+    self.heroes[hero].setImages(images);
   }
   if (self.pidList.length == 0)
   {
@@ -215,10 +213,10 @@ self.setup_game_world = function(ide_tab)
   self.reset();
 }
 
-self.addHero = function(name, type, ide_tab, x, y, image) {
+self.addHero = function(name, type, ide_tab, x, y, images) {
 
   self.heroes[name] = new Hero(name, type, hero_radius, x, y, self.ctxLines,
-    self.ctxDisplay, ide_tab, self, image);
+    self.ctxDisplay, ide_tab, self, images);
 
   //
   // Draw her.

@@ -105,7 +105,7 @@ var HeroEditor = function(ide, username, hero)
 
     if (!ide.tabs[name] || confirm("Overwrite this hero?"))
     {
-      ide.publishHero(name, type, image);
+      ide.publishHero(name, type, [image]);
     }
     else
     {

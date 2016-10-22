@@ -73,7 +73,7 @@ chars["world"] = "heroes/world.png";
 var chars_per_line = 40;
 
 
-function Hero(name, char, radius, x, y, line_context, display_context, sprite_ide, game, image) {
+function Hero(name, char, radius, x, y, line_context, display_context, sprite_ide, game, images) {
 
 var self = this;
 self.ctxLines = line_context;
@@ -101,16 +101,21 @@ self.width = 5;
 
 self.char = char;
 
-self.image = new Image();
-
-if (image)
+self.setImages = function(images)
 {
-  self.image.src = image;
+  self.images = [];
+  if (!images || images.length === 0)
+  {
+    images = [chars["human"]];
+  }
+  for (var i = 0; i < images.length; ++i)
+  {
+    var img = new Image();
+    img.src = images[i];
+    self.images.push(img);
+  }
 }
-else
-{
-  self.image.src = chars[char] || chars["andrew"];
-}
+self.setImages(images);
 
 self.radius = radius;
 
@@ -163,7 +168,7 @@ self.draw = function(ctx)
 
   for (var i = 0; i < self.xs.length; i++)
   {
-    draw_rotated_image(ctx, self.image, self.xs[i],
+    draw_rotated_image(ctx, self.images[0], self.xs[i],
       self.ys[i], self.radius * 2, self.radius * 2, self.heading);
   }
 

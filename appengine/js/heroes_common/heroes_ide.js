@@ -39,7 +39,7 @@ var hero_offset = 3;
 self.starting_x = Heroes.WIDTH/hero_offset;
 self.starting_y = Heroes.HEIGHT/2;
 
-self.publishHero = function(name, type, image)
+self.publishHero = function(name, type, images)
 {
   var index, hero_id, x, y;
   if (self.tabs[name])
@@ -52,7 +52,7 @@ self.publishHero = function(name, type, image)
     y = self.starting_y;
     index = Object.keys(self.tabs).length;
   }
-  wilddog.publishHero(game.id, name, type, index, x, y, image, hero_id);
+  wilddog.publishHero(game.id, name, type, index, x, y, images, hero_id);
 }
 
 self.cycle_starting_locations = function()
@@ -67,9 +67,9 @@ self.cycle_starting_locations = function()
 //
 // When a new hero is created.
 //
-self.new_hero_tab = function(new_tab_name, type, hero_id, image)
+self.new_hero_tab = function(new_tab_name, type, hero_id, images)
 {
-  self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name, type, hero_id, self, null, image);
+  self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name, type, hero_id, self, null, images[0]);
 
   // Start pushing data.
   if (!self.tabs[new_tab_name].read_only)
@@ -93,7 +93,7 @@ self.new_hero_tab = function(new_tab_name, type, hero_id, image)
 
   if (self.game)
   {
-    self.game.addHero(new_tab_name, type, self.tabs[new_tab_name], self.starting_x, self.starting_y, image);
+    self.game.addHero(new_tab_name, type, self.tabs[new_tab_name], self.starting_x, self.starting_y, images);
     self.cycle_starting_locations();
 
   }
@@ -101,10 +101,10 @@ self.new_hero_tab = function(new_tab_name, type, hero_id, image)
   return self.tabs[new_tab_name];
 }
 
-self.update_hero = function(hero_name, x, y, image)
+self.update_hero = function(hero_name, x, y, images)
 {
-  game.update_hero(hero_name, x, y, image);
-  self.tabs[hero_name].update_thumbnail(image);
+  game.update_hero(hero_name, x, y, images);
+  self.tabs[hero_name].update_thumbnail(images[0]);
 }
 
 self.remove_tab = function(tab_name)

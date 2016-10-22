@@ -63,7 +63,7 @@ self.publishNewGame = function(username)
   return key;
 }
 
-self.publishHero = function(game_id, name, type, index, x, y, image, hero_id)
+self.publishHero = function(game_id, name, type, index, x, y, images, hero_id)
 {
   var hero_ref;
   if (!hero_id)
@@ -86,9 +86,9 @@ self.publishHero = function(game_id, name, type, index, x, y, image, hero_id)
   {
     hero_ref['update']({"x" : x, "y" : y});
   }
-  if (image)
+  if (images)
   {
-    hero_ref['update']({"image": image});
+    hero_ref['update']({"images": images});
   }
   if (name && type)
   {
@@ -163,7 +163,7 @@ self.connectSubscriberGame = function(game_id, ide)
       {
         var name = hero.name || "foo" + hero.x;
         var type = hero.type || "human";
-        var image = hero.image;
+        var images = hero.images || [];
 
         if (first_call)
         {
@@ -174,7 +174,7 @@ self.connectSubscriberGame = function(game_id, ide)
           }
           else
           {
-            tab = ide.new_hero_tab(name, type, id, image);
+            tab = ide.new_hero_tab(name, type, id, images);
           }
           self.connectSubscriberWorkspace(id, tab.workspace);
         }
@@ -182,7 +182,7 @@ self.connectSubscriberGame = function(game_id, ide)
 
         if (hero.x && hero.y && (name.toLowerCase() != "world"))
         {
-          ide.update_hero(name, hero.x, hero.y, hero.image);
+          ide.update_hero(name, hero.x, hero.y, images);
         }
       }
     })
