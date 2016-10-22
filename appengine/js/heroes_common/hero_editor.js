@@ -29,6 +29,9 @@ goog.provide('HeroesEditor');
 var HeroEditor = function(ide, username, hero)
 {
   var self = this;
+  var edited_image_index = 0;
+  var canvas_images = {};
+  $(".costumes").remove();
 
   //
   // Clear the forms.
@@ -78,11 +81,55 @@ var HeroEditor = function(ide, username, hero)
   // Show a template/existing hero to edit.
   //
 
+  var set_thumbnail = function(index, image)
+  {
+    //
+    // Create the DOM node if it doesn't exist.
+    //
+    if (index >= Object.keys(canvas_images).length)
+    {
+      var new_thumb = $('<div class="costumes">' + index + '<img width="70px" height="70px" id="' + username + '-costume-' + index + '"></div>');
+      new_thumb.insertBefore("#" + username + "-add-costume");
+    }
+
+    //
+    // Save the data.
+    //
+    canvas_images[index] = image;
+    $("#" + username + "-costume-" + index)['attr']('src', canvas_images[index]);
+
+    //
+    // Let the user edit the thumbnail later.
+    //
+    $("#" + username + "-costume-" + index)['click'](function ()
+    {
+      var edited_image = lc.getImage();
+      if (edited_image)
+      {
+        set_thumbnail(edited_image_index, edited_image.toDataURL("image/png"));
+      }
+      edited_image_index = index;
+      lc.clear();
+      load_image(image);
+    })
+  }
+  lc.on('drawingChange', function() {
+    var img = lc.getImage();
+    if (img)
+    {
+      set_thumbnail(edited_image_index, img.toDataURL("image/png"));
+    }
+  });
+
   if (hero)
   {
     $('#' + username + '-hero-name').val(hero.tab_name);
     $('#' + username + '-hero-type').val(hero.hero_type);
-    load_image(hero.image);
+    load_image(hero.images[0]);    
+    hero.images.forEach( function(el, i)
+    {
+      set_thumbnail(i, el);
+    })
   }
   
   //
@@ -93,7 +140,13 @@ var HeroEditor = function(ide, username, hero)
   {
     var name = $("#" + username + "-hero-name")['val']();
     var type = $("#" + username + "-hero-type")['val']();
-    var image = lc.getImage().toDataURL("image/png");
+    
+    var image = lc.getImage();
+    if (image)
+    {
+      canvas_images[edited_image_index] = image.toDataURL("image/png");
+    }
+
 
     name = name.replace(/[^a-zA-Z0-9]+/g, "");
 
@@ -105,7 +158,7 @@ var HeroEditor = function(ide, username, hero)
 
     if (!ide.tabs[name] || confirm("Overwrite this hero?"))
     {
-      ide.publishHero(name, type, [image]);
+      ide.publishHero(name, type, canvas_images);
     }
     else
     {
@@ -130,4 +183,32 @@ var HeroEditor = function(ide, username, hero)
     x_button['hide']();
   }
 
+  //
+  // Store whatever's in the current canvas, then clear it.
+  //
+  var new_costume = function()
+  {
+    //
+    // Save current image.
+    //
+
+    var image = lc.getImage().toDataURL("image/png");
+    set_thumbnail(edited_image_index, image);
+    
+    //
+    // Setup a fresh image.
+    //
+
+    edited_image_index = Object.keys(canvas_images).length;
+    lc.clear();    
+  }
+
+  
+  var costume_button = $("#" + username + "-add-costume")['off']('click')['click'](function()
+  {
+    if (lc.getImage())
+    {
+      new_costume();
+    }
+  });
 }

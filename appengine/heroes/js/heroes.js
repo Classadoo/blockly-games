@@ -72,7 +72,9 @@ Heroes.BLOCKLY_HTML =
           '<a id="{user}-x" class="form-item"><img width="15px" height="15px" src="heroes/x.png"></a>' +
         '</form>' +
         '<div class="row">' +
-          '<div class="col-xs-3 thumbnails" id={user}-thumbnails></div>' +
+          '<div class="col-xs-3 thumbnails" id={user}-thumbnails>' +
+            '<div id="{user}-add-costume"><a href="#">+ New Costume</a></div>' +
+          '</div>' +
           '<div class="col-xs-9 literally-canvas">' +
             '<div id="paint-{user}"></div>' +
           '</div>' +

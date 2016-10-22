@@ -69,7 +69,7 @@ self.cycle_starting_locations = function()
 //
 self.new_hero_tab = function(new_tab_name, type, hero_id, images)
 {
-  self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name, type, hero_id, self, null, images[0]);
+  self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name, type, hero_id, self, null, images);
 
   // Start pushing data.
   if (!self.tabs[new_tab_name].read_only)
@@ -104,7 +104,7 @@ self.new_hero_tab = function(new_tab_name, type, hero_id, images)
 self.update_hero = function(hero_name, x, y, images)
 {
   game.update_hero(hero_name, x, y, images);
-  self.tabs[hero_name].update_thumbnail(images[0]);
+  self.tabs[hero_name].update_images(images);
 }
 
 self.remove_tab = function(tab_name)
@@ -206,13 +206,13 @@ character_types.forEach(function(animal)
 // Tab containing one workspace for a world/hero.
 //
 
-var IDE_Tab = function(username, tab_name, hero_type, hero_id, parent, toolbox_id, image)
+var IDE_Tab = function(username, tab_name, hero_type, hero_id, parent, toolbox_id, images)
 {
 var self = this;
 self.hero_id = hero_id;
 self.hero_type = hero_type;
 self.tab_name = tab_name;
-self.image = image;
+self.images = images || [];
 toolbox_id = toolbox_id || 'toolbox';
 self.dom_id = username + "-" + tab_name;
 self.read_only = !(getUsername() == username ||
@@ -230,18 +230,18 @@ var a = $('<a href="#' + self.dom_id + '-container" aria-controls="' + self.dom_
 //
 // Insert thumbnail of the hero.
 //
-if (image)
+if (self.images.length)
 {
   var thumbnail = new Image(20, 20);
-  thumbnail.src = image;
+  thumbnail.src = self.images[0];
   thumbnail.id = self.dom_id + '-thumbnail';
   a.append(thumbnail);
 }
 
-self.update_thumbnail = function(image)
+self.update_images = function(images)
 {
-  this.image = image;
-  $("#" + self.dom_id + '-thumbnail').attr('src', image);
+  this.images = images;
+  $("#" + self.dom_id + '-thumbnail').attr('src', images[0]);
 }
 
 //

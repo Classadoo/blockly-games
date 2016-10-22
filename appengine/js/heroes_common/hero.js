@@ -104,6 +104,8 @@ self.char = char;
 self.setImages = function(images)
 {
   self.images = [];
+  self.image_index = 0;
+
   if (!images || images.length === 0)
   {
     images = [chars["human"]];
@@ -168,7 +170,7 @@ self.draw = function(ctx)
 
   for (var i = 0; i < self.xs.length; i++)
   {
-    draw_rotated_image(ctx, self.images[0], self.xs[i],
+    draw_rotated_image(ctx, self.images[self.image_index], self.xs[i],
       self.ys[i], self.radius * 2, self.radius * 2, self.heading);
   }
 
