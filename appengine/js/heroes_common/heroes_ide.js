@@ -194,7 +194,7 @@ $('#' + self.username + '-new-hero-button')['click']( function() {
 // Setup the dropdown for hero templates.
 //
 
-var character_types = ["custom", "lion", "eagle", "human", "smiley", "king", "knight", "dancer", "turtle"];
+var character_types = ["lion", "eagle", "human", "smiley", "king", "knight", "dancer", "turtle", "custom"];
 character_types.forEach(function(animal)
 {
   $("#" + self.username + "-hero-type")['append']($("<option></option>",

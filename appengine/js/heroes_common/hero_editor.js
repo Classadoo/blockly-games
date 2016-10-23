@@ -70,6 +70,7 @@ var HeroEditor = function(ide, username, hero)
     var img = new Image();
     img.src = src;
     lc['saveShape'](LC['createShape']('Image', {"image": img}));
+    set_thumbnail(edited_image_index, src);
   }
 
   $("#" + username + "-hero-type")['on']('change', function() {
@@ -200,7 +201,8 @@ var HeroEditor = function(ide, username, hero)
     //
 
     edited_image_index = Object.keys(canvas_images).length;
-    lc['clear']();    
+    lc['clear']();
+    load_image(chars[$("#" + username + "-hero-type")['val']()]);
   }
 
   
