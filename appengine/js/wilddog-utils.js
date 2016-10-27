@@ -41,7 +41,7 @@ var getClassroom = function()
 function WilddogInterface(classroom)
 {
 var self = this;
-self.ref = new Wilddog("https://blocklypipe.wilddogio.com");
+self.ref = new Wilddog("https://classadoo-heroes.wilddogio.com");
 
 var classroom_ref = self.ref['child']("classrooms")['child'](classroom);
 
