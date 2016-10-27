@@ -88,7 +88,7 @@ self.reset = function() {
   // Kill the game event loop.
   clearInterval(self.eventLoop);
 
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername() + "/code_running");
+  var ref = new Wilddog("https://classadoo-heroes.wilddogio.com/users/" + getUsername() + "/code_running");
   var code_obj = {};
   code_obj[self.username] = false;
   ref['update'](code_obj);
@@ -186,7 +186,7 @@ self.runButtonClick = function(e) {
   resetButton.style.display = 'inline';
   self.execute();
 
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com/users/" + getUsername() + "/code_running");
+  var ref = new Wilddog("https://classadoo-heroes.wilddogio.com/users/" + getUsername() + "/code_running");
   var code_obj = {};
   code_obj[self.username] = true;
   ref['update'](code_obj);

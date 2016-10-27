@@ -41,7 +41,7 @@ window.onload = function()
   var name_input = document.getElementById("name-input");
   var student_class_input = document.getElementById("classroom-input");
 
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com");
+  var ref = new Wilddog("https://classadoo-heroes.wilddogio.com");
   ref.child('classrooms').on("child_added", function(child)
   {
     child = child['key']();

@@ -198,7 +198,7 @@ function pushToTalk(wilddog_base_url, username)
       peer.on('close', function()
       {
         clearInterval(watchdog_interval);
-        delete peers.peer_id;
+        delete peer_list.peer_id;
         console.warn("A peer disconnected", peer_id);
       });
       

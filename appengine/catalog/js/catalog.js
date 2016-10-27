@@ -32,7 +32,7 @@ Catalog.init = function()
 
   var project_list = document.getElementById("project_list");
 
-  var ref = new Wilddog("https://blocklypipe.wilddogio.com");
+  var ref = new Wilddog("https://classadoo-heroes.wilddogio.com");
   var user_ref = ref['child']("users")['child'](getUsername());
   var user_games_ref = user_ref['child']("games");
   var games_ref = ref['child']("games");

@@ -102,6 +102,22 @@ Heroes.init = function() {
   Heroes.classroom = getClassroom();
   Heroes.wilddog = new WilddogInterface(Heroes.classroom);
 
+  //
+  // Setup Push-to-talk
+  //
+  var ptt = new pushToTalk("https://classadoo-heroes.wilddogio.com/classrooms/" + Heroes.classroom, getUsername());
+  document.addEventListener("keydown", function(e) {
+    if(e.keyCode == 13) {
+      ptt['enableStream'](true);
+    }
+  });
+  document.addEventListener("keyup", function(e) {
+    if(e.keyCode == 13) {
+      ptt['enableStream'](false);
+    }
+  });
+
+
   var username = getUsername();
   Heroes.wilddog.setIDE(username, username);
   Heroes.wilddog.setLevel(username, BlocklyGames.LEVEL);
@@ -290,18 +306,3 @@ var compute_distance = function(x1, y1, x2, y2)
 {
   return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
 }
-
-//
-// Setup Push-to-talk
-//
-var ptt = new pushToTalk("https://classadoo-heroes.wilddogio.com", getUsername());
-document.addEventListener("keydown", function(e) {
-  if(e.keyCode == 13) {
-    ptt['enableStream'](true);
-  }
-});
-document.addEventListener("keyup", function(e) {
-  if(e.keyCode == 13) {
-    ptt['enableStream'](false);
-  }
-});
