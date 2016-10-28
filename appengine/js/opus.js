@@ -131,7 +131,6 @@ var Opus = function(wilddog_ref, username){
   recorder.addEventListener("dataAvailable", function(e){
     var b64encoded = btoa(String.fromCharCode.apply(null, e.detail));
     var end = true;
-    console.log(b64encoded);
     if (recording_loop)
     {
       end = false;
