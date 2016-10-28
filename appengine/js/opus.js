@@ -69,7 +69,17 @@ var Opus = function(wilddog_ref, username){
     bitRate: 4000,
     encoderSampleRate: 8000,
     encoderPath: "../appengine/js/encoderWorker.min.js",
-    leaveStreamOpen: true
+    leaveStreamOpen: true,
+    streamOptions : {
+    optional: [],
+    mandatory: {
+      googEchoCancellation: true,
+      googAutoGainControl: true,
+      googNoiseSuppression: true,
+      googHighpassFilter: true,
+      googTypingNoiseDetection: true
+    }
+  }
   });
 
 
@@ -97,7 +107,6 @@ var Opus = function(wilddog_ref, username){
   
   self.enableStream = function(enable)
   {
-    console.log(enable);
     if (enable)
     {
       if (!recording_loop)
