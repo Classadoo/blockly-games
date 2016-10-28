@@ -87,6 +87,7 @@ self.reset = function() {
 
   // Kill the game event loop.
   clearInterval(self.eventLoop);
+  self.eventLoop = null;
 
   var ref = new Wilddog("https://classadoo-heroes.wilddogio.com/users/" + getUsername() + "/code_running");
   var code_obj = {};
@@ -143,7 +144,7 @@ self.update_hero = function(hero, x, y, images)
   {
     self.heroes[hero].setImages(images);
   }
-  if (self.pidList.length == 0)
+  if (!self.eventLoop)
   {
     self.reset();
   }
@@ -154,7 +155,7 @@ self.update_hero = function(hero, x, y, images)
  */
 self.execute = function() {
   if (!('Interpreter' in window)) {
-    // Interpreter lazy loads and hasn't arrived yet.  Try again later.
+    // Interpreter lazy loads and hasn't arrived yet. Try again later.
     setTimeout(self.execute, 250);
     return;
   }
