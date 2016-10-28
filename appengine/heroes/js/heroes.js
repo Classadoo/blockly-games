@@ -62,7 +62,7 @@ Heroes.BLOCKLY_HTML =
         '<form class="form-inline">' +
           '<div class="form-group form-item">' +
             '<label for="hero-name">Name</label>' +
-            '<input type="text" class="form-control" id="{user}-hero-name" placeholder="Andrew">' +
+            '<input type="text" class="form-control" id="{user}-hero-name">' +
           '</div>' +
           '<div class="form-group form-item">' +
             '<label for="hero-type">Type</label>' +

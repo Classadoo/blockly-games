@@ -32,6 +32,8 @@ var HeroEditor = function(ide, username, hero)
   var edited_image_index = 0;
   var canvas_images = {};
   $(".costumes")['remove']();
+  
+  var STOCK_NAMES = ["Paul", "Mitch", "Peter", "Sally", "Quail", "Dennis", "Lucy", "Trya", "Jimmer", "Randy", "Susan", "Falthia", "Arwen", "Galadriel", "Smeagal"];
 
   //
   // Clear the forms.
@@ -132,6 +134,11 @@ var HeroEditor = function(ide, username, hero)
       set_thumbnail(i, el);
     })
   }
+  else
+  {
+    var placeholder_name = STOCK_NAMES[Math.floor(Math.random() * STOCK_NAMES.length)];
+    $('#' + username + '-hero-name')['val'](placeholder_name);
+  }
   
   //
   // Handle submit (Remove previous handlers. They have an old LC object).
@@ -159,6 +166,11 @@ var HeroEditor = function(ide, username, hero)
 
     if (!ide.tabs[name] || confirm("Overwrite this hero?"))
     {
+      var stock_idx = STOCK_NAMES.indexOf(name);
+      if (stock_idx >= 0)
+      {
+        STOCK_NAMES.splice(stock_idx, 1);
+      }
       ide.publishHero(name, type, canvas_images);
     }
     else
