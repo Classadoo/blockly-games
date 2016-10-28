@@ -73,7 +73,7 @@ chars["world"] = "heroes/world.png";
 var chars_per_line = 40;
 
 
-function Hero(name, char, radius, x, y, line_context, display_context, sprite_ide, game, images) {
+function Hero(name, char, starting_radius, x, y, line_context, display_context, sprite_ide, game, images) {
 var self = this;
 self.ctxLines = line_context;
 
@@ -118,7 +118,7 @@ self.setImages = function(images)
 }
 self.setImages(images);
 
-self.radius = radius;
+self.radius = starting_radius;
 
 self.collision_events = {};
 self.collisions_in_progress = {};
@@ -251,6 +251,7 @@ self.reset = function()
   self.xs = [self.x];
   self.ys = [self.y];
   self.tail_length = 1;
+  self.radius = starting_radius;
   self.heading = 0;
 
   self.colour = null;
