@@ -105,7 +105,18 @@ Heroes.init = function() {
   //
   // Setup Push-to-talk
   //
-  var ptt = new pushToTalk("https://classadoo-heroes.wilddogio.com/classrooms/" + Heroes.classroom, getUsername());
+
+  // TODO: configure this some other way.
+  var rtc = false;
+  if (rtc)
+  {
+    ptt = new pushToTalk("https://classadoo-heroes.wilddogio.com/classrooms/" + Heroes.classroom, getUsername());
+  }
+  else
+  {
+    ptt = new Opus(new Wilddog("https://classadoo-audio.wilddogio.com/recordings/" + Heroes.classroom), getUsername());
+  }
+
   document.addEventListener("keydown", function(e) {
     if(e.keyCode == 13) {
       ptt['enableStream'](true);
@@ -247,7 +258,7 @@ Heroes.addGame = function(readOnly, username, game_id)
   {
     //TODO(aheine): it's pointless to preload these now. Just store the data url.
     game.ide.publishHero("world", "world", [chars["world"]]);
-    game.ide.publishHero(getUsername(), "human", [chars["human"]]);
+    game.ide.publishHero(getUsername(), "human", [chars["human"], chars["human2"]]);
   }
 
   BlocklyGames.bindClick(username + '-runButton', game.runButtonClick);

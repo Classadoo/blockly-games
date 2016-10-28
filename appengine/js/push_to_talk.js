@@ -182,6 +182,7 @@ function pushToTalk(wilddog_base_url, username)
         if (now - last_heartbeat > WATCHDOG_TIMEOUT)
         {
           console.error("We lost a peer", peer_id);
+          delete peer_list.peer_id;
         }
       }
 
@@ -190,7 +191,8 @@ function pushToTalk(wilddog_base_url, username)
       {
         watchdog_interval = setInterval(function()
         {
-          peer.send('beat');
+          //TODO send whether we are enabled or not, so the UI can show that.
+          peer.send("beat");
           watchdog();
         }, RTC_HEARTBEAT_INTERVAL_MS);
       });

@@ -63,6 +63,7 @@ var chars = {};
 chars["eagle"] = "heroes/eagle.png";
 chars["lion"] = "heroes/lion.png";
 chars["human"] = "heroes/andrew.png";
+chars["human2"] = "heroes/andrew2.png";
 chars["smiley"] =  "heroes/smiley.png";
 chars["king"] = "heroes/king.png";
 chars["knight"] =  "heroes/knight.png";
