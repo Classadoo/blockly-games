@@ -30,6 +30,11 @@ var Player = function(user_ref)
   {
       play_streams();
   });
+  audio.addEventListener("error", function()
+  {
+    console.error("Audio error. Stream on");
+    play_streams();
+  });
   
   user_ref.on('value', function(snapshot)
   {
@@ -83,13 +88,14 @@ var Opus = function(wilddog_ref, username){
   });
 
 
-  var recording_loop = null;
+  var recording_timeout = null;
+  var stop_timeout = null;
   var streaming;
   var start_streaming = function()
   {
     streaming = true;
     recorder.start();
-    recording_loop = setTimeout(function(){
+    recording_timeout = setTimeout(function(){
       recorder.stop();
     }, CHUNK_LENGTH_MS);
   }
@@ -99,17 +105,18 @@ var Opus = function(wilddog_ref, username){
     // Delay here. For some reason, the end of the recording is usually chopped off.
     setTimeout( function()
     {
-      clearTimeout(recording_loop);
-      recording_loop = null;
+      clearTimeout(recording_timeout);
+      recording_timeout = null;
       recorder.stop();
-    }, 400);
+    }, 500);
   }
   
   self.enableStream = function(enable)
   {
     if (enable)
     {
-      if (!recording_loop)
+      clearTimeout(stop_timeout);
+      if (!recording_timeout)
       {
         start_streaming();
       }
@@ -131,7 +138,7 @@ var Opus = function(wilddog_ref, username){
   recorder.addEventListener("dataAvailable", function(e){
     var b64encoded = btoa(String.fromCharCode.apply(null, e.detail));
     var end = true;
-    if (recording_loop)
+    if (recording_timeout)
     {
       end = false;
       start_streaming();
