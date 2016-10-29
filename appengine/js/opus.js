@@ -15,26 +15,32 @@ var Player = function(user_ref)
   document.body.appendChild(audio);
 
   var streams = [];
-  var play_streams = function()
+  var stream = function()
   {
+    console.log("playin");
     if (streams.length)
     {
       var url = URL.createObjectURL(streams.shift());
       audio.src = url;
       audio.play();
     }
+    else
+    {
+      setTimeout(stream, 1000);
+    }
   }
   
   var end_of_message = true;
   audio.addEventListener("ended", function()
   {
-      play_streams();
+      stream();
   });
   audio.addEventListener("error", function()
   {
     console.error("Audio error. Stream on");
-    play_streams();
+    stream();
   });
+  stream();
   
   user_ref.on('value', function(snapshot)
   {
@@ -50,17 +56,6 @@ var Player = function(user_ref)
       }));
       var dataBlob = new Blob( [u8], { type: 'audio/ogg' } );
       streams.push(dataBlob);
-
-      //
-      // Trigger play.
-      //
-      var beginning_of_message = end_of_message;
-      end_of_message = snapshot.val().end;
-      if (beginning_of_message)
-      {
-        var buffer = end_of_message ? 0 : BUFFER_LENGTH_MS;
-        setTimeout(play_streams, buffer);
-      }
     }
   })
 }
