@@ -255,7 +255,7 @@ a.append(spinner);
 //
 if (tab_name.toLowerCase() != "world" && !self.read_only)
 {
-  a['append']('<img id="' + self.dom_id + '-edit" src="heroes/edit.png" height=15 width=15>');
+  a['append']('<img id="' + self.dom_id + '-edit" src="heroes/edit.png" height=22 width=22>');
 }
 li['append'](a);
 

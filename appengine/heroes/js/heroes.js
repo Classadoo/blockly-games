@@ -68,12 +68,12 @@ Heroes.BLOCKLY_HTML =
             '<label for="hero-type">Type</label>' +
             '<select class="form-control" id="{user}-hero-type"></select>' +
           '</div>' +
-          '<button type="button" class="btn btn-default form-item" id={user}-submit-hero>Submit</button>' +
+          '<button type="button" class="btn btn-success form-item" id={user}-submit-hero>Submit</button>' +
           '<a id="{user}-x" class="form-item"><img width="15px" height="15px" src="heroes/x.png"></a>' +
         '</form>' +
         '<div class="row">' +
           '<div class="col-xs-3 thumbnails" id={user}-thumbnails>' +
-            '<div id="{user}-add-costume"><a href="#">+ New Costume</a></div>' +
+            '<div id="{user}-add-costume"><button type="button" class="btn btn-warning">New Image</button></div>' +
           '</div>' +
           '<div class="col-xs-9 literally-canvas">' +
             '<div id="paint-{user}"></div>' +
