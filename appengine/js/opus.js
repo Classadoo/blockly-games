@@ -56,7 +56,7 @@ var Player = function(user_ref, peer_name)
       stream(is_new_message);
       if (is_new_message)
       {
-        $("#whos_talking").append('<span id="talking-' + peer_name + '">' + peer_name + '</span>');
+        $("#whos_talking").append('<span class="talking" id="talking-' + peer_name + '">' + peer_name + '</span>');
       }
       
       is_new_message = snapshot.val().end;
@@ -98,7 +98,7 @@ var Opus = function(wilddog_ref, username){
   {
     if (!streaming)
     {
-      $("#whos_talking").append('<span id="talking-me">ME</span>');
+      $("#whos_talking").append('<span class="talking" id="talking-me">ME</span>');
       recorder.start();
     }
   }

@@ -180,3 +180,6 @@ button:hover:not(:disabled) {
    padding-right: 50px;
    color: green;
 }
+.talking {
+  padding: 2px;
+}
