@@ -130,7 +130,7 @@ self.dragging = false;
 $(display_context.canvas)['mousedown']( function(e)
 {
   var pos = getCursorPosition(this, e)
-  if (compute_distance(pos.x, pos.y, self.x, self.y) < self.radius)
+  if (compute_distance(pos.x, pos.y, self.x, self.y) < self.radius && !sprite_ide.read_only)
   {
     self.dragging = true;
     self.drag_event_x = e.clientX;

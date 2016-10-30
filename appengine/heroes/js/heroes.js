@@ -108,13 +108,14 @@ Heroes.init = function() {
 
   // TODO: configure this some other way.
   var rtc = false;
+  var ptt;
   if (rtc)
   {
     ptt = new pushToTalk("https://classadoo-heroes.wilddogio.com/classrooms/" + Heroes.classroom, getUsername());
   }
   else
   {
-    ptt = new Opus(new Wilddog("https://classadoo-audio.wilddogio.com/recordings/" + Heroes.classroom), getUsername());
+    ptt = new Opus(new Wilddog("https://nihaoclass.wilddogio.com/recordings/" + Heroes.classroom), getUsername());
   }
 
   document.addEventListener("keydown", function(e) {

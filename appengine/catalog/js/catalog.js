@@ -82,7 +82,7 @@ Catalog.init = function()
 
     Catalog.class_name = classroom['val']();
 
-    ptt = new Opus(new Wilddog("https://classadoo-audio.wilddogio.com/recordings/" + Catalog.class_name), getUsername());
+    ptt = new Opus(new Wilddog("https://nihaoclass.wilddogio.com/recordings/" + Catalog.class_name), getUsername());
     document.addEventListener("keydown", function(e) {
       if(e.keyCode == 13) {
         ptt['enableStream'](true);
