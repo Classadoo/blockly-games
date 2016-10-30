@@ -7,7 +7,6 @@
 
 
 CHUNK_LENGTH_MS = 3000;
-BUFFER_LENGTH_MS = 1000;
 
 var Player = function(user_ref)
 {
@@ -15,33 +14,25 @@ var Player = function(user_ref)
   document.body.appendChild(audio);
 
   var streams = [];
-  var stream = function()
+  var stream = function(reset_stream)
   {
-    console.log("playin");
     if (streams.length)
     {
-      var url = URL.createObjectURL(streams.shift());
+      var dataBlob = new Blob( streams, { type: 'audio/ogg' } );
+      var url = URL.createObjectURL(dataBlob);
+      
+      var pos = audio.currentTime;
       audio.src = url;
+      if (!reset_stream)
+      {
+        audio.currentTime = pos;
+      }
+
       audio.play();
-    }
-    else
-    {
-      setTimeout(stream, 1000);
     }
   }
   
-  var end_of_message = true;
-  audio.addEventListener("ended", function()
-  {
-      stream();
-  });
-  audio.addEventListener("error", function()
-  {
-    console.error("Audio error. Stream on");
-    stream();
-  });
-  stream();
-  
+  var is_new_message = true;
   user_ref.on('value', function(snapshot)
   {
     if (snapshot.val())
@@ -54,8 +45,14 @@ var Player = function(user_ref)
       {
         return c.charCodeAt(0);
       }));
-      var dataBlob = new Blob( [u8], { type: 'audio/ogg' } );
-      streams.push(dataBlob);
+      streams.push(u8);
+      stream(is_new_message);
+      
+      is_new_message = snapshot.val().end;
+      if (is_new_message)
+      {
+        streams = [];
+      }
     }
   })
 }
@@ -70,6 +67,7 @@ var Opus = function(wilddog_ref, username){
     encoderSampleRate: 8000,
     encoderPath: "../appengine/js/encoderWorker.min.js",
     leaveStreamOpen: true,
+    streamPages: true,
     streamOptions : {
     optional: [],
     mandatory: {
@@ -82,26 +80,23 @@ var Opus = function(wilddog_ref, username){
   }
   });
 
-
-  var recording_timeout = null;
   var stop_timeout = null;
   var streaming;
+  var last_send = Date.now();
   var start_streaming = function()
   {
-    streaming = true;
-    recorder.start();
-    recording_timeout = setTimeout(function(){
-      recorder.stop();
-    }, CHUNK_LENGTH_MS);
+    if (!streaming)
+    {
+      recorder.start();
+    }
   }
 
   var stop_streaming = function()
   {
     // Delay here. For some reason, the end of the recording is usually chopped off.
-    setTimeout( function()
+    stop_timeout = setTimeout( function()
     {
-      clearTimeout(recording_timeout);
-      recording_timeout = null;
+      streaming = false;
       recorder.stop();
     }, 500);
   }
@@ -111,10 +106,7 @@ var Opus = function(wilddog_ref, username){
     if (enable)
     {
       clearTimeout(stop_timeout);
-      if (!recording_timeout)
-      {
-        start_streaming();
-      }
+      start_streaming();
     }
     else 
     {
@@ -129,16 +121,31 @@ var Opus = function(wilddog_ref, username){
   recorder.addEventListener("streamReady", function(e){
     console.log('Audio stream is ready.');
   });
+  recorder.addEventListener("start", function(e){
+    last_send = Date.now();
+    streaming = true;
+  });
 
+  var pages = [];
   recorder.addEventListener("dataAvailable", function(e){
-    var b64encoded = btoa(String.fromCharCode.apply(null, e.detail));
-    var end = true;
-    if (recording_timeout)
+    pages.push(e.detail);
+
+    //TODO(aheine): !streaming doesn't exactly tell me if it's ended, because this event takes time to fire...
+    var end_of_stream = !streaming;
+    var now = Date.now();
+    if (end_of_stream || (now - last_send > CHUNK_LENGTH_MS))
     {
-      end = false;
-      start_streaming();
+      len = pages.reduce(function(reducing, next){return reducing + next.length;}, 0);
+      var flattened = new Uint8Array(len);
+      pages.reduce(function(reducing, next){
+        flattened.set(next, reducing);
+        return reducing + next.length;
+      }, 0);
+      pages = [];
+      var b64encoded = btoa(String.fromCharCode.apply(null, flattened));
+      wilddog_ref.child(username).set({end : end_of_stream, audio : b64encoded});
+      last_send = Date.now();
     }
-    wilddog_ref.child(username).set({end : end, audio : b64encoded});
   });
 
   recorder.initStream();
@@ -148,9 +155,8 @@ var Opus = function(wilddog_ref, username){
     var peer_name = snapshot.key();
     if (peer_name != username)
     {
-      console.log(peer_name, username);
        new Player(wilddog_ref.child(peer_name))
-     }
+    }
   });
 };
 

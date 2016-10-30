@@ -164,7 +164,6 @@ self.connectSubscriberGame = function(game_id, ide)
         var name = hero.name;
         var type = hero.type || "human";
         var images = hero.images || [];
-        console.log(first_call, name);
         if (first_call)
         {
           var tab;

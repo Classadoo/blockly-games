@@ -21,11 +21,11 @@
 goog.provide('ItemObject');
 
 function Item(x, y, vx, vy) {
-
-  this.x = x || 0;
-  this.y = y || 0;
-  this.vx = vx || 0;
-  this.vy = vy || 0;
+  var self = this;
+  self.x = x || 0;
+  self.y = y || 0;
+  self.vx = vx || 0;
+  self.vy = vy || 0;
 }
 
 // Draws this item to a given context.

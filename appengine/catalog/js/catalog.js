@@ -82,10 +82,17 @@ Catalog.init = function()
 
     Catalog.class_name = classroom['val']();
 
-    // Create video chat link.
-    $("#video-link")['attr']("href",
-        "https://classadoo.github.io/meetingcenter/cmc/student.html?meetingID=" + encodeURIComponent(Catalog.class_name) + "&name=" + getUsername());
-    $("#video-link")['show']();
+    ptt = new Opus(new Wilddog("https://classadoo-audio.wilddogio.com/recordings/" + Catalog.class_name), getUsername());
+    document.addEventListener("keydown", function(e) {
+      if(e.keyCode == 13) {
+        ptt['enableStream'](true);
+      }
+    });
+    document.addEventListener("keyup", function(e) {
+      if(e.keyCode == 13) {
+        ptt['enableStream'](false);
+      }
+    });
 
     // Create classroom link.
     $("#join-lesson-button")['append']("<div>" + Catalog.class_name + "</div>");
