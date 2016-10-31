@@ -100,6 +100,7 @@ Heroes.init = function() {
   //
 
   Heroes.classroom = getClassroom();
+  var username = getUsername();
   Heroes.wilddog = new WilddogInterface(Heroes.classroom);
 
   //
@@ -130,7 +131,6 @@ Heroes.init = function() {
   });
 
 
-  var username = getUsername();
   Heroes.wilddog.setIDE(username, username);
   Heroes.wilddog.setLevel(username, BlocklyGames.LEVEL);
   Heroes.wilddog.setError(username, "");
@@ -140,7 +140,7 @@ Heroes.init = function() {
     var err_string = errorMsg + " - " + url + " - " + lineNumber;
     if (err_string != last_err_string)
     {
-      Heroes.wilddog.setError(getUsername(), err_string);
+      Heroes.wilddog.setError(username, err_string);
     }
   }
 
@@ -151,6 +151,12 @@ Heroes.init = function() {
   Heroes.wilddog.connectSubscriberClassroom(Heroes.add_user, Heroes.setMaxLevel);
   Heroes.wilddog.subscribeToIDE(username, function(ide_name)
   {
+    // Stop playing this one.
+    if (Heroes.games[Heroes.displayed_ide])
+    {
+      Heroes.games[Heroes.displayed_ide].reset();
+    }
+
     // Hide other IDEs
     for (var game in Heroes.games)
     {
@@ -262,8 +268,8 @@ Heroes.addGame = function(readOnly, username, game_id)
     game.ide.publishHero(getUsername(), "human", [chars["human"], chars["human2"]]);
   }
 
-  BlocklyGames.bindClick(username + '-runButton', game.runButtonClick);
-  BlocklyGames.bindClick(username + '-resetButton', game.resetButtonClick);
+  BlocklyGames.bindClick(username + '-runButton', game.execute);
+  BlocklyGames.bindClick(username + '-resetButton', game.reset);
 
   Heroes.games[username] = game;
   return game;

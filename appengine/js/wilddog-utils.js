@@ -315,4 +315,12 @@ self.subscribeToIDE = function(username, ide_callback)
     }
   });
 }
+
+self.set_running = function(username, game_name, running)
+{
+  var user_ref = self.ref['child']("users")['child'](username);
+  var code_obj = {};
+  code_obj[game_name] = running;
+  user_ref['update']({"code_running" : code_obj});
+}
 }

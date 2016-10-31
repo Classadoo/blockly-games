@@ -57,6 +57,11 @@ self.heroes = {};
  * pending tasks.
  */
 self.reset = function() {
+  //
+  // Show the run() button. Hide the reset() button.
+  var runButton = document.getElementById(self.username + '-runButton');
+  runButton.style.display = 'inline';
+  document.getElementById(self.username + '-resetButton').style.display = 'none';
 
   //
   // Clear drawings.
@@ -85,14 +90,13 @@ self.reset = function() {
   self.ctxScratch.font = 'normal 18pt Arial';
   self.display();
 
+  if (self.eventLoop)
+  {
+    wilddog.set_running(getUsername(), self.username, false);
+  }
   // Kill the game event loop.
   clearInterval(self.eventLoop);
   self.eventLoop = null;
-
-  var ref = new Wilddog("https://classadoo-heroes.wilddogio.com/users/" + getUsername() + "/code_running");
-  var code_obj = {};
-  code_obj[self.username] = false;
-  ref['update'](code_obj);
 };
 
 self.display = function() {
@@ -154,6 +158,19 @@ self.update_hero = function(hero, x, y, images)
  * Execute the user's code.  Heaven help us...
  */
 self.execute = function() {
+  self.reset();
+
+  // Set up the run/reset buttons.
+  var runButton = document.getElementById(self.username + '-runButton');
+  var resetButton = document.getElementById(self.username + '-resetButton');
+
+  // Ensure that Reset button is at least as wide as Run button.
+  if (!resetButton.style.minWidth) {
+    resetButton.style.minWidth = runButton.offsetWidth + 'px';
+  }
+  runButton.style.display = 'none';
+  resetButton.style.display = 'inline';
+
   if (!('Interpreter' in window)) {
     // Interpreter lazy loads and hasn't arrived yet. Try again later.
     setTimeout(self.execute, 250);
@@ -161,7 +178,6 @@ self.execute = function() {
   }
 
   var game_speed = 30
-  self.reset();
   self.startGame(game_speed);
 
   self.game_world.execute();
@@ -170,42 +186,7 @@ self.execute = function() {
     self.heroes[hero].execute(game_speed);
   }
 
-};
-
-/**
- * Click the run button.  Start the program.
- * @param {!Event} e Mouse or touch event.
- */
-self.runButtonClick = function(e) {
-  var runButton = document.getElementById(self.username + '-runButton');
-  var resetButton = document.getElementById(self.username + '-resetButton');
-  // Ensure that Reset button is at least as wide as Run button.
-  if (!resetButton.style.minWidth) {
-    resetButton.style.minWidth = runButton.offsetWidth + 'px';
-  }
-  runButton.style.display = 'none';
-  resetButton.style.display = 'inline';
-  self.execute();
-
-  var ref = new Wilddog("https://classadoo-heroes.wilddogio.com/users/" + getUsername() + "/code_running");
-  var code_obj = {};
-  code_obj[self.username] = true;
-  ref['update'](code_obj);
-};
-
-/**
- * Click the reset button.  Reset the Heroes.
- * @param {!Event} e Mouse or touch event.
- */
-self.resetButtonClick = function(e) {
-  // Prevent double-clicks or double-taps.
-  if (BlocklyInterface.eventSpam(e)) {
-    return;
-  }
-  var runButton = document.getElementById(self.username + '-runButton');
-  runButton.style.display = 'inline';
-  document.getElementById(self.username + '-resetButton').style.display = 'none';
-  self.reset();
+  wilddog.set_running(getUsername(), self.username, true);
 };
 
 self.setup_game_world = function(ide_tab)
