@@ -7,6 +7,7 @@
 
 
 CHUNK_LENGTH_MS = 3000;
+EXPIRATION_MS = 10000;
 
 var addSpeakerIcon = function(name)
 {
@@ -66,6 +67,12 @@ var Player = function(user_ref, peer_name)
   {
     if (snapshot.val())
     {
+      var timestamp = snapshot.val().timestamp || 0;
+      if (new Date().getTime() - timestamp > EXPIRATION_MS)
+      {
+        return;
+      }
+
       //
       // Buffer the message.
       //
@@ -107,7 +114,8 @@ var Opus = function(wilddog_ref, username){
 
   var stop_timeout = null;
   var streaming;
-  var last_send = Date.now();
+  var last_send = new Date().getTime();
+  var start_timestamp = 0;
   var start_streaming = function()
   {
     if (!streaming)
@@ -122,7 +130,8 @@ var Opus = function(wilddog_ref, username){
           el.pause();
           $(el).addClass("paused");
         }
-      })    
+      })   
+      start_timestamp = new Date().getTime(); 
     }
   }
 
@@ -164,7 +173,7 @@ var Opus = function(wilddog_ref, username){
     console.log('Audio stream is ready.');
   });
   recorder.addEventListener("start", function(e){
-    last_send = Date.now();
+    last_send = new Date().getTime();
     streaming = true;
   });
 
@@ -174,7 +183,7 @@ var Opus = function(wilddog_ref, username){
 
     //TODO(aheine): !streaming doesn't exactly tell me if it's ended, because this event takes time to fire...
     var end_of_stream = !streaming;
-    var now = Date.now();
+    var now = new Date().getTime();
     if (end_of_stream || (now - last_send > CHUNK_LENGTH_MS))
     {
       len = pages.reduce(function(reducing, next){return reducing + next.length;}, 0);
@@ -185,8 +194,8 @@ var Opus = function(wilddog_ref, username){
       }, 0);
       pages = [];
       var b64encoded = btoa(String.fromCharCode.apply(null, flattened));
-      wilddog_ref.child(username).set({end : end_of_stream, audio : b64encoded});
-      last_send = Date.now();
+      wilddog_ref.child(username).set({end : end_of_stream, audio : b64encoded, timestamp : start_timestamp});
+      last_send = new Date().getTime();
     }
   });
 
