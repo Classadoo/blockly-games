@@ -1,45 +1,67 @@
 /*
  *  <script src="../build/recorder.min.js"></script>
- *  Recorder.recorder.start()
- *  Recorder.recorder.stop()
+ *  Opus.start()
+ *  Opus.stop()
  *
 */
 
 
 CHUNK_LENGTH_MS = 3000;
 
+var addSpeakerIcon = function(name)
+{
+  // Add the speaker icon.
+  if ($("#talking-" + name).length === 0)
+  {
+    $("#whos_talking").append('<span class="talking" id="talking-' + name + '">' + name + '</span>');
+  }
+}
+var removeSpeakerIcon = function(name)
+{
+  $("#talking-" + name).remove();
+}
+
 var Player = function(user_ref, peer_name)
 {
-  var audio = document.createElement('audio');
-  document.body.appendChild(audio);
+  var audio = $('<audio></audio>');
+  $("body").append(audio);
 
   var streams = [];
-  var stream = function(reset_stream)
+  var stream = function(continued_message, is_end)
   {
     if (streams.length)
     {
-      var dataBlob = new Blob( streams, { type: 'audio/ogg' } );
+      // Wait for playing audio to finish.
+      if (!continued_message && $(".talking").length > 0)
+      {
+        setTimeout(function(){stream(continued_message, is_end), 200});
+        return;
+      }
+      addSpeakerIcon(peer_name);
+
+      var dataBlob = new Blob(streams, { type: 'audio/ogg' });
       var url = URL.createObjectURL(dataBlob);
       
-      var pos = audio.currentTime;
-      audio.src = url;
-      if (!reset_stream)
-      {
-        audio.currentTime = pos;
-      }
+      var playhead = continued_message ? audio[0].currentTime : 0;
+      audio.attr('src', url);
 
-      audio.play();
+      audio[0].currentTime = playhead;
+      audio[0].play();
+      if (is_end)
+      {
+        streams = [];
+      }
     }
   }
   
-  audio.addEventListener("ended",function() {
-    $("#talking-" + peer_name).remove();
+  audio.on("ended",function() {
+    removeSpeakerIcon(peer_name);
   });
-  audio.addEventListener("error",function() {
-    $("#talking-" + peer_name).remove();
+  audio.on("error",function() {
+    removeSpeakerIcon(peer_name);
   });
   
-  var is_new_message = true;
+  var continued_message = false;
   user_ref.on('value', function(snapshot)
   {
     if (snapshot.val())
@@ -53,17 +75,9 @@ var Player = function(user_ref, peer_name)
         return c.charCodeAt(0);
       }));
       streams.push(u8);
-      stream(is_new_message);
-      if (is_new_message)
-      {
-        $("#whos_talking").append('<span class="talking" id="talking-' + peer_name + '">' + peer_name + '</span>');
-      }
-      
-      is_new_message = snapshot.val().end;
-      if (is_new_message)
-      {
-        streams = [];
-      }
+
+      stream(continued_message, snapshot.val().end);
+      continued_message = !snapshot.val().end;
     }
   })
 }
@@ -98,8 +112,17 @@ var Opus = function(wilddog_ref, username){
   {
     if (!streaming)
     {
-      $("#whos_talking").append('<span class="talking" id="talking-me">ME</span>');
+      addSpeakerIcon("ME");
       recorder.start();
+      var already_talking = $("audio");
+      already_talking.each(function(i, el)
+      {
+        if (!el.paused)
+        {
+          el.pause();
+          $(el).addClass("paused");
+        }
+      })    
     }
   }
 
@@ -108,9 +131,15 @@ var Opus = function(wilddog_ref, username){
     // Delay here. For some reason, the end of the recording is usually chopped off.
     stop_timeout = setTimeout( function()
     {
-      $("#talking-me").remove();
+      removeSpeakerIcon("ME");
       streaming = false;
       recorder.stop();
+      var were_talking = $(".paused");
+      were_talking.each(function(i, el)
+      {
+        el.play();
+        $(el).removeClass("paused");
+      })
     }, 500);
   }
   
