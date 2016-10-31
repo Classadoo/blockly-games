@@ -409,8 +409,8 @@ self.checkCollisions = function(other_heroes, items, item_radius)
     {
       if (self.x < self.radius ||
           self.y < self.radius ||
-          self.x + radius > Heroes.WIDTH ||
-          self.y + radius > Heroes.HEIGHT)
+          self.x + self.radius > Heroes.WIDTH ||
+          self.y + self.radius > Heroes.HEIGHT)
       {
         if (self.collisions_in_progress[what] == false)
         {
