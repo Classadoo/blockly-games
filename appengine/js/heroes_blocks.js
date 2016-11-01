@@ -26,6 +26,7 @@
 goog.provide('Heroes.Blocks');
 
 goog.require('Blockly');
+goog.require('Blockly.Recorder');
 goog.require('Blockly.Blocks.colour');
 goog.require('Blockly.Blocks.logic');
 goog.require('Blockly.Blocks.loops');
