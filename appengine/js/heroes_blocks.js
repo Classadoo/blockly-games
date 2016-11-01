@@ -647,7 +647,6 @@ Blockly.Blocks['heroes_game_speed'] = {
    * @this Blockly.Block
    */
   init: function() {
-    this.addRecorder();
     this.setColour(Heroes.Blocks.HUE);
     var HEROES =
         [["Set speed slow", 'slow'],
@@ -663,6 +662,28 @@ Blockly.Blocks['heroes_game_speed'] = {
 Blockly.JavaScript['heroes_game_speed'] = function(block) {
   // Generate JavaScript for setting the width.
   return 'setSpeed(\'' + block.getFieldValue('SPEED') + '\', \'block_id_' + block.id + '\');\n';
+};
+
+
+
+Blockly.Blocks['heroes_audio'] = {
+  /**
+   * Block for pen up/down.
+   * @this Blockly.Block
+   */
+   init: function() {
+     this.addRecorder();
+     this.setColour(Heroes.Blocks.HUE);
+     this.appendDummyInput()
+         .appendField('My Sound');
+     this.setPreviousStatement(true);
+     this.setNextStatement(true);
+   }
+};
+
+Blockly.JavaScript['heroes_audio'] = function(block) {
+  // Generate JavaScript for pen up/down.
+  return 'customAudio(\'block_id_' + block.id + '\');\n';
 };
 
 Blockly.Blocks['heroes_pen'] = {

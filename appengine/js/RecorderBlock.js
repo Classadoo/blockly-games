@@ -37,8 +37,9 @@ goog.require('goog.userAgent');
  * @extends {Blockly.Icon}
  * @constructor
  */
-Blockly.Recorder = function(block) {
+Blockly.Recorder = function(block, sound) {
   var self = this;
+  self.sound = sound;
 
   Blockly.Recorder.superClass_.constructor.call(self, block);
   self.createIcon();
@@ -56,7 +57,7 @@ Blockly.Recorder = function(block) {
   self.recorderJS.initStream();
   self.recorderJS.addEventListener("dataAvailable", function(e){
     var b64encoded = btoa(String.fromCharCode.apply(null, e.detail));
-    self.sound = b64encoded;
+    self.setRecording(b64encoded);
   });
   self.recorderJS.addEventListener("streamReady", function(e){
    //TODO enable the buttons or something.
@@ -79,13 +80,13 @@ Blockly.Recorder.prototype.text_ = '';
  * Width of bubble.
  * @private
  */
-Blockly.Recorder.prototype.width_ = 60;
+Blockly.Recorder.prototype.width_ = 98;
 
 /**
  * Height of bubble.
  * @private
  */
-Blockly.Recorder.prototype.height_ = 30;
+Blockly.Recorder.prototype.height_ = 74;
 
 /**
  * Draw the comment icon.
@@ -93,21 +94,9 @@ Blockly.Recorder.prototype.height_ = 30;
  * @private
  */
 Blockly.Recorder.prototype.drawIcon_ = function(group) {
-  // Circle.
+  // Red circle to record.
   Blockly.createSvgElement('circle',
-      {'class': 'blocklyIconShape', 'r': '8', 'cx': '8', 'cy': '8'},
-       group);
-  // Can't use a real '?' text character since different browsers and operating
-  // systems render it differently.
-  // Body of question mark.
-  Blockly.createSvgElement('path',
-      {'class': 'blocklyIconSymbol',
-       'd': 'm6.8,10h2c0.003,-0.617 0.271,-0.962 0.633,-1.266 2.875,-2.405 0.607,-5.534 -3.765,-3.874v1.7c3.12,-1.657 3.698,0.118 2.336,1.25 -1.201,0.998 -1.201,1.528 -1.204,2.19z'},
-       group);
-  // Dot of question point.
-  Blockly.createSvgElement('rect',
-      {'class': 'blocklyIconSymbol',
-       'x': '6.8', 'y': '10.78', 'height': '2', 'width': '2'},
+      {'r': '8', 'cx': '8', 'cy': '8', 'fill': 'red', 'stroke': '#550000', 'stroke-width': '2px'},
        group);
 };
 
@@ -142,15 +131,14 @@ Blockly.Recorder.prototype.createEditor_ = function() {
     if (this.recording_)
     {
       this.recording_ = false;
-      console.log("stop recording");
       recordButton.innerHTML = "Start Recording";
       recordButton.className = 'blocklyRecorderButton'
       this.recorderJS.stop();
+      this.setVisible(false);
     }
     else
     {
       this.recording_ = true;
-      console.log("start recording");
       recordButton.innerHTML = "Stop Recording";
       recordButton.className = 'blocklyRecorderButton recording'
       this.recorderJS.start();
@@ -237,18 +225,16 @@ Blockly.Recorder.prototype.setBubbleSize = function(width, height) {
   }
 };
 
-
-
 /**
  * Set this comment's text.
  * @param {string} text Recorder text.
  */
 Blockly.Recorder.prototype.setRecording = function(b64encoded) {
-  if (this.recording_ != b64encoded)
+  if (this.sound != b64encoded)
   {
     Blockly.Events.fire(new Blockly.Events.Change(
-      this.block_, 'recording', null, this.recording_, b64encoded));
-    this.recording_ = b64encoded;
+      this.block_, 'recording', null, this.sound, b64encoded));
+    this.sound = b64encoded;
   }
 };
 

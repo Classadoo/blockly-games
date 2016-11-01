@@ -120,20 +120,35 @@ self.setSpeed = function(speed_string, id)
       self.speed = 0.9;
       break;
   }
+  self.animate(id);
+}
+
+self.customAudio = function(id)
+{
   var m = id.match(/^block_id_([^']+)$/)[1];
-
   var b64encoded = sprite_ide.workspace.getBlockById(m).getRecording()
-  var audio = $('<audio></audio>');
-  $("body").append(audio);
-  var u8 = new Uint8Array(atob(b64encoded).split("").map(function(c)
+  if (b64encoded)
   {
-    return c.charCodeAt(0);
-  }));
-  var dataBlob = new Blob([u8], { type: 'audio/ogg' });
-  var url = URL.createObjectURL(dataBlob);
-  audio.attr('src', url);
-  audio[0].play();
+    var audio = $('<audio></audio>');
+    $("body").append(audio);
 
+    var u8 = new Uint8Array(atob(b64encoded).split("").map(function(c)
+    {
+      return c.charCodeAt(0);
+    }));
+    var dataBlob = new Blob([u8], { type: 'audio/ogg' });
+    var url = URL.createObjectURL(dataBlob);
+    audio.attr('src', url);
+    audio[0].play();
+
+    audio.on("ended",function() {
+      audio.remove();
+    });
+    audio.on("error",function() {
+      audio.remove();
+    });
+  }
+    
   self.animate(id);
 }
 
@@ -216,6 +231,13 @@ self.initBasicInterpreter = function(interpreter, scope)
   };
   interpreter.setProperty(scope, 'setSpeed',
       interpreter.createNativeFunction(wrapper));
+
+  wrapper = function(id) {
+    self.customAudio(id.toString());
+  };
+  interpreter.setProperty(scope, 'customAudio',
+      interpreter.createNativeFunction(wrapper));
+
 }
 
 }
