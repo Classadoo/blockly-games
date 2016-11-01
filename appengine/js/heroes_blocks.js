@@ -647,6 +647,7 @@ Blockly.Blocks['heroes_game_speed'] = {
    * @this Blockly.Block
    */
   init: function() {
+    this.addRecorder();
     this.setColour(Heroes.Blocks.HUE);
     var HEROES =
         [["Set speed slow", 'slow'],

@@ -1,4 +1,4 @@
-html, body{
+.fill_height{
   height: 100vh;
   overflow:hidden;
 }

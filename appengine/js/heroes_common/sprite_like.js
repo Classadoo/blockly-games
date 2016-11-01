@@ -120,6 +120,19 @@ self.setSpeed = function(speed_string, id)
       self.speed = 0.9;
       break;
   }
+  var m = id.match(/^block_id_([^']+)$/)[1];
+
+  var b64encoded = sprite_ide.workspace.getBlockById(m).getRecording()
+  var audio = $('<audio></audio>');
+  $("body").append(audio);
+  var u8 = new Uint8Array(atob(b64encoded).split("").map(function(c)
+  {
+    return c.charCodeAt(0);
+  }));
+  var dataBlob = new Blob([u8], { type: 'audio/ogg' });
+  var url = URL.createObjectURL(dataBlob);
+  audio.attr('src', url);
+  audio[0].play();
 
   self.animate(id);
 }
