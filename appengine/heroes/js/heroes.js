@@ -68,6 +68,7 @@ Heroes.BLOCKLY_HTML =
             '<label for="hero-type">Type</label>' +
             '<select class="form-control" id="{user}-hero-type"></select>' +
           '</div>' +
+          '<button type="button" class="btn btn-success form-item" id={user}-submit-hero>Submit</button>' +
           '<a id="{user}-x" class="form-item"><img width="15px" height="15px" src="heroes/x.png"></a>' +
         '</form>' +
         '<div class="row">' +
@@ -91,7 +92,7 @@ Heroes.init = function() {
 
   //
   // First, figure out if they are in viewing or editing mode.
-  // TODO ^^
+  //
 
 
   //
@@ -263,8 +264,8 @@ Heroes.addGame = function(readOnly, username, game_id)
   if (Heroes.new_game && username == getUsername())
   {
     //TODO(aheine): it's pointless to preload these now. Just store the data url.
-    game.ide.publishHero(null, "world", "world", [chars["world"]]);
-    game.ide.publishHero(null, getUsername(), "human", [chars["human"], chars["human2"]]);
+    game.ide.publishHero("world", "world", [chars["world"]]);
+    game.ide.publishHero(getUsername(), "human", [chars["human"], chars["human2"]]);
   }
 
   BlocklyGames.bindClick(username + '-runButton', game.execute);

@@ -33,9 +33,7 @@ var HeroEditor = function(ide, username, hero)
   var canvas_images = {};
   $(".costumes")['remove']();
   
-  var STOCK_NAMES = ["Paul", "Mitch", "Peter", "Sally", "Quail", "Dennis", "Lucy",
-                     "Trya", "Jimmer", "Randy", "Susan", "Falthia", "Arwen", "Galadriel",
-                     "Smeagal"];
+  var STOCK_NAMES = ["Paul", "Mitch", "Peter", "Sally", "Quail", "Dennis", "Lucy", "Trya", "Jimmer", "Randy", "Susan", "Falthia", "Arwen", "Galadriel", "Smeagal"];
 
   //
   // Clear the forms.
@@ -47,7 +45,12 @@ var HeroEditor = function(ide, username, hero)
   //
   // Show the tab.
   //
-  $('.nav-tabs a[href="#' + username + '-add-hero"]')['tab']('show');
+  $('.nav-tabs a[href="#' + username + '-add-hero"]')['tab']('show')['keydown'](function(event){
+    if(event.keyCode == 13) {
+      event.preventDefault();
+      $("#" + self.username + "-submit-hero")['click']();
+    }
+  });
 
 
   //
@@ -76,45 +79,6 @@ var HeroEditor = function(ide, username, hero)
     lc['clear']();
     load_image(chars[this.value]);
   });
-
-  var submit = function()
-  {
-    var name = $("#" + username + "-hero-name")['val']();
-    var type = $("#" + username + "-hero-type")['val']();
-    
-    var image = lc['getImage']();
-    if (image)
-    {
-      canvas_images[edited_image_index] = image.toDataURL("image/png");
-    }
-
-
-    name = name.replace(/[^a-zA-Z0-9]+/g, "");
-
-    if (!name || !type)
-    {
-      console.log("Fill out the whole form: ", name, type);
-      return;
-    }
-
-    // Don't let them overwrite a hero with the same name.
-    if (!ide.tabs[name] || hero || confirm("Overwrite the existing hero named " + name + "?"))
-    {
-      var stock_idx = STOCK_NAMES.indexOf(name);
-      if (stock_idx >= 0)
-      {
-        STOCK_NAMES.splice(stock_idx, 1);
-      }
-      
-      var hero_id = hero ? hero.hero_id : null;
-      ide.publishHero(name, type, canvas_images);
-    }
-    else
-    {
-      console.log("This hero already exists: ", name);
-      return;
-    }
-  };
 
   //
   // Show a template/existing hero to edit.
@@ -156,9 +120,7 @@ var HeroEditor = function(ide, username, hero)
     var img = lc['getImage']();
     if (img)
     {
-      console.log("submitting");
       set_thumbnail(edited_image_index, img.toDataURL("image/png"));
-      submit();
     }
   });
 
@@ -177,7 +139,47 @@ var HeroEditor = function(ide, username, hero)
     var placeholder_name = STOCK_NAMES[Math.floor(Math.random() * STOCK_NAMES.length)];
     $('#' + username + '-hero-name')['val'](placeholder_name);
   }
+  
+  //
+  // Handle submit (Remove previous handlers. They have an old LC object).
+  //
 
+  $("#" + username + "-submit-hero")['off']('click')['click'](function()
+  {
+    var name = $("#" + username + "-hero-name")['val']();
+    var type = $("#" + username + "-hero-type")['val']();
+    
+    var image = lc['getImage']();
+    if (image)
+    {
+      canvas_images[edited_image_index] = image.toDataURL("image/png");
+    }
+
+
+    name = name.replace(/[^a-zA-Z0-9]+/g, "");
+
+    if (!name || !type)
+    {
+      console.log("Fill out the whole form: ", name, type);
+      return;
+    }
+
+    if (!ide.tabs[name] || confirm("Overwrite this hero?"))
+    {
+      var stock_idx = STOCK_NAMES.indexOf(name);
+      if (stock_idx >= 0)
+      {
+        STOCK_NAMES.splice(stock_idx, 1);
+      }
+      ide.publishHero(name, type, canvas_images);
+    }
+    else
+    {
+      console.log("This hero already exists: ", name);
+      return;
+    }
+  });
+  
   var x_button = $("#" + username + "-x")['show']()['off']('click');
   if (hero && hero.tab_name)
   {

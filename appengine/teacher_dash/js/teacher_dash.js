@@ -57,6 +57,7 @@ Heroes.BLOCKLY_HTML =
           '<label for="hero-type">Type</label>' +
           '<select class="form-control" id="{user}-hero-type"></select>' +
         '</div>' +
+        '<button type="button" class="btn btn-default" id={user}-submit-hero>Submit</button>' +
       '</form>' +
     '</div>' +
   '</div>' +
