@@ -130,7 +130,7 @@ self.customAudio = function(id)
   if (b64encoded)
   {
     var audio = $('<audio></audio>');
-    $("body").append(audio);
+    $("body")['append'](audio);
 
     var u8 = new Uint8Array(atob(b64encoded).split("").map(function(c)
     {
@@ -138,13 +138,13 @@ self.customAudio = function(id)
     }));
     var dataBlob = new Blob([u8], { type: 'audio/ogg' });
     var url = URL.createObjectURL(dataBlob);
-    audio.attr('src', url);
+    audio['attr']('src', url);
     audio[0].play();
 
-    audio.on("ended",function() {
+    audio['on']("ended",function() {
       audio.remove();
     });
-    audio.on("error",function() {
+    audio['on']("error",function() {
       audio.remove();
     });
   }

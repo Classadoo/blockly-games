@@ -49,22 +49,22 @@ Blockly.Recorder = function(block, sound) {
 
   // TODO: probably better quality audio.
   self.recorderJS = new Recorder({
-    monitorGain: 0,
-    numberOfChannels: 1,
-    bitRate: 4000,
-    encoderSampleRate: 8000,
-    encoderPath: "../appengine/js/encoderWorker.min.js",
-    leaveStreamOpen: true
+    'monitorGain': 0,
+    'numberOfChannels': 1,
+    'bitRate': 4000,
+    'encoderSampleRate': 8000,
+    'encoderPath': "../appengine/js/encoderWorker.min.js",
+    'leaveStreamOpen': true
   });
-  self.recorderJS.initStream();
-  self.recorderJS.addEventListener("dataAvailable", function(e){
+  self.recorderJS['initStream']();
+  self.recorderJS['addEventListener']("dataAvailable", function(e){
     var b64encoded = btoa(String.fromCharCode.apply(null, e.detail));
     self.setRecording(b64encoded);
   });
-  self.recorderJS.addEventListener("streamReady", function(e){
+  self.recorderJS['addEventListener']("streamReady", function(e){
    //TODO enable the buttons or something.
   });
-  self.recorderJS.addEventListener("streamError", function(e){
+  self.recorderJS['addEventListener']("streamError", function(e){
     console.error('Error encountered: ' + e.error.name );
   });
 
@@ -135,7 +135,7 @@ Blockly.Recorder.prototype.createEditor_ = function() {
       this.recording_ = false;
       recordButton.innerHTML = "Start Recording";
       recordButton.className = 'blocklyRecorderButton'
-      this.recorderJS.stop();
+      this.recorderJS['stop']();
       this.setVisible(false);
     }
     else
@@ -143,7 +143,7 @@ Blockly.Recorder.prototype.createEditor_ = function() {
       this.recording_ = true;
       recordButton.innerHTML = "Stop Recording";
       recordButton.className = 'blocklyRecorderButton recording'
-      this.recorderJS.start();
+      this.recorderJS['start']();
     }
   });
 
