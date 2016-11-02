@@ -29,7 +29,7 @@ goog.provide('HeroesEditor');
 var HeroEditor = function(ide, username, hero)
 {
   var self = this;
-  var edited_image_index = 0;
+  self.edited_image_index = 0;
   var canvas_images = {};
   $(".costumes")['remove']();
   
@@ -72,7 +72,7 @@ var HeroEditor = function(ide, username, hero)
     var img = new Image();
     img.src = src;
     lc['saveShape'](LC['createShape']('Image', {"image": img}));
-    set_thumbnail(edited_image_index, src);
+    set_thumbnail(self.edited_image_index, src);
   }
 
   $("#" + username + "-hero-type")['on']('change', function() {
@@ -109,9 +109,9 @@ var HeroEditor = function(ide, username, hero)
       var edited_image = lc['getImage']();
       if (edited_image)
       {
-        set_thumbnail(edited_image_index, edited_image.toDataURL("image/png"));
+        set_thumbnail(self.edited_image_index, edited_image.toDataURL("image/png"));
       }
-      edited_image_index = index;
+      self.edited_image_index = index;
       lc['clear']();
       load_image(image);
     })
@@ -120,7 +120,7 @@ var HeroEditor = function(ide, username, hero)
     var img = lc['getImage']();
     if (img)
     {
-      set_thumbnail(edited_image_index, img.toDataURL("image/png"));
+      set_thumbnail(self.edited_image_index, img.toDataURL("image/png"));
     }
   });
 
@@ -152,7 +152,7 @@ var HeroEditor = function(ide, username, hero)
     var image = lc['getImage']();
     if (image)
     {
-      canvas_images[edited_image_index] = image.toDataURL("image/png");
+      canvas_images[self.edited_image_index] = image.toDataURL("image/png");
     }
 
 
@@ -206,13 +206,13 @@ var HeroEditor = function(ide, username, hero)
     //
 
     var image = lc['getImage']().toDataURL("image/png");
-    set_thumbnail(edited_image_index, image);
+    set_thumbnail(self.edited_image_index, image);
     
     //
     // Setup a fresh image.
     //
 
-    edited_image_index = Object.keys(canvas_images).length;
+    self.edited_image_index = Object.keys(canvas_images).length;
     lc['clear']();
     load_image(chars[$("#" + username + "-hero-type")['val']()]);
   }
