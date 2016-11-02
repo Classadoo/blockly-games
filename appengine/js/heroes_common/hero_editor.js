@@ -214,7 +214,7 @@ var HeroEditor = function(ide, username, hero)
 
     self.edited_image_index = Object.keys(canvas_images).length;
     lc['clear']();
-    load_image(chars[$("#" + username + "-hero-type")['val']()]);
+    load_image(image);
   }
 
   
