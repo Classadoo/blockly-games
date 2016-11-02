@@ -148,10 +148,6 @@ self.update_hero = function(hero, x, y, images)
   {
     self.heroes[hero].setImages(images);
   }
-  if (!self.eventLoop)
-  {
-    self.reset();
-  }
 }
 
 /**

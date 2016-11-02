@@ -324,3 +324,52 @@ var compute_distance = function(x1, y1, x2, y2)
 {
   return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
 }
+
+var rect_overlap = function(x1, y1, w1, h1, x2, y2, w2, h2)
+{
+  var greater_x;
+  var greater_w;
+  var lesser_x;
+  var lesser_w;
+
+  var greater_y;
+  var greater_h;
+  var lesser_y;
+  var lesser_h;
+
+  if (x1 > x2)
+  {
+    greater_x = x1;
+    greater_w = w1;
+    lesser_x = x2;
+    lesser_w = w2;
+  }
+  else
+  {
+    greater_x = x2;
+    greater_w = w2;
+    lesser_x = x1;
+    lesser_w = w1;
+  }
+
+  if (y1 > y2)
+  {
+    greater_y = y1;
+    greater_h = h1;
+    lesser_y = y2;
+    lesser_h = h2;
+  }
+  else
+  {
+    greater_y = y2;
+    greater_h = h2;
+    lesser_y = y1;
+    lesser_h = h1;
+  }
+  
+  var x_overlap = false;
+  var y_overlap = false;
+  if ((greater_x - greater_w/2) < (lesser_x + lesser_w/2)) { x_overlap = true;}
+  if ((greater_y - greater_h/2) < (lesser_y + lesser_h/2)) { y_overlap = true;}
+  return x_overlap && y_overlap;
+}

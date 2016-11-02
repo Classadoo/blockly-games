@@ -80,6 +80,8 @@ self.ctxLines = line_context;
 
 self.x = x || 0;
 self.y = y || 0;
+self.x_offset = 0;
+self.y_offset = 0;
 
 //
 // Create a list of xs and ys so we can draw a slithery tail.
@@ -97,7 +99,7 @@ self.heading = 0;
 
 self.pen = true;
 self.colour = null;
-self.width = 5;
+self.penWidth = 5;
 
 self.char = char;
 
@@ -110,6 +112,7 @@ self.setImages = function(images)
   {
     images = [chars["human"]];
   }
+  
   for (var i = 0; i < images.length; ++i)
   {
     var img = new Image();
@@ -119,7 +122,6 @@ self.setImages = function(images)
 }
 self.setImages(images);
 
-self.radius = starting_radius;
 
 self.collision_events = {};
 self.collisions_in_progress = {};
@@ -130,8 +132,10 @@ self.dragging = false;
 $(display_context.canvas)['mousedown']( function(e)
 {
   var pos = getCursorPosition(this, e)
-  if (compute_distance(pos.x, pos.y, self.x, self.y) < self.radius && !sprite_ide.read_only)
+  
+  if (rect_overlap(pos.x, pos.y, 2, 2, self.x + self.x_offset, self.y + self.y_offset, self.width, self.height) && !sprite_ide.read_only)
   {
+    console.log('drag');
     self.dragging = true;
     self.drag_event_x = e.clientX;
     self.drag_event_y = e.clientY;
@@ -168,10 +172,21 @@ self.draw = function(ctx)
     self.ys.shift();
   }
 
+  // If images are different sizes, offset them, so things line up.
+  self.width = self.images[self.image_index].naturalWidth;
+  self.height = self.images[self.image_index].naturalHeight;
+  self.x_offset = 0;
+  self.y_offset = 0;
+  self.images.forEach(function(el)
+  {
+    self.x_offset = Math.min(self.x_offset, (self.width - el.naturalWidth)/2);
+    self.y_offset = Math.min(self.y_offset, (self.height - el.naturalHeight)/2);
+  })
+
   for (var i = 0; i < self.xs.length; i++)
   {
-    draw_rotated_image(ctx, self.images[self.image_index], self.xs[i],
-      self.ys[i], self.radius * 2, self.radius * 2, self.heading);
+    draw_rotated_image(ctx, self.images[self.image_index], self.xs[i] + self.x_offset,
+      self.ys[i] + self.y_offset, self.width, self.height, self.heading);
   }
 
   self.draw_speech(ctx);
@@ -209,8 +224,8 @@ self.draw_speech = function(ctx)
     var height = 24;
     var radius = height/4;
     var width = ctx.measureText(self.words).width + radius * 2;
-    var x = self.x + self.radius;
-    var y = self.y + self.radius;
+    var x = self.x + self.x_offset + self.width/2;
+    var y = self.y + self.y_offset + self.height/2;
 
     var r = x + width;
     var b = y + height;
@@ -252,8 +267,10 @@ self.reset = function()
   self.xs = [self.x];
   self.ys = [self.y];
   self.tail_length = 1;
-  self.radius = starting_radius;
+  self.growth = 0;
   self.heading = 0;
+  self.x_offset = 0;
+  self.y_offset = 0;
 
   self.colour = null;
 
@@ -354,16 +371,16 @@ self.move = function(x, y, id) {
   {
     self.ctxLines.strokeStyle = self.colour || getRandomColor();
     self.ctxLines.fillStyle = self.colour;
-    self.ctxLines.lineWidth = self.width;
+    self.ctxLines.lineWidth = self.penWidth;
     self.ctxLines.beginPath();
-    self.ctxLines.moveTo(self.x, self.y);
+    self.ctxLines.moveTo(self.x + self.x_offset, self.y + self.y_offset);
   }
 
   self.set_pos(self.x + x, self.y - y);
 
   if (self.pen)
   {
-    self.ctxLines.lineTo(self.x, self.y);
+    self.ctxLines.lineTo(self.x + self.x_offset, self.y + self.y_offset);
     self.ctxLines.stroke();
   }
 
@@ -394,7 +411,7 @@ self.checkCollisions = function(other_heroes, items, item_radius)
       var item;
       while (i--) {
         item = items[i];
-        if (compute_distance(item.x, item.y, self.x, self.y) < (self.radius + item_radius))
+        if (rect_overlap(item.x, item.x, item.radius, item.radius, self.x + self.x_offset, self.y + self.y_offset, self.width, self.height))
         {
           // Use anonymous function to put a closure around the temporary interpreter.
           (function() {
@@ -407,10 +424,10 @@ self.checkCollisions = function(other_heroes, items, item_radius)
     }
     else if (what == "edge")
     {
-      if (self.x < self.radius ||
-          self.y < self.radius ||
-          self.x + self.radius > Heroes.WIDTH ||
-          self.y + self.radius > Heroes.HEIGHT)
+      if (self.x + self.x_offset < self.width/2 ||
+          self.y + self.y_offset < self.height/2 ||
+          self.x + self.x_offset + self.width/2 > Heroes.WIDTH ||
+          self.y + self.y_offset + self.height/2 > Heroes.HEIGHT)
       {
         if (self.collisions_in_progress[what] == false)
         {
@@ -435,7 +452,7 @@ self.checkCollisions = function(other_heroes, items, item_radius)
         console.log("How'd we make an event with a non-existent hero?");
         return;
       }
-      if (compute_distance(other_hero.x, other_hero.y, self.x, self.y) < (self.radius + other_hero.radius))
+      if (rect_overlap(other_hero.x + other_hero.x_offset, other_hero.y + other_hero.y_offset, other_hero.width, other_hero.height, self.x + self.x_offset, self.y + self.y_offset, self.width, self.height))
       {
         if (self.collisions_in_progress[what] == false)
         {
