@@ -181,7 +181,7 @@ self.connectSubscriberGame = function(game_id, ide)
 
         if (hero.x && hero.y && (name.toLowerCase() != "world"))
         {
-          ide.update_hero(name, hero.x, hero.y, images);
+          ide.update_hero(id, name, hero.x, hero.y, images);
         }
       }
     })

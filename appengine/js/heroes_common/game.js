@@ -139,14 +139,14 @@ self.display = function() {
   self.ctxDisplay.drawImage(self.ctxScratch.canvas, 0, 0);
 };
 
-self.update_hero = function(hero, x, y, images)
+self.update_hero = function(hero_id, x, y, images)
 {
-  self.heroes[hero].starting_x = x;
-  self.heroes[hero].starting_y = y;
+  self.heroes[hero_id].starting_x = x;
+  self.heroes[hero_id].starting_y = y;
   
   if (images)
   {
-    self.heroes[hero].setImages(images);
+    self.heroes[hero_id].setImages(images);
   }
   if (!self.eventLoop)
   {
@@ -195,9 +195,9 @@ self.setup_game_world = function(ide_tab)
   self.reset();
 }
 
-self.addHero = function(name, type, ide_tab, x, y, images) {
+self.addHero = function(hero_id, name, type, ide_tab, x, y, images) {
 
-  self.heroes[name] = new Hero(name, type, hero_radius, x, y, self.ctxLines,
+  self.heroes[hero_id] = new Hero(name, type, hero_radius, x, y, self.ctxLines,
     self.ctxDisplay, ide_tab, self, images);
 
   //
@@ -205,15 +205,15 @@ self.addHero = function(name, type, ide_tab, x, y, images) {
   //
 
   self.display();
-  return self.heroes[name];
+  return self.heroes[hero_id];
 };
 
-self.remove_hero = function(name)
+self.remove_hero = function(id)
 {
   //
   // Forget the object.
   //
-  delete self.heroes[name];
+  delete self.heroes[id];
 
 
   //

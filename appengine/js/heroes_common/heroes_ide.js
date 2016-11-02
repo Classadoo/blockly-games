@@ -39,20 +39,16 @@ var hero_offset = 3;
 self.starting_x = Heroes.WIDTH/hero_offset;
 self.starting_y = Heroes.HEIGHT/2;
 
-self.publishHero = function(name, type, images)
+self.publishHero = function(id, name, type, images)
 {
-  var index, hero_id, x, y;
-  if (self.tabs[name])
-  {
-    hero_id = self.tabs[name].hero_id;
-  }
-  else
+  var index, x, y;
+  if (!id)
   {
     x = self.starting_x;
     y = self.starting_y;
     index = Object.keys(self.tabs).length;
   }
-  wilddog.publishHero(game.id, name, type, index, x, y, images, hero_id);
+  wilddog.publishHero(game.id, name, type, index, x, y, images, id);
 }
 
 self.cycle_starting_locations = function()
@@ -69,12 +65,12 @@ self.cycle_starting_locations = function()
 //
 self.new_hero_tab = function(new_tab_name, type, hero_id, images)
 {
-  self.tabs[new_tab_name] = new IDE_Tab(self.username, new_tab_name, type, hero_id, self, null, images);
+  self.tabs[hero_id] = new IDE_Tab(self.username, new_tab_name, type, hero_id, self, null, images);
 
   // Start pushing data.
-  if (!self.tabs[new_tab_name].read_only)
+  if (!self.tabs[hero_id].read_only)
   {
-    wilddog.connectPublisherWorkspace(hero_id, type, self.tabs[new_tab_name].workspace);
+    wilddog.connectPublisherWorkspace(hero_id, type, self.tabs[hero_id].workspace);
   }
 
   //
@@ -84,61 +80,65 @@ self.new_hero_tab = function(new_tab_name, type, hero_id, images)
 
   for (var tab in self.tabs)
   {
-    if (new_tab_name != tab && tab != "world")
+    if (hero_id != tab)
     {
-      self.tabs[tab].workspace.objects.push([new_tab_name, new_tab_name]);
-      self.tabs[new_tab_name].workspace.objects.push([tab, tab]);
+      if (self.tabs[tab].hero_type == "world")
+      {
+        continue;
+      }
+      self.tabs[tab].workspace.objects.push([hero_id, hero_id]);
+      self.tabs[hero_id].workspace.objects.push([tab, tab]);
     }
   }
 
   if (self.game)
   {
-    self.game.addHero(new_tab_name, type, self.tabs[new_tab_name], self.starting_x, self.starting_y, images);
+    self.game.addHero(hero_id, new_tab_name, type, self.tabs[hero_id], self.starting_x, self.starting_y, images);
     self.cycle_starting_locations();
   }
 
-  return self.tabs[new_tab_name];
+  return self.tabs[hero_id];
 }
 
-self.update_hero = function(hero_name, x, y, images)
+self.update_hero = function(id, hero_name, x, y, images)
 {
   if (self.game)
   {
-    game.update_hero(hero_name, x, y, images);
+    game.update_hero(id, x, y, images);
   }
-  self.tabs[hero_name].update_images(images);
+  self.tabs[id].update_images(images);
 }
 
-self.remove_tab = function(tab_name)
+self.remove_tab = function(id)
 {
   //
   // Remove from wilddog, DOM, self, and game..
   //
   if (self.game)
   {
-    wilddog.publishDeleteTab(self.tabs[tab_name].hero_id, game.id);
+    wilddog.publishDeleteTab(self.tabs[id].hero_id, game.id);
   }
 
-  self.tabs[tab_name].remove();
-  delete self.tabs[tab_name];
+  self.tabs[id].remove();
+  delete self.tabs[id];
 
   if (self.game)
   {
-    self.game.remove_hero(tab_name);
+    self.game.remove_hero(id);
   }
 
   //
   // Remove from collision list.
   //
-  for (var hero in self.heroes)
+  for (var hero in self.tabs)
   {
     // Iterate in reverse so the index isn't affected when we remove elements.
-    var i = self.heroes[hero].workspace.objects.length;
+    var i = self.tabs[id].workspace.objects.length;
     var item;
     while (i--) {
-      if (self.heroes[hero].workspace.objects[i][0] == name)
+      if (self.tabs[id].workspace.objects[i][0] == name)
       {
-        self.heroes[hero].workspace.objects.splice(i, 1);
+        self.tabs[id].workspace.objects.splice(i, 1);
       }
     }
   }
@@ -146,19 +146,19 @@ self.remove_tab = function(tab_name)
 
 self.new_world_tab = function(world_id, images)
 {
-  self.tabs["world"] = new IDE_Tab(self.username, "world", "world", world_id, self, "world_toolbox", images);
+  self.tabs[world_id] = new IDE_Tab(self.username, "world", "world", world_id, self, "world_toolbox", images);
   if (self.game)
   {
-    self.game.setup_game_world(self.tabs["world"]);
+    self.game.setup_game_world(self.tabs[world_id]);
   }
 
   // Start pushing data.
-  if (!self.tabs["world"].read_only)
+  if (!self.tabs[world_id].read_only)
   {
-    wilddog.connectPublisherWorkspace(world_id, "world", self.tabs["world"].workspace);
+    wilddog.connectPublisherWorkspace(world_id, "world", self.tabs[world_id].workspace);
   }
 
-  return self.tabs["world"];
+  return self.tabs[world_id];
 }
 
 self.display = function()
