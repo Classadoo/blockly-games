@@ -92,7 +92,8 @@ Blockly.Blocks['music_play_note'] = {
     this.setHelpUrl(MUSIC_DUMMY_HELPURL);
   },
   onchange: function(changeEvent) {
-    if (changeEvent.element == 'field' && changeEvent.name == 'PITCH') {
+    if (changeEvent.element == 'field' && changeEvent.name == 'PITCH' &&
+        changeEvent.newValue) {
       musicPlayer.playNote_(
           [Number(changeEvent.newValue)], 0.5, (new Date).getTime());
     }
@@ -102,6 +103,41 @@ Blockly.Blocks['music_play_note'] = {
 Blockly.JavaScript['music_play_note'] = function(block) {
   // Play a single note.
   return 'addChord([' + block.getFieldValue('PITCH') + '], 1);\n';
+};
+
+Blockly.Blocks['music_play_note_blank'] = {
+  /**
+   * Block for playing a music note without any options pre-selected.
+   * @this Blockly.Block
+   */
+  init: function() {
+    var noteOptionsWithDummy = [[
+      "Choose a note...", ""
+    ]].concat(Music.Blocks.NOTE_OPTIONS);
+
+    this.appendDummyInput().appendField("play note").appendField(
+        new Blockly.FieldDropdown(noteOptionsWithDummy), "PITCH");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(Music.Blocks.HUE);
+    this.setTooltip(MUSIC_DUMMY_TOOLTIP);
+    this.setHelpUrl(MUSIC_DUMMY_HELPURL);
+  },
+  onchange: function(changeEvent) {
+    if (changeEvent.element == 'field' && changeEvent.name == 'PITCH') {
+      musicPlayer.playNote_(
+          [Number(changeEvent.newValue)], 0.5, (new Date).getTime());
+    }
+  }
+};
+
+Blockly.JavaScript['music_play_note_blank'] = function(block) {
+  // Play a single note.
+  if (block.getFieldValue('PITCH')) {
+    return 'addChord([' + block.getFieldValue('PITCH') + '], 1);\n';
+  } else {
+    return '';
+  }
 };
 
 Blockly.Blocks['music_play_phrase'] = {
@@ -114,10 +150,10 @@ Blockly.Blocks['music_play_phrase'] = {
     // Stores the options for the phrases. The default phrases represent "Happy
     // Birthday to You".
     this.options_ = [
-        ["type 1", "55:0.75-55:0.25-57:1-55:1-60:1-59:2"],
-        ["type 2", "55:0.75-55:0.25-57:1-55:1-62:1-60:2"],
-        ["type 3", "55:0.75-55:0.25-67:1-64:1-60:1-59:1-57:2"],
-        ["type 4", "65:0.75-65:0.25-64:1-60:1-62:1-60:2"]
+        ["1", "55:0.75-55:0.25-57:1-55:1-60:1-59:2"],
+        ["2", "55:0.75-55:0.25-57:1-55:1-62:1-60:2"],
+        ["3", "55:0.75-55:0.25-67:1-64:1-60:1-59:1-57:2"],
+        ["4", "65:0.75-65:0.25-64:1-60:1-62:1-60:2"]
     ];
 
     this.appendDummyInput('PHRASE').appendField("play phrase").appendField(
@@ -231,10 +267,10 @@ Blockly.Blocks['loops_repeat']= {
    * Block for repeat n times (internal number).
    */
   init: function() {
-    this.appendDummyInput().appendField('repeat').appendField(
-        new Blockly.FieldNumber('10'), "TIMES"
-    ).appendField("times");
-    this.appendStatementInput('DO')
+    this.appendDummyInput().appendField(
+        new Blockly.FieldNumber('10'), 'TIMES'
+    ).appendField('times');
+    this.appendStatementInput('repeat')
         .appendField(Blockly.Msg.CONTROLS_REPEAT_INPUT_DO);
 
     this.setPreviousStatement(true, null);

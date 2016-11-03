@@ -40,6 +40,7 @@ BlocklyGames.NAME = 'maze';
 
 /**
  * Go to the next level.
+ * @suppress {duplicate}
  */
 BlocklyInterface.nextLevel = function() {
   if (BlocklyGames.LEVEL < BlocklyGames.MAX_LEVEL) {
