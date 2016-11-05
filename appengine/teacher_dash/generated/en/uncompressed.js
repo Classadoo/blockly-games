@@ -199,6 +199,7 @@
       "third-party/blockly/generators/javascript/lists.js",
       "third-party/blockly/blocks/lists.js",
       "js/js-blocks.js",
+      "js/RecorderBlock.js",
       "js/heroes_blocks.js",
       "teacher_dash/js/teacher_dash.js"
   ];

@@ -200,6 +200,7 @@
       "third-party/blockly/generators/javascript/logic.js",
       "js/js-blocks.js",
       "third-party/blockly/blocks/text.js",
+      "js/RecorderBlock.js",
       "third-party/blockly/generators/javascript/colour.js",
       "third-party/blockly/blocks/colour.js",
       "third-party/blockly/generators/javascript/text.js",
